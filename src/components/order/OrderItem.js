@@ -14,7 +14,7 @@ function OrderItem({libellePlan='CREDIT',valueSubtitle, cout,coutValue, headerTi
             <View style={styles.itemContainer}>
              <View style={styles.subtitle}>
                  <AppText style={{fontSize: 15, fontWeight: 'bold'}}>{subtitle}: </AppText>
-                 <AppText>{valueSubtitle}</AppText>
+                 <AppText style={{padding: 5}}>{valueSubtitle}</AppText>
              </View>
 
             <View style={styles.sousTotal}>

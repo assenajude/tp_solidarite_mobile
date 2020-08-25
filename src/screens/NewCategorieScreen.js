@@ -7,6 +7,7 @@ import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import * as Yup from "yup";
 import * as categorieActions from "../store/actions/categorieActions";
+import {addCategorie} from '../store/slices/categorieSlice'
 
 
 const categorieSchema = Yup.object().shape({
@@ -20,16 +21,15 @@ function NewCategorieScreen({navigation}) {
     const dispatch = useDispatch();
     const [addFailed, setAddFailed] = useState(false)
 
-    const addCategorie = async (categorie) => {
-        try {
-            await dispatch(categorieActions.addCategorie(categorie));
-            navigation.goBack()
-        } catch (e) {
-            setAddFailed(true)
-            throw new Error(e.message)
-        }
+    const AddNewCategorie = useCallback(async (categorie) => {
+        await dispatch(addCategorie(categorie))
+        navigation.goBack()
+    })
 
-    };
+/*    const createCategorie = async (categorie) => {
+            await dispatch(addCategorie(categorie));
+            navigation.goBack()
+    };*/
 
     return (
         <View style={styles.container}>
@@ -38,7 +38,7 @@ function NewCategorieScreen({navigation}) {
                 libelle: '',
                 description: '',
                 type: ''
-            }} validationSchema={categorieSchema} onSubmit={addCategorie}>
+            }} validationSchema={categorieSchema} onSubmit={AddNewCategorie}>
                 <AppErrorMessage error='Impossible de faire lajout' visible={addFailed}/>
                 <AppFormField title='Libellé' name='libelle'/>
                 <AppFormField title='Description' name='description'/>

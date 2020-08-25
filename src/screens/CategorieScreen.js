@@ -2,51 +2,32 @@ import React, {useState, useEffect, useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux'
 import {View, StyleSheet, ActivityIndicator, Text, FlatList, TouchableWithoutFeedback} from 'react-native';
 import * as Yup from 'yup';
-
-import * as categorieActions from '../store/actions/categorieActions';
 import ListHeader from "../components/list/ListHeader";
 import ListFooter from "../components/list/ListFooter";
 import ListItem from "../components/list/ListItem";
+import {loadCategories} from '../store/slices/categorieSlice'
 import ItemSeparator from "../components/list/ItemSeparator";
 import color from '../utilities/colors';
-import routes  from '../navigation/routes'
+import routes  from '../navigation/routes';
 
-
+import configureStore from "../store/configureStore";
+import categorieService from "../api/categorieService";
 
 function CategorieScreen({navigation}) {
+    const store = configureStore();
     const dispatch = useDispatch();
     const  [getFailed, setGetFailed] = useState(false);
     const [loadingData,setLoadingData] = useState(true)
-    const categoriesData = useSelector(state =>state.categorie.categories)
-
-/*
-    const getCategories = useCallback(async() => {
-        try {
-            await dispatch(categorieActions.setCategories());
-        } catch (e) {
-            console.log(e.message)
-        }
-    }, [dispatch])
-*/
-
-const getCategories = useCallback(async () => {
-    try {
-        const response = await dispatch(categorieActions.setCategories());
-        setLoadingData(false)
-    } catch (e) {
-        setGetFailed(true);
-        throw new Error(e.message)
-    }
-}, [dispatch])
-
-
+    const categories = [];
+        const categoriesData = useSelector(state => state.entities.categorie.list);
+    const [allCategorie, setAllCategorie] = useState([])
 
 
     useEffect(() => {
-        getCategories();
-    }, [dispatch, getCategories])
+    }, [])
 
 
+/*
     if (loadingData) {
         return(
             <View style={styles.activityIndicator}>
@@ -55,19 +36,19 @@ const getCategories = useCallback(async () => {
 
             )
     }
+*/
 
 return (
     <View style={styles.mainContainer}>
-        <View style={styles.flatContainer}>
-        <FlatList ListHeaderComponent={ListHeader} data={categoriesData} keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => <ListItem key1={item.id} key2={item.libelleCateg} key3={item.descripCateg} key4={item.typeCateg} />}
-        />
+        <View style={styles.listContainer}>
+            <FlatList ListHeaderComponent={ListHeader} data={categoriesData} keyExtractor={item => item.id.toString()}
+                      renderItem={({item}) => <ListItem propriety1={item.id} propriety2={item.libelleCateg} propriety3={item.descripCateg} propriety4={item.typeCateg} />}
+            />
             {categoriesData.length === 0 && <Text>Aucune categorie trouvee</Text>}
         </View>
-        <View elevation={2} style={styles.buttonContainer}>
-        <View style={styles.buttonStyle}>
-        <ListFooter otherStyle={styles.addNewButton} onPress={() => navigation.navigate(routes.NEW_CATEG)}/>
-        </View>
+
+        <View style={styles.addNew}>
+            <ListFooter onPress={() => navigation.navigate(routes.NEW_CATEG)}/>
         </View>
     </View>
 )
@@ -76,22 +57,18 @@ return (
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        justifyContent: 'space-around',
-        backgroundColor: color.blanc
+        justifyContent:'center',
+        alignItems: 'center'
     },
-    buttonStyle: {
+    addNew: {
         alignSelf: 'flex-end',
-        margin:20,
-        width: 60,
-        height: 60,
+        margin: 40
     },
-    flatContainer: {
-        height: '80%',
-        padding: 10
+    listContainer: {
+        flex: 1,
+        padding: 20
     },
-    buttonContainer: {
-        borderTopWidth: 0.1
-    },
+
     activityIndicator: {
       flex: 1,
       justifyContent: 'center',

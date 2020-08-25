@@ -11,6 +11,10 @@ import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import articleService from "../api/articleService";
 import AppFormImagePicker from "../components/forms/AppFormImagePicker";
+import AppText from "../components/AppText";
+import routes from "../navigation/routes";
+import {loadCategories} from '../store/slices/categorieSlice';
+import {saveArticle} from '../store/slices/articleSlice'
 
 
 const articleValidationSchema = Yup.object().shape({
@@ -23,18 +27,22 @@ const articleValidationSchema = Yup.object().shape({
     articleImage: Yup.string()
 })
 
-function ArticleScreen(props) {
+function ArticleScreen({navigation}) {
 
     const [registerFailed, setRegisterfailed] = useState(false);
     const [image, setImage] = useState(null);
-    const categories = useSelector(state => state.categorie.categories);
     const [categorieId, setCategorieId] = useState(1)
     const dispatch = useDispatch();
 
-
+    const getCategories = useCallback(async () => {
+        await dispatch(loadCategories())
+    }, [dispatch])
 
     useEffect(()=> {
-    }, [])
+        getCategories()
+    }, [getCategories])
+
+    const categories = useSelector(state => state.entities.categorie.list);
 
     const listCategories = () => {
         return (
@@ -44,26 +52,33 @@ function ArticleScreen(props) {
 
 
     const handleAddArticle = async (article) => {
-        try {
-            console.log(article);
-            const response = await articleService.createArticle(article);
-            if (!response.ok) setRegisterfailed(true);
-            console.log(response)
-        } catch (e) {
-            setRegisterfailed(true)
-            throw new Error(e.message)
-        }
-
+            const articleData = {
+                categorieId,
+                code: article.code,
+                designation: article.designation,
+                quantite: article.quantite,
+                prix: article.prix,
+                aide: article.aide,
+                description: article.designation,
+                image: article.articleImage
+            }
+            await dispatch(saveArticle(articleData))
+           navigation.navigate(routes.ACCUEIL)
     }
 
     return (
-        <View style={styles.container}>
-            <Picker style={{height: 50, width: 120}} selectedValue={categorieId} onValueChange={(id) => {
-                console.log(id)
-                setCategorieId(id)}}>
-                {listCategories()}
-            </Picker>
+
         <ScrollView>
+            <View style={styles.container}>
+            <View style={styles.listContainer}>
+                <AppText style={{marginRight: 20, fontWeight: 'bold'}}>Categorie: </AppText>
+                <Picker mode='dropdown' style={{height: 50, width: 150}} selectedValue={categorieId} onValueChange={(id) => {
+                    console.log(id)
+                    setCategorieId(id)}}>
+                    {listCategories()}
+                </Picker>
+            </View>
+                <View style={styles.formStyle}>
             <AppForm initialValues={{
                 code: '',
                 designation: '',
@@ -79,22 +94,30 @@ function ArticleScreen(props) {
             >
                 <AppFormField name='code' title='Code'/>
                 <AppFormField name='designation' title='designation'/>
-                <AppFormField name='qte' title='Quantite'/>
+                <AppFormField name='quantite' title='Quantite'/>
                 <AppFormField name='prix' title='Prix'/>
                 <AppFormField name='aide' title='Aide?'/>
                 <AppFormField name='description' title='Description'/>
                  <AppFormImagePicker name='articleImage'/>
                 <AppSubmitButton title='Ajouter'/>
             </AppForm>
+                </View>
+            </View>
         </ScrollView>
-        </View>
     );
 }
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        top: 20,
+        bottom: 20
+    },
+    listContainer: {
+        flexDirection: 'row'
+    },
+    formStyle: {
+        padding: 10,
+        paddingBottom: 30
     }
 })
 export default ArticleScreen;

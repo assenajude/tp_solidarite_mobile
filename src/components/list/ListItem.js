@@ -2,13 +2,13 @@ import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native'
 import AppText from "../AppText";
 
-function ListItem({key1, key2, key3, key4}) {
+function ListItem({propriety1, propriety2, propriety3, propriety4}) {
     return (
         <TouchableOpacity>
         <View style={styles.container}>
-            <AppText >{key1}</AppText>
+            <AppText >{propriety1}</AppText>
 
-            <AppText lineNumber={1} style={styles.info}>{key2} -- {key3}--{key4}</AppText>
+            <AppText lineNumber={1} style={styles.info}>{propriety2}   {propriety3}   {propriety4}</AppText>
 
         </View>
         </TouchableOpacity>

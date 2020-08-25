@@ -11,23 +11,24 @@ import Color from '../utilities/colors'
 import * as shoppingCartActions from '../store/actions/shoppingCartActions'
 import CartListHeader from "../components/shoppingCart/CartListHeader";
 import routes from "../navigation/routes";
-import {addOrder} from  '../store/actions/orderActions'
+import {addToOrder} from '../store/actionsCreators/orderActionCreator'
+import {changeItemQuantity} from '../store/actionsCreators/shoppingCartActionCreator'
 
 function ShoppingCartScreen({navigation}) {
     const dispatch = useDispatch();
-    const totalAmount = useSelector(state => state.shoppingCart.totalAmount);
-    const itemsLenght = useSelector(state => state.shoppingCart.itemsLenght)
+    const totalAmount = useSelector(state => state.entities.shoppingCart.totalAmount);
+    const itemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
 
     const items = useSelector(state => {
         const itemsTransformed = [];
-        for(key in state.shoppingCart.items) {
+        for(key in state.entities.shoppingCart.items) {
             itemsTransformed.push({
                 id: key,
-                libelle: state.shoppingCart.items[key].libelle,
-                image: state.shoppingCart.items[key].image,
-                quantite: state.shoppingCart.items[key].quantite,
-                prix: state.shoppingCart.items[key].prix,
-                montant: state.shoppingCart.items[key].montant
+                libelle: state.entities.shoppingCart.items[key].libelle,
+                image: state.entities.shoppingCart.items[key].image,
+                quantite: state.entities.shoppingCart.items[key].quantite,
+                prix: state.entities.shoppingCart.items[key].prix,
+                montant: state.entities.shoppingCart.items[key].montant
             })
         };
         return itemsTransformed;
@@ -46,11 +47,11 @@ function ShoppingCartScreen({navigation}) {
         <View style={styles.mainContainer}>
        <FlatList ListHeaderComponent={() => <CartListHeader/>}
                  ListFooterComponent={() => <CartListFooter totalAmount={totalAmount} getOrder={() =>{
-                     dispatch(addOrder(items, itemsLenght, totalAmount))
+                     dispatch(addToOrder(items, itemsLenght, totalAmount))
                      navigation.navigate(routes.ORDER)}}/>} data={items}
                  keyExtractor={(item) => item.id.toString()}
                  renderItem={({item}) => <CartItem designation={item.libelle} itemQuantite={item.quantite} changeQuantite={(itemValue, index) => {
-                     dispatch(shoppingCartActions.changeQuantite(item.id, itemValue))
+                     dispatch(changeItemQuantity(item.id, itemValue))
                  }}
                              source={{uri: item.image}} itemBtnFirst='Détail'
                              itemBtnSecond='Supprimer' itemPrice={item.prix}

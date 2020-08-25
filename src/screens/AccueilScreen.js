@@ -4,17 +4,21 @@ import {MaterialCommunityIcons} from '@expo/vector-icons'
 import {View, Text, FlatList, StyleSheet, Image, ActivityIndicator, StatusBar, Alert, Modal} from "react-native";
 
 import * as articleActions from '../store/actions/articleActions';
-import * as shoppingCartActions from '../store/actions/shoppingCartActions'
+import * as shoppingCartActions from '../store/actions/shoppingCartActions';
 import AppInfo from "../components/AppInfo";
 import AppButton from "../components/AppButton";
 import AppCard from "../components/AppCard";
 import Color from '../utilities/colors';
 import routes from '../navigation/routes';
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
+import * as categorieActions from "../store/actions/categorieActions";
+import {loadArticles} from '../store/slices/articleSlice'
+import {addToCart} from '../store/actionsCreators/shoppingCartActionCreator'
+
 
 function AccueilScreen({navigation}) {
-    const articles = useSelector(state => state.articles.availableArticles);
-    const [isLoading, setIsLoading] = useState(true);
+    const isLoading = useSelector(state => state.entities.article.loading)
+    const articles = useSelector(state => state.entities.article.availableArticles)
     const [refresh, setRefresh] = useState(false);
     const [error, setError] = useState();
     const dispatch = useDispatch();
@@ -22,31 +26,13 @@ function AccueilScreen({navigation}) {
     const [selectedItem, setSelectedItem] = useState({})
 
     const getAllArticles = useCallback(async () => {
-        try {
-            if (refresh) {
-                setError(null);
-                setRefresh(true)
-                setIsLoading(false)
-                await dispatch(articleActions.getArticles());
-                setRefresh(false)
-            } else {
-                setError(null);
-                setIsLoading(true);
-                await dispatch(articleActions.getArticles());
-                setIsLoading(false)
-            }
-
-        } catch (e) {
-            setError(e.message)
-        }
-
-    }, [dispatch, setIsLoading, setError])
-
+                await dispatch(loadArticles());
+    }, [dispatch]);
 
 
     useEffect(() => {
-        getAllArticles();
-    }, [dispatch, getAllArticles]);
+        getAllArticles()
+    }, [getAllArticles]);
 
 
     /*
@@ -105,9 +91,8 @@ function AccueilScreen({navigation}) {
                 keyExtractor={item => item.id.toString()}
                           renderItem={({item}) =>
                           <AppCard addToCart={() => {
-                              {dispatch(shoppingCartActions.addToCart(item))};
+                              {dispatch(addToCart(item))};
                               setSelectedItem(item);
-                              console.log(selectedItem);
                               setItemCartModal(true)
                           }
                           } button2='Acheter' title={item.designArticle} subtitle={+item.prixArticle}
@@ -129,7 +114,9 @@ const styles = StyleSheet.create({
         width: 300,
         overflow: 'hidden'
     },
-    container: {},
+    container: {
+        paddingBottom: 20
+    },
     isLoadingStyle: {
         flex: 1,
         justifyContent: 'center',

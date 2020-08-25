@@ -3,26 +3,18 @@ import {View, StyleSheet, Text} from 'react-native'
 import AppButton from "../components/AppButton";
 import routes from '../navigation/routes'
 import {useDispatch, useSelector} from "react-redux";
-import * as planActions from "../store/actions/planActions";
-import * as payementActions from '../store/actions/payementActions'
+import {loadCategories, getCategories} from "../store/slices/categorieSlice";
 
 function OtherFileMain({navigation}) {
 
     const dispatch = useDispatch();
-    const loadPlan = useCallback(async () => {
-        const response = await dispatch(planActions.getplan());
-    }, [dispatch]);
-
-    const loadPayement = useCallback(async () => {
-        await dispatch(payementActions.getAllPayements());
+    const getCategories = useCallback(async () => {
+        await dispatch(loadCategories())
     }, [dispatch])
 
-    const plans = useSelector(state => state.plan.plans);
-
     useEffect(() => {
-        loadPlan();
-        loadPayement()
-    }, [dispatch, loadPlan, loadPayement])
+            getCategories();
+    }, [getCategories])
 
     return (
         <View style={styles.container}>

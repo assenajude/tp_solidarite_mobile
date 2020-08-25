@@ -1,13 +1,16 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native'
+import React, {useState, useEffect, useCallback, useMemo} from 'react';
+import {View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator} from 'react-native'
 import * as Yup from 'yup'
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector, shallowEqual} from 'react-redux';
+import {createSelector} from 'reselect'
 import {Picker} from '@react-native-community/picker'
 
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
-import * as planActions from '../store/actions/planActions'
+import {addPlan} from '../store/slices/planSlice'
+import {loadPayements} from "../store/slices/payementSlice";
+
 
 const planValideSchema = Yup.object().shape({
     libelle: Yup.string(),
@@ -16,74 +19,118 @@ const planValideSchema = Yup.object().shape({
     compensation: Yup.number()
 })
 
-function NewPlanScreen({navigation}) {
+function NewPlanScreen({navigation, route}) {
+
     const dispatch = useDispatch();
+    const listPayements = useSelector(state => state.entities.payement.list)
+
     const [addFailed, setAddFailed] = useState(false);
-    const payements = useSelector(state => state.payement.payements);
-    const [payementId, setPayementId]  = useState(1)
+    const [payementId, setPayementId]  = useState(1);
+    const [allPayements, setAllPayements] = useState([]);
+
+    const [showPicker, setShowPicker] = useState(false);
+
+    const loadPayement = useCallback(async () => {
+        await dispatch(loadPayements());
+    }, [dispatch]);
+
+
+    const payementsPlan = [
+           {
+               id: 1,
+               modePayement: 'Cash'
+           },
+           {
+             id: 2,
+             modePayement: 'Credit'
+           },
+           {
+               id: 3,
+               modePayement: 'Cheque'
+           }
+
+        ]
+    const [listPayement, setListPayement] = useState([]);
+
+
+
+
+
+
+        useEffect(() => {
+            loadPayement()
+            setAllPayements(listPayements)
+
+        }, [dispatch, loadPayement])
+
+
+
+    const getList = () => {
+        return (
+            allPayements.map((item, index) => <Picker.Item label={item.modePayement} value={item.id} key={index}/>)
+        )
+    }
+
+     /*   const getList = () => {
+            return (
+                planPayements.map((item, index) =>
+                    <Picker.Item label={item.modePayement} value={item.id} key={index}/>)
+            )
+        }*/
+
+     const areEqual = (prevList, nextList) => true;
+
+    const ListPicker = React.memo(({list})=> {
+        return (
+            <Picker mode='dropdown' style={styles.listStyle}
+                    selectedValue={payementId}
+                    onValueChange={(id) => setPayementId(id)}>
+                {listPayements.map((item, index) =>
+                    <Picker.Item label={item.mode} value={item.id} key={index}/>)}
+            </Picker>
+        )
+    }, areEqual)
 
 
     const addNewPlan = async (plan) => {
         const planData = {
-            idPayement: payementId,
+            payementId,
             libelle: plan.libelle,
             description: plan.description,
             mensualite: plan.mensualite,
             compensation: plan.compensation
         }
+            await dispatch(addPlan(planData));
+            navigation.goBack();
+    };
+            return (
+                <View style={styles.container}>
+                    <ScrollView>
+                        <View style={styles.listContainer}>
+                            <Text style={{fontWeight: 'bold', marginRight: 15}}>Payement: </Text>
+                         <Picker mode='dropdown' style={styles.listStyle}
+                                                                 selectedValue={payementId}
+                                                                 onValueChange={(id, index) => setPayementId(id)}>
+                             {listPayements.map((item, index) =>
+                                 <Picker.Item label={item.mode} value={item.id} key={index}/>)}
+                            </Picker>
 
-        try {
-            if(!payementId) {
-                Alert.alert('Avertissement', 'Veillez choisir un payement', [
-                    {
-                        text: 'ok',  onPress: () => { return;}
-                    }
-                ], {cancelable: false});
-                return ;
-            }
-            await dispatch(planActions.addPlan(planData));
-            navigation.goBack()
-        } catch (e) {
-            setAddFailed(true)
-           throw new Error(e.message)
-        }
-    }
-
-    const listPayementItems = () => {
-        return (
-            payements.map((payement, index) => <Picker.Item label={payement.mode} value={payement.id} key={index}/>)
-        )
-    }
-
-    return (
-        <View style={styles.container}>
-        <ScrollView>
-            <View style={styles.listContainer}>
-                <Text style={{fontWeight: 'bold', marginRight: 15}}>Payement: </Text>
-                <Picker style={styles.listStyle}
-                        selectedValue={payementId}
-                        onValueChange={(id, index) => {
-                            setPayementId(id);
-                        }}>
-                    {listPayementItems()}
-                </Picker>
-            </View>
-
-          <AppForm initialValues={{
-              libelle: '',
-              description: '',
-              mensualite: 0,
-              compensation: 0
-          }} validationSchema={planValideSchema} onSubmit={addNewPlan}>
-              <AppFormField title='Libelle' name='libelle'/>
-              <AppFormField title='Description' name='description'/>
-              <AppFormField title='Nombre de mensualité' name='mensualite'/>
-              <AppFormField title='Compensation' name='compensation'/>
-              <AppSubmitButton title='Ajouter'/>
-          </AppForm>
-        </ScrollView>
-        </View>
-    );
+                        </View>
+                        <AppForm initialValues={{
+                            libelle: '',
+                            description: '',
+                            mensualite: 0,
+                            compensation: 0
+                        }} validationSchema={planValideSchema} onSubmit={addNewPlan}>
+                            <AppFormField title='Libelle' name='libelle'/>
+                            <AppFormField title='Description' name='description'/>
+                            <AppFormField title='Nombre de mensualité' name='mensualite'/>
+                            <AppFormField title='Compensation' name='compensation'/>
+                            <AppSubmitButton title='Ajouter'/>
+                        </AppForm>
+                    </ScrollView>
+                </View>
+            )
 }
 
 const styles = StyleSheet.create({
@@ -104,6 +151,11 @@ const styles = StyleSheet.create({
     listContainer: {
         flexDirection: 'row',
         margin: 10,
+        alignItems: 'center'
+    },
+    videContainer: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center'
     }
 })

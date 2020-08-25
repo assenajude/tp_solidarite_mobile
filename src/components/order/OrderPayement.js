@@ -10,13 +10,12 @@ import AppText from "../AppText";
 
 function OrderPayement({payementHeader, planHeader,planDescrip, payementDetail,libellePlan,
                            payementSubtitle, payementSubtitleValue, payementCout,
-                           payementCoutValue, changePayementSubtitleValue, planDataLength, changePlanTitle}) {
+                           payementCoutValue, changePayementSubtitleValue, planDataLength, changePlanTitle, payementData}) {
     return (
         <View>
             <OrderItem libellePlan={libellePlan}  headerTitle={payementHeader} buttonTitle={payementDetail} changeTitle={changePlanTitle} planLength={planDataLength}
                        subtitle={payementSubtitle} valueSubtitle={<Picker mode='dropdown' selectedValue={payementSubtitleValue} onValueChange={changePayementSubtitleValue} style={styles.picker}>
-                <Picker.Item label='CASH' value='cash'/>
-                <Picker.Item label='CREDIT' value='credit'/>
+                {payementData.map((item, index) => <Picker.Item label={item.mode} value={item.id} key={index}/>)}
             </Picker> }
                        cout={payementCout} coutValue={payementCoutValue}>
             {payementSubtitleValue == 'credit' && <View style={styles.planContainer}>

@@ -1,17 +1,17 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import {View, Text, StyleSheet, ScrollView, FlatList, Button} from 'react-native'
 import * as Yup from 'yup';
 
 
-import * as payementActions from '../store/actions/payementActions'
 import ListFooter from "../components/list/ListFooter";
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import ListItem from "../components/list/ListItem";
-import {set} from "react-native-reanimated";
 import AppButton from "../components/AppButton";
+import AppText from "../components/AppText";
+import {loadPayements, createPayement} from '../store/slices/payementSlice'
 
 const validePayementSchema = Yup.object().shape({
     mode: Yup.string()
@@ -19,30 +19,36 @@ const validePayementSchema = Yup.object().shape({
 
 function PayementScreen({navigation}) {
     const dispatch = useDispatch();
-    const payements = useSelector(state => state.payement.payements)
+    const payements = useSelector(state => state.entities.payement.list);
+    const loading = useSelector(state => state.entities.payement.loading);
     const [mode, setMode] = useState(0);
 
 
-    const addNewPayement = async (payement) => {
-        try{
-            await dispatch(payementActions.addPayement(payement));
+   const getAllPayements = useCallback(async () => {
+        await dispatch(loadPayements())
+   }, [dispatch])
+
+    const addNewPayement = useCallback(async (payement) => {
+            await dispatch(createPayement(payement));
             setMode(0)
-        } catch (e) {
-            throw new Error(e.message)
-        }
-    }
+    }, [dispatch, setMode])
 
     useEffect(() => {
-    }, [])
+        getAllPayements();
+    }, [dispatch, getAllPayements, mode])
 
     return (
-
         <View style={styles.container}>
         <View>
            <View>
+               { payements.length === 0 &&
+                   <View style={styles.vide}>
+                       <AppText>Aucun payement trouvé</AppText>
+                   </View>
+               }
                <FlatList data={payements}
-                         keyExtrator={item => item.id.toString()}
-               renderItem={({item}) => <ListItem key1={item.id} key2={item.mode}/>}/>
+                         keyExtractor={item => item.id.toString()}
+               renderItem={({item}) => <ListItem propriety1={item.id} propriety2={item.mode}/>}/>
            </View>
             {mode === 1 && <ScrollView>
                 <AppForm initialValues={{
@@ -75,6 +81,12 @@ const styles = StyleSheet.create({
         padding: 2,
         width: 60,
         margin: 10
+    },
+    vide: {
+      flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        top: 50
     }
 })
 export default PayementScreen;

@@ -2,35 +2,27 @@ import React, {useEffect, useState, useCallback} from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import {View, Text, StyleSheet, FlatList, ScrollView} from 'react-native'
 
-import payementService from "../api/payementService";
 import Color  from '../utilities/colors'
 import OrderItem from "../components/order/OrderItem";
-import AppButton from "../components/AppButton";
 import OrderListBottom from "../components/order/OrderListBottom";
 
 import OrderPayement from "../components/order/OrderPayement";
 import OrderLivraison from "../components/order/OrderLivraison";
-import * as payementAction from '../store/actions/payementActions'
-
+import {loadPayements} from '../store/slices/payementSlice'
 
 function OrderScreen(props) {
     const dispatch = useDispatch();
-    const orders = useSelector(state => state.order.orders);
+    const orders = useSelector(state => state.entities.order.list);
     const [totalGlobal, setTotalGlobal] = useState(0);
     const [modePayement, setModePayement] = useState('CASH');
     const [adresseLivraison, setAdresseLivraison] = useState('');
+    const payements = useSelector(state => state.entities.payement.list)
 
     const getAllPayements = useCallback(async () => {
-        try{
-            const payements = await dispatch(payementAction.getAllPayements());
+            await dispatch(loadPayements());
             if (!payements) return 'Aucun payement trouvé'
-            console.log(payements.data)
-        } catch (e) {
-            console.log(e.message)
-        }
+    }, [dispatch]);
 
-    });
-    const payements = useSelector(state => state.payement.payements)
     const planData = [
         {
             libelle: 'GUEPARD',
@@ -58,7 +50,7 @@ function OrderScreen(props) {
         {
             header: 'Commande',
             libelle: orders[0].itemsLenght,
-            value: orders[0].montant
+            value: orders[0].amount
         },
         {
             header: 'Payement',
@@ -87,8 +79,7 @@ function OrderScreen(props) {
 
     useEffect(() => {
         getAllPayements();
-        console.log(payements)
-    }, [payements, dispatch, getAllPayements])
+    }, [dispatch, getAllPayements])
 
 
     if (orders.length === 0) {
@@ -109,7 +100,7 @@ function OrderScreen(props) {
                               />
 
                           } else if (item.header === 'Payement') {
-                              return <OrderPayement libellePlan={possibilities[1].value}
+                              return <OrderPayement libellePlan={possibilities[1].value} payementData={payements}
                                                     changePlanTitle='Changer de plan' planDataLength={planData.length} payementHeader={item.header} payementDetail='Detail Plan'
                                                     payementSubtitle='Mode' payementSubtitleValue={modePayement}
                                                     changePayementSubtitleValue={(value) => setModePayement(value)}

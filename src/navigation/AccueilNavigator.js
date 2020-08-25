@@ -17,13 +17,16 @@ import routes from "./routes";
 import CategorieScreen from "../screens/CategorieScreen";
 import NewCategorieScreen from "../screens/NewCategorieScreen";
 import LeftUserCompte from "../components/user/LeftUserCompte";
+import configureStore from "../store/configureStore";
+
 
 
 const ArticleStackNavigator = createStackNavigator();
 
 const AccueilNavigator = ({navigation}) => {
+
     const [product, setProduct] = useState('Tous');
-    const cartItemLenght = useSelector(state => state.shoppingCart.itemsLenght)
+    const cartItemLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
     const badgeCompte = 5;
     const pickerItems = [
         {
@@ -48,7 +51,7 @@ const AccueilNavigator = ({navigation}) => {
             headerStyle: {backgroundColor: Color.rougeBordeau},
             headerTintColor: Color.blanc,
             headerRight: ({size, color}) => (
-                <TouchableOpacity onPress={() => props.navigation.navigate(routes.CART)}>
+                <TouchableOpacity onPress={() => navigation.navigate(routes.CART)}>
                 <AppIconWithBadge notifStyle={{backgroundColor: Color.bleuFbi}} style={{marginRight: 10}} color={Color.blanc} name='shoppingcart' size={24} badgeCount={cartItemLenght}
                                   />
                 </TouchableOpacity>

@@ -3,13 +3,12 @@ import React from "react";
 import {Provider} from 'react-redux'
 import { StyleSheet, Text, View } from "react-native";
 
-import TabNavigation from "./src/navigation/TabNavigation";
-import store from "./src/store/configureStore";
-import AppSearchBar from "./src/components/AppSearchBar";
-import HomeScreen from "./src/screens/HomeScreen";
+import configureStore from "./src/store/configureStore";
+
 import UserCompteNavigation from "./src/navigation/UserCompteNavigation";
 
 export default function App() {
+    const store = configureStore();
   return (
       <Provider store={store}>
         <UserCompteNavigation/>
