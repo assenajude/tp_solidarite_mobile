@@ -5,7 +5,8 @@ import {addToOrder} from '../actionsCreators/orderActionCreator'
 const orderSlice = createSlice({
     name: 'order',
     initialState: {
-        list: []
+        list: [],
+        currentOrder: {}
     },
     reducers: {},
     extraReducers: {
@@ -16,7 +17,8 @@ const orderSlice = createSlice({
                 itemsLenght: action.payload.itemsLength,
                 amount: action.payload.amount
             }
-            state.list.push(order)
+            state.list.push(order);
+            state.currentOrder = order
         }
     }
 });

@@ -3,17 +3,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import {View, Text, FlatList, StyleSheet, Image, ActivityIndicator, StatusBar, Alert, Modal} from "react-native";
 
-import * as articleActions from '../store/actions/articleActions';
-import * as shoppingCartActions from '../store/actions/shoppingCartActions';
 import AppInfo from "../components/AppInfo";
 import AppButton from "../components/AppButton";
 import AppCard from "../components/AppCard";
 import Color from '../utilities/colors';
 import routes from '../navigation/routes';
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
-import * as categorieActions from "../store/actions/categorieActions";
 import {loadArticles} from '../store/slices/articleSlice'
 import {addToCart} from '../store/actionsCreators/shoppingCartActionCreator'
+import {loadPayements} from "../store/slices/payementSlice";
 
 
 function AccueilScreen({navigation}) {
@@ -29,10 +27,14 @@ function AccueilScreen({navigation}) {
                 await dispatch(loadArticles());
     }, [dispatch]);
 
+    const getPayements =  useCallback(async () => {
+        await dispatch(loadPayements())
+    }, [dispatch])
 
     useEffect(() => {
         getAllArticles()
-    }, [getAllArticles]);
+        getPayements()
+    }, [getAllArticles, getPayements]);
 
 
     /*

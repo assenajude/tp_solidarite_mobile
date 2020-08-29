@@ -6,7 +6,8 @@ import shoppingCartSlice from '../store/slices/shoppingCartSlice';
 import articleSlice from '../store/slices/articleSlice';
 import locationSlice from '../store/slices/locationSlice';
 import orderSlice from '../store/slices/orderSlice';
-import planSlice from '../store/slices/planSlice'
+import planSlice from '../store/slices/planSlice';
+import shippingAdresseSlice from '../store/slices/shippingAdresseSlice'
 
 export default combineReducers({
     payement: payementSlice,
@@ -15,6 +16,7 @@ export default combineReducers({
     plan: planSlice,
     order: orderSlice,
     location: locationSlice,
-    article: articleSlice
+    article: articleSlice,
+    shippingAddress: shippingAdresseSlice
 
 })

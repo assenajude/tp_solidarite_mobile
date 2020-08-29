@@ -14,10 +14,10 @@ function OrderPayement({payementHeader, planHeader,planDescrip, payementDetail,l
     return (
         <View>
             <OrderItem libellePlan={libellePlan}  headerTitle={payementHeader} buttonTitle={payementDetail} changeTitle={changePlanTitle} planLength={planDataLength}
-                       subtitle={payementSubtitle} valueSubtitle={<Picker mode='dropdown' selectedValue={payementSubtitleValue} onValueChange={changePayementSubtitleValue} style={styles.picker}>
+                       title1={payementSubtitle} title1Value={<Picker mode='dropdown' selectedValue={payementSubtitleValue} onValueChange={changePayementSubtitleValue} style={styles.picker}>
                 {payementData.map((item, index) => <Picker.Item label={item.mode} value={item.id} key={index}/>)}
             </Picker> }
-                       cout={payementCout} coutValue={payementCoutValue}>
+                       title2={payementCout} title2Value={payementCoutValue}>
             {payementSubtitleValue == 'credit' && <View style={styles.planContainer}>
                 <View style={styles.planHeader}>
                 <AppText style={{fontWeight: 'bold'}}>Plan: </AppText>

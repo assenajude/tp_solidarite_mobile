@@ -18,6 +18,7 @@ import CategorieScreen from "../screens/CategorieScreen";
 import NewCategorieScreen from "../screens/NewCategorieScreen";
 import LeftUserCompte from "../components/user/LeftUserCompte";
 import configureStore from "../store/configureStore";
+import PlanScreen from "../screens/PlanScreen";
 
 
 
@@ -98,6 +99,8 @@ const AccueilNavigator = ({navigation}) => {
               options={{title: 'Panier' }}/>
               <ArticleStackNavigator.Screen name='OrderScreen' component={OrderScreen}
               options={{title: 'Commande'}}/>
+            <ArticleStackNavigator.Screen name='PlanScreen' component={PlanScreen}
+                                          options={{title: 'Choisir un Plan'}}/>
         </ArticleStackNavigator.Navigator>
 )};
 

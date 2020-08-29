@@ -1,18 +1,22 @@
 import React from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native'
+import {View, TouchableOpacity, StyleSheet} from 'react-native'
+import {AntDesign} from '@expo/vector-icons'
 import AppText from "../AppText";
 
-function PlanListItem({prop1, prop2, prop3}) {
+function PlanListItem({prop1, prop2, prop3, onPress, showIcon}) {
     return (
-        <View style={styles.container}>
-            <View style={styles.idStyle}>
+        <TouchableOpacity onPress={onPress}>
+         <View style={styles.container}>
+             {showIcon && <AntDesign name="check" size={24} color="green" />}
+             <View style={styles.idStyle}>
                 <AppText>{prop1}</AppText>
             </View>
             <View style={styles.propStyle}>
                 <AppText style={{fontWeight: 'bold'}}>{prop2}</AppText>
                 <AppText lineNumber={1}>{prop3}</AppText>
             </View>
-        </View>
+          </View>
+        </TouchableOpacity>
     );
 }
 

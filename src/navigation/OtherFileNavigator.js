@@ -14,6 +14,8 @@ import PlanScreen from "../screens/PlanScreen";
 import NewPlanScreen from "../screens/NewPlanScreen";
 import LivraisonScreen from "../screens/LivraisonScreen";
 import PayementScreen from "../screens/PayementScreen";
+import ShippingAdresseScreen from "../screens/ShippingAdresseScreen";
+import NewShippingAdScreen from "../screens/NewShippingAdScreen";
 
 const StackOther = createStackNavigator();
 
@@ -52,6 +54,12 @@ function OtherFileNavigator({navigation}) {
 
             <StackOther.Screen name='LivraisonScreen' component={LivraisonScreen} options={{
                 title: 'Gestion  livraisons'
+            }}/>
+            <StackOther.Screen name='ShippingAdresseScreen' component={ShippingAdresseScreen} options={{
+                title: 'Adresses de livraison'
+            }}/>
+            <StackOther.Screen name='NewShippingAdScreen' component={NewShippingAdScreen} options={{
+                title: 'Nouvelle adresse livraison'
             }}/>
         </StackOther.Navigator>
     );

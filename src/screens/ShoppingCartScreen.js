@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {useDispatch} from 'react-redux'
 import {View, Text, FlatList, StyleSheet, ScrollView} from 'react-native'
 import {useSelector} from 'react-redux';
@@ -7,17 +7,19 @@ import CartListFooter from "../components/shoppingCart/CartListFooter";
 
 import CartItem from "../components/shoppingCart/CartItem";
 import AppText from "../components/AppText";
-import Color from '../utilities/colors'
-import * as shoppingCartActions from '../store/actions/shoppingCartActions'
+import {getSelected, loadPayements} from '../store/slices/payementSlice'
 import CartListHeader from "../components/shoppingCart/CartListHeader";
 import routes from "../navigation/routes";
 import {addToOrder} from '../store/actionsCreators/orderActionCreator'
 import {changeItemQuantity} from '../store/actionsCreators/shoppingCartActionCreator'
+import {loadPlans} from "../store/slices/planSlice";
+import {plansByPayement} from "../store/actionsCreators/planActionCreator";
 
 function ShoppingCartScreen({navigation}) {
     const dispatch = useDispatch();
     const totalAmount = useSelector(state => state.entities.shoppingCart.totalAmount);
-    const itemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
+    const itemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght);
+    const payements = useSelector(state => state.entities.payement.list)
 
     const items = useSelector(state => {
         const itemsTransformed = [];
@@ -34,7 +36,21 @@ function ShoppingCartScreen({navigation}) {
         return itemsTransformed;
     });
 
+
+
+    const getPlans =  useCallback(async () => {
+        await dispatch(loadPlans())
+    }, [dispatch])
+
+
+    const getSelectedPayement = useCallback(async (idPayement) => {
+        await dispatch(getSelected(idPayement))
+    }, [dispatch])
+
+
     useEffect(() => {
+        getPlans();
+        dispatch(getSelected(payements[0].id))
     }, []);
 
     if (items.length === 0) {

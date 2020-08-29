@@ -1,12 +1,17 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {createSelector} from 'reselect';
+
+
 import {apiRequest} from "../actionsCreators/apiActionCreator";
+import {plansByPayement} from "../actionsCreators/planActionCreator";
 
 const planSlice = createSlice({
     name: 'plan',
     initialState: {
         loadingPlan: false,
         error: null,
-        list: []
+        list: [],
+        plansPayement:[]
     },
     reducers: {
         planRequested: (state, action)=> {
@@ -21,6 +26,12 @@ const planSlice = createSlice({
         },
         planAdded: (state, action) => {
             state.list.push(action.payload)
+        }
+    },
+    extraReducers: {
+        [plansByPayement]: (state, action) => {
+            const plans = state.list.filter(plan => plan.payementId === action.payload);
+            if (plans) state.planPayement.push(plans)
         }
     }
 })
@@ -48,4 +59,4 @@ export const addPlan = (plan) => apiRequest({
     onStart: planRequested.type,
     onSuccess: planAdded.type,
     onError: planRequestfailed.type
-})
+});
