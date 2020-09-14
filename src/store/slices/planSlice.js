@@ -11,7 +11,7 @@ const planSlice = createSlice({
         loadingPlan: false,
         error: null,
         list: [],
-        plansPayement:[]
+        plansPayement:[],
     },
     reducers: {
         planRequested: (state, action)=> {

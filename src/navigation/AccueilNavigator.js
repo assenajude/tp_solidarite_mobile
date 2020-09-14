@@ -19,6 +19,10 @@ import NewCategorieScreen from "../screens/NewCategorieScreen";
 import LeftUserCompte from "../components/user/LeftUserCompte";
 import configureStore from "../store/configureStore";
 import PlanScreen from "../screens/PlanScreen";
+import RegisterScreen from "../screens/RegisterScreen";
+import LoginScreen from "../screens/LoginScreen";
+import OrderPayementScreen from "../screens/OrderPayementScreen";
+import OrderLivraisonScreen from "../screens/OrderLivraisonScreen";
 
 
 
@@ -62,24 +66,11 @@ const AccueilNavigator = ({navigation}) => {
                options={{
                    headerTitleAlign: 'center',
                    headerLeft: () => <LeftUserCompte getUserCompteNavigator={() =>navigation.openDrawer()}/>,
-                   headerTitle: () => {
+                   headerTitle: 'Accueil',
+        /*           headerTitle: () => {
                        if (showPicker) {
                            return (
-                         /*   <AppMainTopBar getInput={() => {
-                                setShowPicker(false)
-                            }} showModal={modalVisible}
-                                           onPress={() => setModalVisible(true)} closeModal={() => setModalVisible(false)}
-                                           onSelect={(item) => {
-                                               setSelectedItem(item.label);
-                                               setModalVisible(false)
-                                           }} children={selectedItem}
-                                           items={pickerItems}/>*/
-                    /*     <Picker style={{height: 50, width: 100}} selectedValue={product} onValueChange={(itemValue, itemIndex) => setProduct(itemValue)}>
-                             <Picker.Item label='Tous' value='tous' />
-                             <Picker.Item label='Article' value='article' />
-                             <Picker.Item label='Location' value='location' />
 
-                         </Picker>*/
                         <DropDownPicker getInput={() => setShowPicker(false)}
                             pickerStyle={{color: Color.blanc}} selected={product}
                             changeSelectedValue={(itemValue, itemIndex) => setProduct(itemValue)}/>
@@ -89,7 +80,7 @@ const AccueilNavigator = ({navigation}) => {
                                setShowPicker(true)
                            }}></AppSearchBar>)
                        }
-                   }
+                   }*/
                }}/>
             <ArticleStackNavigator.Screen name='DetailScreen' component={DetailScreen}
              options={
@@ -98,9 +89,14 @@ const AccueilNavigator = ({navigation}) => {
               <ArticleStackNavigator.Screen name='ShoppingCartScreen' component={ShoppingCartScreen}
               options={{title: 'Panier' }}/>
               <ArticleStackNavigator.Screen name='OrderScreen' component={OrderScreen}
-              options={{title: 'Commande'}}/>
-            <ArticleStackNavigator.Screen name='PlanScreen' component={PlanScreen}
-                                          options={{title: 'Choisir un Plan'}}/>
+              options={{title: 'Resumé de votre commande'}}/>
+            <ArticleStackNavigator.Screen name='PlanScreen' component={PlanScreen} options={{title: 'Choisir un Plan'}}/>
+
+            <ArticleStackNavigator.Screen name='RegisterScreen' component={RegisterScreen} options={{title: 'Compte utilisateur'}}/>
+            <ArticleStackNavigator.Screen name='LoginScreen' component={LoginScreen} options={{title: 'Compte utilisateur'}}/>
+            <ArticleStackNavigator.Screen name='OrderPayementScreen' component={OrderPayementScreen} options={{title: 'Payement de la commande'}}/>
+            <ArticleStackNavigator.Screen name='OrderLivraisonScreen' component={OrderLivraisonScreen} options={{title: 'Livraison de la commande'}}/>
+
         </ArticleStackNavigator.Navigator>
 )};
 

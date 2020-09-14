@@ -15,13 +15,15 @@ import AppText from "../components/AppText";
 import routes from "../navigation/routes";
 import {loadCategories} from '../store/slices/categorieSlice';
 import {saveArticle} from '../store/slices/articleSlice'
+import AppFormSwitch from "../components/forms/AppFormSwitch";
 
 
 const articleValidationSchema = Yup.object().shape({
     code: Yup.string(),
-    prix: Yup.number(),
+    prixReel: Yup.number(),
+    prixPromo: Yup.number(),
     quantite: Yup.number(),
-    aide: Yup.string(),
+    aide: Yup.boolean(),
     designation: Yup.string(),
     description: Yup.string(),
     articleImage: Yup.string()
@@ -29,9 +31,9 @@ const articleValidationSchema = Yup.object().shape({
 
 function ArticleScreen({navigation}) {
 
-    const [registerFailed, setRegisterfailed] = useState(false);
     const [image, setImage] = useState(null);
     const [categorieId, setCategorieId] = useState(1)
+    const loading = useSelector(state => state.entities.article.loading)
     const dispatch = useDispatch();
 
     const getCategories = useCallback(async () => {
@@ -57,7 +59,8 @@ function ArticleScreen({navigation}) {
                 code: article.code,
                 designation: article.designation,
                 quantite: article.quantite,
-                prix: article.prix,
+                prixReel: article.prixReel,
+                prixPromo: article.prixPromo,
                 aide: article.aide,
                 description: article.designation,
                 image: article.articleImage
@@ -83,8 +86,9 @@ function ArticleScreen({navigation}) {
                 code: '',
                 designation: '',
                 quantite: 0,
-                prix: 0,
-                aide: '',
+                prixReel: 0,
+                prixPromo: 0,
+                aide: false,
                 description: '',
                 articleImage:null
             }}
@@ -95,11 +99,12 @@ function ArticleScreen({navigation}) {
                 <AppFormField name='code' title='Code'/>
                 <AppFormField name='designation' title='designation'/>
                 <AppFormField name='quantite' title='Quantite'/>
-                <AppFormField name='prix' title='Prix'/>
-                <AppFormField name='aide' title='Aide?'/>
+                <AppFormField name='prixReel' title='Prix réel'/>
+                <AppFormField name='prixPromo' title='Prix promo'/>
                 <AppFormField name='description' title='Description'/>
                  <AppFormImagePicker name='articleImage'/>
-                <AppSubmitButton title='Ajouter'/>
+                <AppFormSwitch name='aide' title='Possibilité de vente à credit?'/>
+                <AppSubmitButton title='Ajouter' showLoading={loading}/>
             </AppForm>
                 </View>
             </View>

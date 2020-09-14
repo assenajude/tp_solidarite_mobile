@@ -28,7 +28,8 @@ const categorieSlice = createSlice({
             state.loading = false
         },
         categorieAdded: (state, action) => {
-            state.list.push(action.payload)
+            state.list.push(action.payload);
+            state.loading = false
         }
     }
 

@@ -38,8 +38,6 @@ function UserCompteNavigation(props) {
                 <Drawer.Screen name='LocationScreen' component={LocationScreen}/>
                 <Drawer.Screen name='ArticleScreen' component={ArticleScreen}/>
                 <Drawer.Screen name='ParametreScreen' component={ParametreScreen} />
-                <Drawer.Screen name='LoginScreen' component={LoginScreen}/>
-                <Drawer.Screen name='RegisterScreen' component={RegisterScreen} />
                 <Drawer.Screen name='UserInfoScreen' component={UserInfoScreen}/>
                 <Drawer.Screen name='UserNotifScreen' component={UserNotifScreen}/>
                 <Drawer.Screen name='Other' component={OtherFileNavigator}/>

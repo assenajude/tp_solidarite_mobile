@@ -6,7 +6,8 @@ const shippingSlice = createSlice({
     name: 'shippingAdresse',
     initialState: {
         list: [],
-        loading: false
+        adresseVilles: [],
+        loading: false,
     },
     reducers: {
         adresseApiRequested: (state, action) => {
@@ -20,13 +21,18 @@ const shippingSlice = createSlice({
             state.loading = false
         },
         shippingAdReceived: (state, action) => {
+           state.loading = false
             state.list = action.payload
+        },
+        getAdresseVilles: (state, action) => {
+            const selectedRegions = state.list.filter(adresse => adresse.region === action.payload)
+            state.adresseVilles = selectedRegions.map(adresse => adresse.ville)
         }
     },
     extraReducers: {}
 })
 
-const {adresseApiRequested, adresseApiRequestFailed, adresseAdded, shippingAdReceived} = shippingSlice.actions;
+const {adresseApiRequested, adresseApiRequestFailed, adresseAdded, shippingAdReceived, getAdresseVilles} = shippingSlice.actions;
 
 export default shippingSlice.reducer
 
@@ -51,4 +57,8 @@ export const addShippingAdresse = (shipping) => dispatch => {
         onError: adresseApiRequestFailed.type
 
     }))
+}
+
+export const getSelectedAdVilles = (region) => dispatch => {
+    dispatch(getAdresseVilles(region))
 }

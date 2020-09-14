@@ -16,6 +16,13 @@ import LivraisonScreen from "../screens/LivraisonScreen";
 import PayementScreen from "../screens/PayementScreen";
 import ShippingAdresseScreen from "../screens/ShippingAdresseScreen";
 import NewShippingAdScreen from "../screens/NewShippingAdScreen";
+import PointRelaisScreen from "../screens/PointRelaisScreen";
+import NewPointRelaisScreen from "../screens/NewPointRelaisScreen";
+import NewUserAdresseScreen from "../screens/NewUserAdresseScreen";
+import RegionScreen from "../screens/RegionScreen";
+import VilleScreen from "../screens/VilleScreen";
+import NewUserAdresse from "../screens/NewUserAdresse";
+import UserAdresseScreen from "../screens/UserAdresseScreen";
 
 const StackOther = createStackNavigator();
 
@@ -60,6 +67,24 @@ function OtherFileNavigator({navigation}) {
             }}/>
             <StackOther.Screen name='NewShippingAdScreen' component={NewShippingAdScreen} options={{
                 title: 'Nouvelle adresse livraison'
+            }}/>
+            <StackOther.Screen name='PointRelaisScreen' component={PointRelaisScreen} options={{
+                title: 'Les Points relais'
+            }}/>
+            <StackOther.Screen name='NewPointRelaisScreen' component={NewPointRelaisScreen} options={{
+                title: 'Nouveau point relais'
+            }}/>
+            <StackOther.Screen name='NewUserAdresseScreen' component={NewUserAdresseScreen} options={{
+                title: 'Nouvelle adresse utilisateur'
+            }}/>
+            <StackOther.Screen name='UserAdresseScreen' component={UserAdresseScreen} options={{
+                title: 'Adresse utilisateur'
+            }}/>
+            <StackOther.Screen name='RegionScreen' component={RegionScreen} options={{
+                title: 'Gestion des regions'
+            }}/>
+            <StackOther.Screen name='VilleScreen' component={VilleScreen} options={{
+                title: 'Liste des villes'
             }}/>
         </StackOther.Navigator>
     );

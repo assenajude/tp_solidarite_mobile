@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector, store} from "react-redux";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import {View, Text, FlatList, StyleSheet, Image, ActivityIndicator, StatusBar, Alert, Modal} from "react-native";
 
@@ -12,10 +12,12 @@ import AddToCartModal from "../components/shoppingCart/AddToCartModal";
 import {loadArticles} from '../store/slices/articleSlice'
 import {addToCart} from '../store/actionsCreators/shoppingCartActionCreator'
 import {loadPayements} from "../store/slices/payementSlice";
+import authStorage from '../store/persistStorage'
+import {getAllOrders} from '../store/slices/orderSlice'
 
-
-function AccueilScreen({navigation}) {
+function AccueilScreen({navigation, route}) {
     const isLoading = useSelector(state => state.entities.article.loading)
+    const authToken = useSelector(state => state.auth.token)
     const articles = useSelector(state => state.entities.article.availableArticles)
     const [refresh, setRefresh] = useState(false);
     const [error, setError] = useState();
@@ -31,9 +33,19 @@ function AccueilScreen({navigation}) {
         await dispatch(loadPayements())
     }, [dispatch])
 
+    const getUser = async () => {
+        const user = await authStorage.getUser();
+    }
+
+    const getOrders = async () => {
+        await dispatch(getAllOrders())
+    }
+
     useEffect(() => {
         getAllArticles()
-        getPayements()
+        getPayements();
+        getOrders()
+        getUser()
     }, [getAllArticles, getPayements]);
 
 
@@ -92,14 +104,14 @@ function AccueilScreen({navigation}) {
                           refreshing={refresh}
                 keyExtractor={item => item.id.toString()}
                           renderItem={({item}) =>
-                          <AppCard addToCart={() => {
+                          <AppCard  addToCart={() => {
                               {dispatch(addToCart(item))};
                               setSelectedItem(item);
                               setItemCartModal(true)
                           }
-                          } button2='Acheter' title={item.designArticle} subtitle={+item.prixArticle}
+                          } button2='Acheter' title={item.designArticle} subtitle1={+item.prixPromo} subtitle2={item.prixReel}
                           dispo={item.qteStock} image={{uri: item.imageArticle}}
-                          aideInfo={item.aideVente === 'oui'?(<MaterialCommunityIcons name="help-circle-outline" size={24} color={Color.bleuFbi}/>):''}
+                          aideInfo={item.aide ?(<MaterialCommunityIcons name="help-circle-outline" size={24} color={Color.bleuFbi}/>):''}
                                                            onPress={() => navigation.navigate(routes.ARTICLE_DETAIL, item)}>
                               <AppButton onPress={() => navigation.navigate(routes.ARTICLE_DETAIL, item)} title='Détails' style={{padding: 10, backgroundColor: Color.rougeBordeau, fontWeight: 'bold'}} />
                           </AppCard>
@@ -112,12 +124,13 @@ function AccueilScreen({navigation}) {
 
 const styles = StyleSheet.create({
     imageContainer: {
-        height: 300,
-        width: 300,
         overflow: 'hidden'
     },
     container: {
-        paddingBottom: 20
+        paddingBottom: 20,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     isLoadingStyle: {
         flex: 1,

@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback} from 'react';
+import React, {useEffect, useCallback, useState} from 'react';
 import {useDispatch} from 'react-redux'
 import {View, Text, FlatList, StyleSheet, ScrollView} from 'react-native'
 import {useSelector} from 'react-redux';
@@ -13,13 +13,13 @@ import routes from "../navigation/routes";
 import {addToOrder} from '../store/actionsCreators/orderActionCreator'
 import {changeItemQuantity} from '../store/actionsCreators/shoppingCartActionCreator'
 import {loadPlans} from "../store/slices/planSlice";
-import {plansByPayement} from "../store/actionsCreators/planActionCreator";
 
 function ShoppingCartScreen({navigation}) {
     const dispatch = useDispatch();
     const totalAmount = useSelector(state => state.entities.shoppingCart.totalAmount);
     const itemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght);
     const payements = useSelector(state => state.entities.payement.list)
+    const [quantity, setQuantity] = useState(1)
 
     const items = useSelector(state => {
         const itemsTransformed = [];
@@ -44,13 +44,14 @@ function ShoppingCartScreen({navigation}) {
 
 
     const getSelectedPayement = useCallback(async (idPayement) => {
-        await dispatch(getSelected(idPayement))
+        if (idPayement) {
+            await dispatch(getSelected(idPayement))
+        }
     }, [dispatch])
 
 
     useEffect(() => {
         getPlans();
-        dispatch(getSelected(payements[0].id))
     }, []);
 
     if (items.length === 0) {
@@ -64,10 +65,14 @@ function ShoppingCartScreen({navigation}) {
        <FlatList ListHeaderComponent={() => <CartListHeader/>}
                  ListFooterComponent={() => <CartListFooter totalAmount={totalAmount} getOrder={() =>{
                      dispatch(addToOrder(items, itemsLenght, totalAmount))
-                     navigation.navigate(routes.ORDER)}}/>} data={items}
+                     navigation.navigate(routes.ORDER_PAYEMENT)}}/>} data={items}
                  keyExtractor={(item) => item.id.toString()}
-                 renderItem={({item}) => <CartItem designation={item.libelle} itemQuantite={item.quantite} changeQuantite={(itemValue, index) => {
-                     dispatch(changeItemQuantity(item.id, itemValue))
+                 renderItem={({item}) => <CartItem designation={item.libelle} itemQuantite={item.quantite} quantityDecrement={() => {
+                     const newQuantite = item.quantite- 1
+                     dispatch(changeItemQuantity(item.id, newQuantite))
+                 }} quantityIncrement={() => {
+                     const newQuantity = item.quantite + 1
+                     dispatch(changeItemQuantity(item.id, newQuantity))
                  }}
                              source={{uri: item.image}} itemBtnFirst='Détail'
                              itemBtnSecond='Supprimer' itemPrice={item.prix}

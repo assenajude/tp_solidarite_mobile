@@ -13,6 +13,7 @@ const payementSlice = createSlice({
         payementId: 1,
         selectedPayement: {},
         payementPlans: [],
+        selectedPlan: {},
         currentPlan: {}
     },
     reducers: {
@@ -32,15 +33,16 @@ const payementSlice = createSlice({
         selectedPayement: (state, action) => {
             const selected = state.list.filter(payement => payement.id === action.payload);
             state.selectedPayement = selected[0]
-            if (selected[0].plans.length >=1) {
+            if (selected[0].plans && selected[0].plans.length >=1) {
                 const plans = selected[0].plans;
                 state.payementPlans = plans
-                state.currentPlan = plans[0]
+                //state.currentPlan = plans[0]
             } else {
-                state.currentPlan = {libelle: 'aucun plan dispo'}
+               // state.currentPlan = {libelle: 'aucun plan dispo'}
                 state.payementPlans = []
                 //state.payementPlans = [{libelle: 'aucun plan dispo'}]
             }
+            state.currentPlan = {}
             state.payementId = action.payload
         },
         changeCurrentPlan: (state, action) => {
@@ -55,6 +57,17 @@ const payementSlice = createSlice({
             otherPlans.forEach(plan => {
                 plan.showIcon = false
             })
+        },
+        selectPlan: (state, action) => {
+            let selectedPlan = state.payementPlans.find(plan => plan.id === action.payload.id);
+            if (selectedPlan.checked) {
+                selectedPlan.checked = false
+            } else selectedPlan.checked = true
+            const otherPlans = state.payementPlans.filter(plan => plan.id !== selectedPlan.id);
+            otherPlans.forEach(plan => {
+                plan.checked = false
+            })
+            state.currentPlan = state.payementPlans.find(plan => plan.checked === true)
         }
     },
     extraReducers: {
@@ -71,7 +84,7 @@ const payementSlice = createSlice({
 
 export default payementSlice.reducer;
 
- const {getPayements, payementAdded, payementRequested, payementRequestFailed, selectedPayement, changeCurrentPlan} = payementSlice.actions;
+ const {getPayements, payementAdded, payementRequested, payementRequestFailed, selectedPayement, changeCurrentPlan, selectPlan} = payementSlice.actions;
 
 
 // actions creators
@@ -100,6 +113,10 @@ export const getSelected = (id) => dispatch => {
 
 export const changePlan = (plan) => dispatch => {
     dispatch(changeCurrentPlan(plan))
+}
+
+export const getSelectedPlan = (plan) => dispatch => {
+    dispatch(selectPlan(plan))
 }
 
 

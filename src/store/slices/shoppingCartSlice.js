@@ -8,7 +8,13 @@ const shoppingCartSlice = createSlice({
         totalAmount: 0,
         itemsLenght: 0
     },
-    reducers: {},
+    reducers: {
+        clearCart: (state, action)=> {
+            state.items = {}
+            state.totalAmount = 0
+            state.itemsLenght = 0
+        }
+    },
     extraReducers: {
         [addToCart]: (state, action) => {
             const newProduit = action.payload
@@ -40,4 +46,9 @@ const shoppingCartSlice = createSlice({
 });
 
 export default shoppingCartSlice.reducer;
+const {clearCart} = shoppingCartSlice.actions
 //action creators
+
+export const getCartClear = () => dispatch => {
+    dispatch(clearCart())
+}

@@ -1,3 +1,4 @@
+
 export default class CartItem {
     constructor(id, libelle, image, prix, quantite, montant) {
         this.id = id;

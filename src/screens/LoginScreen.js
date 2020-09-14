@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector, useStore} from 'react-redux'
 import {View, KeyboardAvoidingView,ScrollView, StyleSheet, Image, Keyboard, TouchableWithoutFeedback, Platform} from 'react-native';
 import * as yup from 'yup'
 import {LinearGradient} from 'expo-linear-gradient'
+
 
 import Color from "../utilities/colors"
 import AppFormField from "../components/forms/AppFormField";
@@ -10,10 +11,10 @@ import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppForm from "../components/forms/AppForm";
 import AppText from "../components/AppText";
 import User from "../models/user";
-import * as authAction from '../store/actions/authActions'
 import AppErrorMessage from "../components/forms/AppErrorMessage";
-import AccueilNavigation from '../navigation/AccueilNavigator';
+import {signin} from '../store/slices/authSlice'
 import routes from '../navigation/routes'
+import authStorage from '../store/persistStorage'
 
 const loginValidationSchema = yup.object().shape({
     username: yup.string().required("Veillez saisir un nom d'utilisateur"),
@@ -27,37 +28,30 @@ function LoginScreen({navigation}) {
     });
 
     const [authenticated, setAuthenticated] = useState(false);
-    const [loginFailed, setLoginFailed] = useState(false)
+    const [loginFailed, setLoginFailed] = useState(false);
+    const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+    const token = useSelector(state => state.auth.token);
+
 
     const dispatch = useDispatch();
+    const store = useStore()
 
-    const handleLogin = async (values) => {
-        try{
-            setAuthenticated(false);
-            setLoginFailed(false)
-            const userData = await dispatch(authAction.login(values.username, values.password));
-            setAuthenticated(true);
-            navigation.navigate(routes.ACCUEIL)
-           // console.log(userData.data);
-        } catch (e) {
-            setAuthenticated(false);
-            setLoginFailed(true)
-            throw new Error(e.message)
 
-        }
 
+    const handleLogin = async (user) => {
+        await dispatch(signin(user))
+       store.subscribe(() => {
+           const authToken = store.getState().auth.token;
+          if (!authToken) return;
+          navigation.goBack()
+        })
     }
 
     return (
-
-            // <KeyboardAvoidingView behavior='height' keyboardVerticalOffset={100} style={styles.screen}>
-            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
              <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
-            <ScrollView>
-                <View  style={styles.mainContainer}>
-                <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/logo_solidarite.png')} />
-                <AppText style={{backgroundColor: Color.rougeBordeau, fontSize: 20}}>Connection</AppText>
-                <View style={styles.inputStyle}>
+                 <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/logo_solidarite.png')} />
+                 <ScrollView>
+                <AppText style={styles.headerStyle}>Connection</AppText>
                     <AppErrorMessage visible={loginFailed} error='erreur lors de la connection'/>
                     <AppForm initialValues={{username: '', password: ''}}
                             onSubmit={handleLogin}
@@ -71,47 +65,33 @@ function LoginScreen({navigation}) {
                         <AppSubmitButton  title='Connectez-vous'/>
 
                     </AppForm>
-                </View>
-                </View>
             </ScrollView>
              </LinearGradient>
-            </TouchableWithoutFeedback>
-            // </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-    screen: {
-        flex: 1
-
-    },
     imageContainer: {
         width: '100%',
         height: '100%'
 
     },
     gradient: {
-        width: '100%',
-        height: '100%'
-    },
-    mainContainer: {
-        justifyContent: 'flex-start',
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center'
     },
+    headerStyle: {
+      backgroundColor: Color.rougeBordeau,
+      color: Color.blanc,
+      borderRadius: 10,
+        margin: 20
+    },
+
     logoStyle: {
         width:150,
         height: 150,
         top: 5,
-    },
-    inputStyle: {
-        height: 'auto',
-        width: '80%',
-        maxWidth: 400,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 10,
-        borderWidth: 20,
-        borderColor: Color.rougeBordeau
     },
     buttonStyle: {
         color: Color.bleuFbi,

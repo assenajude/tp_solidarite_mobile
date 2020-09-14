@@ -8,7 +8,6 @@ function AppButton({title, onPress, style, iconName, iconSize, iconColor, textSt
     return (
         <TouchableOpacity style={[styles.buttonColor, style]} onPress={onPress}>
             <View style={styles.contentStyle}>
-
             {iconName && <AntDesign name={iconName} size={iconSize} color={iconColor} {...props}/>}
             {title && <Text style={[styles.textStyle, textStyle]} {...props}>{title}</Text>}
             </View>
@@ -24,7 +23,8 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         width: 'auto',
         paddingLeft: 5,
-        paddingRight: 5
+        paddingRight: 5,
+        justifyContent: 'center'
     },
     contentStyle: {
         justifyContent: 'center',

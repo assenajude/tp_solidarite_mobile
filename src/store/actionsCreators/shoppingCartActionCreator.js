@@ -6,9 +6,9 @@ export const addToCart = createAction('shoppingCart/addToCart', function (item) 
             id: item.id,
             libelle: item.designArticle,
             image: item.imageArticle,
-            prix: item.prixArticle,
+            prix: item.prixPromo,
             quantite: 1,
-            montant: item.prixArticle
+            montant: item.prixPromo
         }
     }
 

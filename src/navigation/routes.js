@@ -27,8 +27,14 @@ export default Object.freeze({
     NEW_PLAN: 'NewPlanScreen',
     LIVRAISON: 'LivraisonScreen',
     SHIPPING: 'ShippingAdresseScreen',
+    NEW_USER_ADDRESS: 'NewUserAdresseScreen',
     USER_ADDRESS: 'UserAdresseScreen',
     POINT_RELAIS: 'PointRelaisScreen',
-    NEW_SHIPPING: 'NewShippingAdScreen'
+    NEW_POINT_RELAIS: 'NewPointRelaisScreen',
+    NEW_SHIPPING: 'NewShippingAdScreen',
+    REGION: 'RegionScreen',
+    VILLE: 'VilleScreen',
+    ORDER_PAYEMENT: 'OrderPayementScreen',
+    ORDER_LIVRAISON: 'OrderLivraisonScreen'
 
 })

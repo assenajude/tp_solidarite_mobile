@@ -1,6 +1,5 @@
 import apiClient from "../../api/http-common";
 import * as actions from '../actionsCreators/apiActionCreator';
-import {categoriesRequested} from '../slices/categorieSlice'
 
 const api = ({dispatch}) => next => async action => {
     if (action.type !== actions.apiRequest.type) return next(action);

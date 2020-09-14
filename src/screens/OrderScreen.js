@@ -1,52 +1,51 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {useSelector, useDispatch, useStore} from 'react-redux'
-import {View, Text, StyleSheet, FlatList, ScrollView} from 'react-native'
+import {View, Text, StyleSheet, Alert, FlatList, ScrollView} from 'react-native'
 
 import Color  from '../utilities/colors'
-import OrderItem from "../components/order/OrderItem";
-import OrderListBottom from "../components/order/OrderListBottom";
-
-import OrderLivraison from "../components/order/OrderLivraison";
-import {getSelected} from '../store/slices/payementSlice';
+import FinalOrderItem from "../components/order/FinalOrderItem";
 import {getInteretValue, getTaux} from '../store/selectors/orderSelector'
-import OrderPlan from "../components/order/OrderPlan";
-import {Picker} from "@react-native-community/picker";
 import routes from "../navigation/routes";
+import {getFraisLivraison, getTotalFinal} from '../store/selectors/orderSelector';
+import AppText from "../components/AppText";
+import AppButton from "../components/AppButton";
+import authStorage from '../store/persistStorage'
+import {makeOrder} from '../store/slices/orderSlice'
+import {getCartClear} from '../store/slices/shoppingCartSlice'
 
 function OrderScreen({navigation}) {
     const store = useStore()
 
     const dispatch = useDispatch();
     const orders = useSelector(state => state.entities.order.list);
-    const [totalGlobal, setTotalGlobal] = useState(0);
-    const payements = useSelector(state => state.entities.payement.list);
-    const selectedPayement = useSelector(state => state.entities.payement.selectedPayement);
-    const [modePayement, setModePayement] = useState(selectedPayement.id);
-    const payementId = useSelector(state => state.entities.payement.payementId)
-    const [adresseLivraison, setAdresseLivraison] = useState('');
+    const selectedPayemet = useSelector(state => state.entities.payement.selectedPayement)
     const currentPlan = useSelector(state => state.entities.payement.currentPlan);
-    const currentOrder = useSelector(state => state.entities.order.currentOrder)
+    const currentOrder = useSelector(state => state.entities.order.currentOrder);
+    const selectedAdesse = useSelector(state => state.entities.userAdresse.selectedAdresse)
 
-
-    const listData = [
-        {
-            header: 'Commande',
-            title1Value: orders[0].itemsLenght,
-            title2Value: orders[0].amount
-        },
-        {
-            header: 'Payement',
-            title1Value: 'Cash',
-            title2Value:0
-
-        },
-        {
-            header: 'Livraison',
-            title1Value: 'Adresse',
-            title2Value: 0
-
+    const saveOrder = async () => {
+        const user = await authStorage.getUser();
+        const order = {
+            userId: user.id,
+            userAdresseId: selectedAdesse.id,
+            planId: currentPlan.id,
+            items: currentOrder.items,
+            itemsLength: currentOrder.itemsLenght,
+            interet: getInteretValue(store.getState()),
+            fraisTransport: getFraisLivraison(store.getState()),
+            montant: getTotalFinal(store.getState())
         }
-    ];
+        await dispatch(makeOrder(order))
+        store.subscribe(() => {
+            const success = store.getState().entities.order.orderSuccess
+            if(success) {
+                dispatch(getCartClear())
+                navigation.navigate(routes.ACCUEIL)
+            }
+            return;
+        })
+    }
+
 
     useEffect(() => {
     }, [dispatch, currentOrder])
@@ -63,35 +62,27 @@ function OrderScreen({navigation}) {
     }
     return (
         <View style={styles.container}>
-            <FlatList ListFooterComponent={() => <OrderListBottom globalOrder={totalGlobal}/>} data={listData} keyExtractor={(item, index) =>index.toString()}
-                      renderItem={({item}) => {
-                          if (item.header === 'Commande') {
-                              return <OrderItem headerTitle={item.header} buttonTitle='Details cmd'
-                                                title1='Total articles: ' title1Value={currentOrder.itemsLenght} title2='Sous-Total: '
-                                                title2Value={currentOrder.amount}
-                              />
+                <View style={styles.header}>
+                    <AppText style={{color: Color.blanc}}>Verifiez les details de votre commande puis finaliser</AppText>
+                </View>
+            <ScrollView>
+                <FinalOrderItem header='Commande' label1='total articles: ' label1Value={currentOrder.itemsLenght}
+                label2='Montant: ' label2Value={currentOrder.amount}/>
 
-                          } else if (item.header === 'Payement') {
-                              return <OrderItem headerTitle={item.header} title1='Mode' buttonTitle='Details payement'
-                                                title1Value={
-                                                    <Picker mode='dropdown' style={{height: 50, width: 120}} selectedValue={payementId} onValueChange={(value) => {
-                                                        getTaux(store.getState())
-                                                        getInteretValue(store.getState())
-                                                        dispatch(getSelected(value));
-                                                    }
-                                                    }>
-                                                        {payements.map((item, index) => <Picker.Item label={item.mode} value={item.id} key={index}/>)}
-                                                    </Picker>
-                                                }  title2={`Taux d'interêt (${getTaux(store.getState())}%)`} title2Value={getInteretValue(store.getState())} >
-                                  <OrderPlan libelle={currentPlan.libelle} description={currentPlan.descripPlan} changePlan={() =>navigation.navigate(routes.PLAN) }/>
-                              </OrderItem>
-                          } else {
-                              return <OrderItem headerTitle={item.header}
-                                                buttonTitle='Details adresse' title1='Point Relais' title1Value='Aboisso' title2='Cout:' title2Value={0}></OrderItem>
-                          }
-                      }
-                      }
-            />
+                <FinalOrderItem  header='Payement' label1='Mode: ' label1Value={selectedPayemet.mode}
+                label2={`Taux d'interet (${getTaux(store.getState())}%): `} label2Value={getInteretValue(store.getState())} label3='Plan: '
+                                label3Value={currentPlan.libelle} changeLabel3={() => navigation.navigate(routes.ORDER_PAYEMENT)} label4='Description:' label4Value={currentPlan.descripPlan}/>
+
+                <FinalOrderItem header='Livraison' label1='Agence de retrait: ' label1Value={selectedAdesse.pointRelai.nom}
+                            label2='Coût: ' label2Value={getFraisLivraison(store.getState())}
+                            label3='Votre contact: ' label3Value={selectedAdesse.nom} changeLabel3={() => navigation.navigate(routes.ORDER_LIVRAISON)} label4='Telephone: ' label4Value={selectedAdesse.tel}/>
+                <View style={styles.totalFinal}>
+                    <AppText style={{fontSize: 24, fontWeight: 'bold'}}>Montant total TTC: </AppText>
+                    <AppText style={{color: Color.rougeBordeau, fontSize: 24, fontWeight: 'bold'}}>{getTotalFinal(store.getState())} FCFA</AppText>
+                </View>
+                 <AppButton onPress={saveOrder} textStyle={{fontWeight: 'bold', fontSize: 18}} style={styles.finalButton} title='Finaliser la commande'/>
+            </ScrollView>
+
         </View>
         );
 }
@@ -101,8 +92,6 @@ const styles = StyleSheet.create({
         flex: 1,
         top: 20,
         marginBottom: 40,
-        justifyContent: 'flex-start',
-        alignItems: 'center'
     },
     emptyStyle: {
         flex: 1,
@@ -116,6 +105,27 @@ const styles = StyleSheet.create({
         marginBottom: 50,
         left: '25%'
 
+    },
+    header: {
+        backgroundColor: Color.rougeBordeau
+    },
+    finalButton: {
+        backgroundColor: Color.rougeBordeau,
+        width: '50%',
+        height: 40,
+        alignSelf: 'center',
+        margin: 40
+    },
+    totalFinal: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        borderWidth: 1,
+        width: '90%',
+        alignSelf: 'center',
+        margin: 30,
+        padding: 10,
+        borderRadius: 10,
+        backgroundColor: Color.blanc
     }
 })
 export default OrderScreen;

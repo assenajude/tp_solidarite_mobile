@@ -5,9 +5,10 @@ import Color from '../../utilities/colors'
 import AppText from "../AppText";
 import AppButton from "../AppButton";
 import CartItemPicker from "./CartItemPicker";
+import CartItemQuantite from "./CartItemQuantite";
 
 
-function CartItem({source, designation, itemQuantite,itemAmount, itemPrice, showCartItem,changeQuantite}) {
+function CartItem({source, designation, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement}) {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.itemContainer}>
@@ -21,11 +22,12 @@ function CartItem({source, designation, itemQuantite,itemAmount, itemPrice, show
                         <AppButton style={{backgroundColor: Color.lightGrey}} iconName='delete' iconSize={20} iconColor={Color.rougeBordeau}/>
                     </View>
                 </View>
+                <View style={styles.secondContainer}>
                 <AppText style={{marginLeft: 40, marginRight: 10}}>{itemPrice}</AppText>
-                <AppText>
-                    <CartItemPicker itemQuantite={itemQuantite} changeItemQuantite={changeQuantite}/>
-                </AppText>
+                    {/*<CartItemPicker itemQuantite={itemQuantite} changeItemQuantite={changeQuantite}/>*/}
+                    <CartItemQuantite quantite={itemQuantite} decrementQuantite={quantityDecrement} incrementQuantite={quantityIncrement} style={{marginRight: 15, marginLeft: 15}}/>
                 <AppText>{itemAmount}</AppText>
+                </View>
             </View>
         </View>
     );
@@ -41,11 +43,17 @@ const styles = StyleSheet.create({
     },
     itemContainer: {
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-around',
         padding: 10
     },
     imageContainer: {
 
+    },
+    secondContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     buttonContainer: {
         flexDirection: 'row',

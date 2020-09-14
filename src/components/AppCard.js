@@ -5,7 +5,7 @@ import AppText from "./AppText";
 import AppButton from "./AppButton";
 import Color from '../utilities/colors'
 
-function AppCard({image, title, subtitle,dispo, onPress, aideInfo, button1, button2, children, addToCart}) {
+function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, aideInfo, button1, button2, children, addToCart}) {
     return (
         <TouchableHighlight onPress={onPress}>
         <View  style={styles.mainContainer} >
@@ -17,8 +17,8 @@ function AppCard({image, title, subtitle,dispo, onPress, aideInfo, button1, butt
                     <AppText>{aideInfo}</AppText>
                 </View>
                 <View style={styles.detailsStyle}>
-                    <Text style={{color: Color.rougeBordeau, fontWeight: 'bold'}}>{subtitle}</Text>
-                    <Text style={{textDecorationLine: 'line-through', fontSize: 12}}>{subtitle}</Text>
+                    <Text style={{color: Color.rougeBordeau, fontWeight: 'bold'}}>{subtitle1}</Text>
+                    <Text style={{textDecorationLine: 'line-through', fontSize: 12}}>{subtitle2}</Text>
                 </View>
               </View>
             <View style={styles.buttonContainerStyle}>
@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
         backgroundColor: Color.blanc,
         overflow: 'hidden',
         height: 350,
+        width: 380,
         margin:15,
         paddingBottom: 15
     },
