@@ -68,6 +68,10 @@ const payementSlice = createSlice({
                 plan.checked = false
             })
             state.currentPlan = state.payementPlans.find(plan => plan.checked === true)
+        },
+        resetPayement: (state) => {
+            state.selectedPayement = {}
+            state.currentPlan = {}
         }
     },
     extraReducers: {
@@ -84,7 +88,7 @@ const payementSlice = createSlice({
 
 export default payementSlice.reducer;
 
- const {getPayements, payementAdded, payementRequested, payementRequestFailed, selectedPayement, changeCurrentPlan, selectPlan} = payementSlice.actions;
+ const {getPayements, resetPayement, payementAdded, payementRequested, payementRequestFailed, selectedPayement, changeCurrentPlan, selectPlan} = payementSlice.actions;
 
 
 // actions creators
@@ -119,10 +123,7 @@ export const getSelectedPlan = (plan) => dispatch => {
     dispatch(selectPlan(plan))
 }
 
-
-export const getSelectedByAction = (idPayement) => dispatch => {
-    dispatch(getSelectedPayement(idPayement))
+export const getResetPayement = () => dispatch => {
+    dispatch(resetPayement())
 }
-
-
 // selectors

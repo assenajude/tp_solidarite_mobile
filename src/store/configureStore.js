@@ -9,7 +9,7 @@ export default function() {
     return configureStore({
         reducer: rootReducer,
         middleware: [
-            ...getDefaultMiddleware(),
+            ...getDefaultMiddleware({immutableCheck: false}),
             api,
             authApi
         ]

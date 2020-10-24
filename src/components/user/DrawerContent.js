@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+import {useSelector, useStore, useDispatch} from "react-redux";
 import {DrawerItem, DrawerContentScrollView} from "@react-navigation/drawer";
 import {View,Button, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
 import {AntDesign, FontAwesome, MaterialCommunityIcons, FontAwesome5,Feather, MaterialIcons, EvilIcons, Entypo} from '@expo/vector-icons'
@@ -8,10 +9,21 @@ import Color from '../../utilities/colors';
 import routes from '../../navigation/routes'
 import AppButton from "../AppButton";
 import AppIconWithBadge from "../AppIconWithBadge";
+import {getLogout} from '../../store/slices/authSlice'
+import {getRoleAdmin} from "../../store/selectors/authSelector";
+import {getUserOrdersPopulate} from "../../store/slices/orderSlice";
 
 function DrawerContent(props) {
-    const [isLogin, setIsLogin] = useState(false);
-    const [username, setUsername] = useState('kouakou Pauin')
+    const store = useStore()
+    const dispatch = useDispatch()
+    const user = useSelector(state => state.auth.user)
+    const isLogin = useSelector(state => state.auth.isLoggedIn)
+
+
+    useEffect(() => {
+
+    }, [])
+
     return (
         <View style={styles.container}>
            <DrawerContentScrollView {...props}>
@@ -19,26 +31,28 @@ function DrawerContent(props) {
                    <View>
                        <View style={styles.avatar}>
                        <View style={styles.avatarStyle}>
-                           <AppAvatar style={{borderRadius: 100}} onPress={() => props.navigation.navigate(routes.USER_INFO)}>
-                               <Image source={require('../../assets/avatar.jpg')} style={styles.avatarImage}/>
+                           <AppAvatar style={{borderRadius: 100}} onPress={() => props.navigation.navigate(routes.COMPTE)}>
+                              {isLogin && <Image source={require('../../assets/avatar.jpg')} style={styles.avatarImage}/>}
+                               {!isLogin && <AntDesign name='user' size={30} color={Color.leger}/>}
                            </AppAvatar>
                        </View>
-                           <TouchableOpacity onPress={() => props.navigation.navigate(routes.USER_NOTIF)}>
+                           <View>
+                           <TouchableOpacity onPress={() => props.navigation.navigate(routes.NOTIFICATION)}>
                            <AppIconWithBadge name='bells'
                                              color='black' size={24} style={{marginRight: 10}}
                                              notifStyle={{backgroundColor: Color.rougeBordeau}} badgeCount={3} />
                            </TouchableOpacity>
+                           </View>
                        </View>
                        <View style={styles.usernameStyle}>
-                       {isLogin && <TouchableOpacity onPress={() => props.navigation.navigate(routes.USER_INFO)}>
+                       {isLogin && <TouchableOpacity onPress={() => props.navigation.navigate(routes.COMPTE)}>
                        <View style={styles.usernameContainer}>
-                           <Text>{username}</Text>
+                           <Text>{user.username}</Text>
                            <EvilIcons name="chevron-right" size={24} color="black" />
                        </View>
                        </TouchableOpacity>}
                         {!isLogin && <View style={styles.logStyle}>
                         <AppButton title='Se connecter'  style={{fontSize: 10, marginRight: 5}} onPress={() => {
-                            setIsLogin(true)
                             props.navigation.navigate(routes.LOGIN)
                         }}/>
                         <Text>ou</Text>
@@ -51,7 +65,7 @@ function DrawerContent(props) {
 
                <View style={styles.mainContent}>
                    <View>
-                       <DrawerItem icon={({size, color}) => <AntDesign name='home' size={24} color={color}/>}
+                       <DrawerItem icon={({size, color}) => <AntDesign name='home' size={size} color={color}/>}
                                    label='Accueil' onPress={() => props.navigation.navigate(routes.ACCUEIL)} />
                    </View>
                    <View>
@@ -59,55 +73,56 @@ function DrawerContent(props) {
                            <AppIconWithBadge name='message1' badgeCount={1}
                                              notifStyle={{backgroundColor: Color.rougeBordeau}} size={size} color={color} />}
                            // <AntDesign name='message1' size={24} color={color} />}
-                           label='Messages' onPress={() => {props.navigation.navigate(routes.MESSAGE)}} />
+                           label='Messages' onPress={() => {props.navigation.navigate(routes.USER_MESSAGE)}} />
+                   </View>
+                   <View>
+                       <DrawerItem icon={({size, color}) => <MaterialIcons name="favorite-border" size={30} color={color} /> }
+                                   label='Favoris' onPress={() => {props.navigation.navigate(routes.USER_FAVORIS)}} />
+                   </View>
+                   <View>
+                       <DrawerItem icon={({size, color}) => <FontAwesome5 name='money-bill-alt' size={size} color={color}/>}
+                                   label='Vos factures' onPress={() => {props.navigation.navigate(routes.USER_FACTURE)}} />
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) => <Feather name="command" size={size} color={color} />}
-                                   label='Commande' onPress={() => {props.navigation.navigate(routes.ORDER)}} />
+                                   label='Vos commandes' onPress={() => {props.navigation.navigate(routes.USER_ORDER)}} />
+                   </View>
+
+                   <View>
+                       <DrawerItem icon={({size, color}) => <MaterialCommunityIcons name="store" size={size} color={color} />}
+                                   label='Vos locations' onPress={() => {props.navigation.navigate('UserLocation')}} />
+                   </View>
+
+                   <View>
+                       <DrawerItem icon={({size, color}) => <AntDesign name="carryout" size={size} color={color} />}
+                                   label='Vos services' onPress={() => {props.navigation.navigate(routes.USER_SERVICE)}} />
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) => <Entypo name="address" size={size} color={color} />}
-                                   label='Adresses' onPress={() => {props.navigation.navigate(routes.ORDER)}} />
+                                   label='Vos adresses' onPress={() => {props.navigation.navigate(routes.USER_ADDRESS)}} />
                    </View>
 
-                   <View>
-                       <DrawerItem icon={({size, color}) => <FontAwesome5 name='money-bill-alt' size={24} color={color}/>}
-                           label='Factures' onPress={() => {props.navigation.navigate(routes.FACTURE)}} />
-                   </View>
 
-                   <View>
-                       <DrawerItem icon={({size, color}) => <FontAwesome name="shopping-bag" size={size} color={color} />}
-                           label='Articles' onPress={() => {props.navigation.navigate(routes.ARTICLE)}} />
-                   </View>
-
-                   <View>
-                       <DrawerItem icon={({size, color}) => <MaterialCommunityIcons name="store" size={24} color={color} />}
-                                   label='Locations' onPress={() => {props.navigation.navigate(routes.LOCATION)}} />
-                   </View>
-
-                   <View>
-                       <DrawerItem icon={({size, color}) => <MaterialIcons name="favorite-border" size={24} color={color} /> }
-                           label='Favoris' onPress={() => {props.navigation.navigate(routes.FAVORIS)}} />
-                   </View>
-                   <View>
+                   {getRoleAdmin(store.getState()) && <View>
                        <DrawerItem icon={({size, color}) => <MaterialCommunityIcons name="dots-horizontal" size={size} color={color} />}
-                                   label='Autres' onPress={() => {props.navigation.navigate('Other')}} />
-                   </View>
+                                   label='Gerer' onPress={() => {props.navigation.navigate('OtherMain')}} />
+                   </View>}
                    <View>
-                       <DrawerItem icon={({size, color}) => <AntDesign name="setting" size={24} color={color} />}
+                       <DrawerItem icon={({size, color}) => <AntDesign name="setting" size={size} color={color} />}
                                    label='Paramètres' onPress={() => {props.navigation.navigate(routes.PARAM)}} />
                    </View>
                </View>
                </View>
            </DrawerContentScrollView>
-            {isLogin && <Button title='Se déconnecter' color={Color.rougeBordeau} onPress={() => setIsLogin(false)}/>}
+            {isLogin && <Button title='Se déconnecter' color={Color.rougeBordeau} onPress={() => dispatch(getLogout())}/>}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        justifyContent: 'center',
     },
     logStyle: {
         flexDirection: 'row',

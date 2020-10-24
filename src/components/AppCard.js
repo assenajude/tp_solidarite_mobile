@@ -5,8 +5,9 @@ import AppText from "./AppText";
 import AppButton from "./AppButton";
 import Color from '../utilities/colors'
 
-function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, aideInfo, button1, button2, children, addToCart}) {
+function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, aideInfo, button2, children, addToCart}) {
     return (
+        <View>
         <TouchableHighlight onPress={onPress}>
         <View  style={styles.mainContainer} >
             {image && <Image resizeMode='contain' style={styles.imageStyle} source={image} />}
@@ -23,10 +24,11 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, aideInfo, 
               </View>
             <View style={styles.buttonContainerStyle}>
                 {children}
-                <AppButton onPress={addToCart} title={button2} style={{padding: 10, backgroundColor: Color.rougeBordeau, fontWeight: 'bold'}} />
+                <AppButton onPress={addToCart} title={button2} textStyle={{fontSize: 10}} style={{width: '20%',padding:5, backgroundColor: Color.rougeBordeau,fontWeight: 'bold'}} />
             </View>
         </View>
         </TouchableHighlight>
+        </View>
     );
 }
 
@@ -34,14 +36,12 @@ const styles = StyleSheet.create({
     mainContainer: {
         shadowColor: Color.leger,
         shadowOpacity: 0.26,
-        shadowOffset: {width: 0, height: 2},
         shadowRadius: 8,
-        elevation:5,
         borderRadius: 10,
         backgroundColor: Color.blanc,
         overflow: 'hidden',
-        height: 350,
-        width: 380,
+        height: 320,
+        width: 320,
         margin:15,
         paddingBottom: 15
     },

@@ -1,14 +1,14 @@
 import React from 'react';
 import {View,Image,Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {AntDesign} from '@expo/vector-icons'
 
 import Color from '../../utilities/colors'
 import AppText from "../AppText";
 import AppButton from "../AppButton";
-import CartItemPicker from "./CartItemPicker";
 import CartItemQuantite from "./CartItemQuantite";
 
 
-function CartItem({source, designation, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement}) {
+function CartItem({source, designation,icon=false, activeDecrement, price, min, max, montantMin,montantMax,  montant, activeIncrement,quantite, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement}) {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.itemContainer}>
@@ -23,10 +23,14 @@ function CartItem({source, designation, itemQuantite,itemAmount, itemPrice, show
                     </View>
                 </View>
                 <View style={styles.secondContainer}>
-                <AppText style={{marginLeft: 40, marginRight: 10}}>{itemPrice}</AppText>
-                    {/*<CartItemPicker itemQuantite={itemQuantite} changeItemQuantite={changeQuantite}/>*/}
-                    <CartItemQuantite quantite={itemQuantite} decrementQuantite={quantityDecrement} incrementQuantite={quantityIncrement} style={{marginRight: 15, marginLeft: 15}}/>
-                <AppText>{itemAmount}</AppText>
+               {price && <AppText style={{marginLeft: 40, marginRight: 10}}>{itemPrice}</AppText>}
+                    {quantite && <CartItemQuantite minusActive={activeDecrement} plusActive={activeIncrement} quantite={itemQuantite} decrementQuantite={quantityDecrement} incrementQuantite={quantityIncrement} style={{marginRight: 15, marginLeft: 15}}/>}
+                {montant && <AppText>{itemAmount}</AppText>}
+
+                    {min && <AppText>{montantMin}</AppText>}
+                    {icon && <AntDesign name='minus' size={24} color='black'/>}
+                    {max && <AppText>{montantMax}</AppText>}
+
                 </View>
             </View>
         </View>

@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
-import { View, Image, StyleSheet} from 'react-native'
+import { View, Image, StyleSheet, TouchableOpacity} from 'react-native'
+import {Entypo} from '@expo/vector-icons'
 import AppButton from "./AppButton";
 import * as ImagePicker from 'expo-image-picker';
 import AppText from "./AppText";
+import colors from "../utilities/colors";
 
 function AppImagePicker({selectedImage,onChangeImage }) {
 
@@ -23,10 +25,17 @@ function AppImagePicker({selectedImage,onChangeImage }) {
         return (
             <View style={styles.videContainer}>
                 <AppText style={{fontWeight: 'bold', marginRight: 20}}>Image:</AppText>
-                <View style={styles.videImage}>
+
+                    <TouchableOpacity onPress={chooseImage}>
+                        <View style={styles.cameraStyle}>
+                            <Entypo name='camera' size={40} color={colors.dark}/>
+                        </View>
+                    </TouchableOpacity>
+
+                {/*<View style={styles.videImage}>
                     <AppText>Aucune image</AppText>
                     <AppButton title='choisir' onPress={chooseImage} />
-                </View>
+                </View>*/}
             </View>
 
         )
@@ -34,12 +43,23 @@ function AppImagePicker({selectedImage,onChangeImage }) {
 
 
     return (
-        <View style={styles.imageContainer}>
-            <View style={styles.secondImageContainer}>
-                <AppText style={{fontWeight: 'bold', marginRight: 20}}>Image</AppText>
-                <View >
+        <View>
+            <View>
+                <View style={{
+                    flexDirection: 'row',
+                    marginLeft: 30
+                }}>
+                <View style={{
+                    flexDirection: 'row',
+                }}>
+
                     {selectedImage && <Image style={styles.imageStyle} source={{uri: selectedImage}} />}
-                    <AppButton title='Changer' onPress={chooseImage} />
+                    <TouchableOpacity style={{marginLeft: 30}} onPress={chooseImage}>
+                        <View style={styles.cameraStyle}>
+                            <Entypo name='camera' size={40} color={colors.dark}/>
+                        </View>
+                    </TouchableOpacity>
+                </View>
                 </View>
             </View>
 
@@ -49,14 +69,12 @@ function AppImagePicker({selectedImage,onChangeImage }) {
 
 const styles = StyleSheet.create({
     imageStyle: {
-        width: 100,
-        height: 100
+        width: 80,
+        height: 80
     },
     imageContainer: {
-        height: 100,
-        width: 100,
-        margin: 20,
-        marginBottom: 40
+       flexDirection: 'row',
+        alignItems: 'center'
     },
     videImage: {
         justifyContent: 'space-between',
@@ -68,8 +86,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 40
     },
-    secondImageContainer: {
-        flexDirection: 'row'
+
+    cameraStyle: {
+        borderWidth: 0.5,
+        padding: 15,
+        backgroundColor: colors.blanc
     }
 })
 

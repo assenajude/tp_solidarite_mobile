@@ -4,7 +4,7 @@ import AppText from "../AppText";
 import Color from "../../utilities/colors";
 import AppButton from "../AppButton";
 
-function CartListFooter({totalAmount, getOrder}) {
+function CartListFooter({totalAmount, getOrder, buttonTitle, buttonIsDisabled}) {
     return (
         <View style={styles.container}>
             <View style={styles.totalAmount}>
@@ -12,7 +12,7 @@ function CartListFooter({totalAmount, getOrder}) {
                 <AppText style={{fontWeight: 'bold', color: Color.rougeBordeau, fontSize: 24}}>{totalAmount} FCFA</AppText>
             </View>
             <View style={styles.orderButton}>
-                <AppButton style={{padding: 15}} onPress={getOrder}  title='Commander'/>
+                <AppButton disableButton={buttonIsDisabled} style={{padding: 15}} onPress={getOrder}  title='Continuer'/>
             </View>
         </View>
     );

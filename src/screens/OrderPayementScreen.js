@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View,ActivityIndicator, StyleSheet, ScrollView} from "react-native";
 import {useSelector, useStore, useDispatch} from "react-redux";
 
@@ -11,7 +11,8 @@ import PayementListItem from "../components/list/PayementListItem";
 import AppButton from "../components/AppButton";
 import {getInteretValue, getTaux, getTotalWithPayement} from '../store/selectors/orderSelector'
 import routes from '../navigation/routes';
-import {getAdresse} from '../store/slices/userAdresseSlice'
+import {getAdresse, getAdresseByUser} from '../store/slices/userAdresseSlice'
+import {getAllVilles} from '../store/slices/villeSlice'
 
 function OrderPayementScreen({navigation}) {
     const dispatch = useDispatch()
@@ -19,22 +20,22 @@ function OrderPayementScreen({navigation}) {
 
     const articleAmount = useSelector(state => state.entities.shoppingCart.totalAmount)
     const payements = useSelector(state => state.entities.payement.list)
-    const currentPlan = useSelector(state => state.entities.payement.currentPlan)
+    const currentOrder = useSelector(state => state.entities.order.currentOrder)
     const payementPlans = useSelector(state => state.entities.payement.payementPlans)
     const [selectedPayement, setSelectedPayement] = useState(1)
     const [checkItem, setCheckItem] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
 
-    const selectPlan = async () => {
-        await dispatch(getSelected(1))
-        if (payementPlans.length === 0 ) setIsLoading(true)
-        setIsLoading(false)
-    }
+
+
+    const getVilles = useCallback(async() => {
+        dispatch(getAllVilles())
+    }, [])
 
 
   useEffect(() => {
-      selectPlan()
       dispatch(getAdresse())
+      getVilles()
   }, [])
 
 
@@ -75,12 +76,16 @@ function OrderPayementScreen({navigation}) {
                                           checked={plan.checked} selectItem={() => {
                             dispatch(getSelectedPlan(plan))
                                               setCheckItem(true)}}/>)}
-                    {isLoading && <View>
-                        <ActivityIndicator size='large' color={colors.rougeBordeau}/>
-                    </View> }
+
                 </View>
-                    <AppButton style={styles.buttonStyle} textStyle={{fontSize: 20}} title='continuer'
-                               onPress={() => navigation.navigate(routes.ORDER_LIVRAISON)}/>
+                    <AppButton disable={true} style={styles.buttonStyle} textStyle={{fontSize: 20}} title='continuer'
+                               onPress={() => {
+                                   if(currentOrder.type === 'e-location' || currentOrder.type === 'e-service') {
+                                       navigation.navigate(routes.ORDER)
+                                   } else {
+                                   navigation.navigate(routes.ORDER_LIVRAISON)
+                                   }
+                               }}/>
             </ScrollView>
         </View>
         </View>

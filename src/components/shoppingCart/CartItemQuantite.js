@@ -4,16 +4,16 @@ import {AntDesign} from '@expo/vector-icons'
 import AppText from "../AppText";
 import colors from "../../utilities/colors";
 
-function CartItemQuantite({quantite,style, decrementQuantite, incrementQuantite}) {
+function CartItemQuantite({quantite,style,minusActive, plusActive, decrementQuantite, incrementQuantite}) {
     return (
         <View style={[styles.quantite, style]}>
-            <TouchableOpacity onPress={decrementQuantite}>
+           {minusActive && <TouchableOpacity onPress={decrementQuantite}>
             <AntDesign name='minus' size={15} style={{fontWeight: 'bold'}}/>
-            </TouchableOpacity>
+            </TouchableOpacity>}
             <AppText style={{marginRight: 10, marginLeft: 10}}>{quantite}</AppText>
-            <TouchableOpacity onPress={incrementQuantite}>
+            {plusActive && <TouchableOpacity onPress={incrementQuantite}>
             <AntDesign name='plus' size={10} style={{fontWeight: 'bold'}}/>
-            </TouchableOpacity>
+            </TouchableOpacity>}
         </View>
     );
 }

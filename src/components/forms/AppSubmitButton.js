@@ -11,7 +11,7 @@ function AppSubmitButton({title, showLoading}) {
     return (
         <View style={styles.container}>
           {showLoading && <ActivityIndicator size='small' color={colors.blanc}/>}
-          <AppButton onPress={handleSubmit} style={{margin: 15, padding: 10}} title={title} />
+          <AppButton style={{width: '60%', padding: 10, marginTop: 10}} onPress={handleSubmit} title={title} />
         </View>
     );
 }
@@ -21,9 +21,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         borderRadius: 30,
-        width: 'auto',
-        height: 50,
-        backgroundColor: colors.bleuFbi
     }
 })
 

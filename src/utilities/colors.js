@@ -9,6 +9,7 @@ export default {
     leger: '#ccc',
     lightGrey: '#F8F4F4',
     dark: '#0C0C0C',
-    rougeClair: "#e63c4b"
+    rougeClair: "#e63c4b",
+    vert: 'green'
 
 }

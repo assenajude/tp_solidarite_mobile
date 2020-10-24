@@ -13,7 +13,7 @@ function ListFooter({otherStyle, onPress}) {
         <TouchableWithoutFeedback onPress={onPress}>
             <View>
                 <View style={otherStyle}>
-                    <AppButton iconColor={color.blanc} iconSize={40} style={styles.buttonStyle} iconName='pluscircleo' />
+                    <AppButton iconColor={color.blanc} iconSize={30} style={styles.buttonStyle} iconName='pluscircleo' />
                 </View>
             </View>
         </TouchableWithoutFeedback>
@@ -22,10 +22,10 @@ function ListFooter({otherStyle, onPress}) {
 
 const styles  = StyleSheet.create({
     buttonStyle: {
-        width: 60,
+        width: 50,
         height: 20,
-        borderRadius: 150,
-        padding: 30,
+        borderRadius: 100,
+        padding: 25,
         backgroundColor: color.rougeBordeau
     },
 })

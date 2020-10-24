@@ -9,6 +9,7 @@ import {loadRelais} from '../store/slices/pointRelaisSlice'
 import {getRegions} from '../store/slices/regionSlice';
 import {getAllVilles} from '../store/slices/villeSlice'
 import {getAdresse} from '../store/slices/userAdresseSlice'
+import colors from "../utilities/colors";
 
 
 function OtherFileMain({navigation}) {
@@ -17,27 +18,27 @@ function OtherFileMain({navigation}) {
 
     const getCategories = useCallback(async () => {
         await dispatch(loadCategories())
-    }, [dispatch])
+    }, [])
 
     const getVilles = useCallback(async () => {
         await dispatch(getAllVilles())
-    }, [dispatch])
+    }, [])
 
     const getShippingAdresse = useCallback(async () => {
         await dispatch(getAllShippingAdress())
-    }, [dispatch])
+    }, [])
 
     const getPointRelais = useCallback(async () => {
         await dispatch(loadRelais())
-    }, [dispatch])
+    }, [])
 
     const getAllRegions = useCallback(async () => {
         await dispatch(getRegions())
-    }, [dispatch])
+    }, [])
 
 const getUserAdresses = useCallback(async () => {
         await dispatch(getAdresse())
-    }, [dispatch])
+    }, [])
 
     useEffect(() => {
             getCategories();
@@ -57,8 +58,6 @@ const getUserAdresses = useCallback(async () => {
            <AppButton title='Ville' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.VILLE)}/>
             <AppButton title='Point relais' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.POINT_RELAIS)}/>
             <AppButton title='Adresse utilisateur' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.USER_ADDRESS)}/>
-            <AppButton title='Livraison' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.LIVRAISON)}/>
-            <AppButton title='Payement utilisateur' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.USER_PAYEMENT)}/>
         </ScrollView>
 
     );
@@ -70,6 +69,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     buttonStyle: {
+        backgroundColor: colors.bleuFbi,
         width: '90%',
         padding: 10,
         margin: 20

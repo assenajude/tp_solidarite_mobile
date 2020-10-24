@@ -26,16 +26,16 @@ function PayementScreen({navigation}) {
 
    const getAllPayements = useCallback(async () => {
         await dispatch(loadPayements())
-   }, [dispatch])
+   }, [])
 
     const addNewPayement = useCallback(async (payement) => {
             await dispatch(createPayement(payement));
             setMode(0)
-    }, [dispatch, setMode])
+    }, [])
 
     useEffect(() => {
         getAllPayements();
-    }, [dispatch, getAllPayements, mode])
+    }, [ getAllPayements])
 
     return (
         <View style={styles.container}>

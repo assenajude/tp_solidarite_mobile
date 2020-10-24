@@ -1,0 +1,80 @@
+import {useStore, useDispatch} from "react-redux";
+import {getOrderPayementMode} from "../store/selectors/payementSelector";
+import {addFacture} from "../store/slices/factureSlice";
+import {addTranche} from "../store/slices/trancheSlice";
+import {createOrderContrat} from "../store/slices/orderSlice";
+
+let useCreateOrderContrat;
+export default useCreateOrderContrat = () => {
+    const store = useStore()
+    const dispatch = useDispatch()
+    
+    const createContrat = async (order) => {
+        const orderPlan = order.plan
+        const modePayement = getOrderPayementMode(store.getState())[order.id].payementMode
+        let dateFin = new Date()
+        const moisDateFin = dateFin.getMonth() + orderPlan.nombreMensualite
+        const jourDateFin = dateFin.getDate()
+        dateFin.setDate(jourDateFin+3)
+        dateFin.setMonth(moisDateFin)
+        let factureData = {
+            orderId: order.id,
+            debut: Date.now(),
+            fin: dateFin.getTime(),
+            montant: order.montant
+        }
+        await dispatch(addFacture(factureData))
+
+        const newFacture = store.getState().entities.facture.newAdded
+
+        if(modePayement.toLowerCase() === 'cash') {
+            let datePayementTranche = new Date()
+            const moisPayement= datePayementTranche.getDate()
+            datePayementTranche.setDate(moisPayement + 3)
+            const trancheData = {
+                factureId: newFacture.id,
+                dateEmission: Date.now(),
+                dateEcheance: datePayementTranche.getTime(),
+                montant: order.montant
+            }
+            dispatch(addTranche(trancheData))
+        } else if(modePayement.toLowerCase() === 'credit') {
+            const montantPerTranche = order.montant / orderPlan.nombreMensualite
+            for(let i=1; i<= orderPlan.nombreMensualite; i++) {
+                let datePayementFin = new Date()
+                let datePayementDebut = new Date()
+                const moisPayement = datePayementDebut.getMonth()
+                 datePayementFin.setMonth(moisPayement + i)
+                 datePayementDebut.setMonth(moisPayement+i-1)
+                const trancheData = {
+                    factureId: newFacture.id,
+                    dateEmission: datePayementDebut.getTime(),
+                    dateEcheance: datePayementFin.getTime(),
+                    montant: montantPerTranche
+                }
+                dispatch(addTranche(trancheData))
+            }
+
+        }
+        const error = store.getState().entities.tranche.error
+        if(error === null) {
+            let finContrat = new Date()
+            const moisFin = finContrat.getMonth()
+            finContrat.setDate(finContrat.getDate() + 3)
+            finContrat.setMonth(moisFin + orderPlan.nombreMensualite)
+            const contratData = {
+                orderId: order.id,
+                debut: Date.now(),
+                fin: finContrat.getTime(),
+                montant: order.montant,
+                nbMensualite: orderPlan.nombreMensualite
+            }
+            dispatch(createOrderContrat(contratData))
+        } else {
+            Alert.alert('Erreur', 'Une erreur est apparue', [
+                {text: 'ok', onPress: () => {return;}}
+            ])
+        }
+    }
+    return {createContrat}
+}

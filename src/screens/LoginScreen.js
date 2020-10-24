@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {View, KeyboardAvoidingView,ScrollView, StyleSheet, Image, Keyboard, TouchableWithoutFeedback, Platform} from 'react-native';
+import {View, Alert,ScrollView, StyleSheet, Image, Keyboard, TouchableWithoutFeedback, Platform} from 'react-native';
 import * as yup from 'yup'
 import {LinearGradient} from 'expo-linear-gradient'
 
@@ -12,9 +12,10 @@ import AppForm from "../components/forms/AppForm";
 import AppText from "../components/AppText";
 import User from "../models/user";
 import AppErrorMessage from "../components/forms/AppErrorMessage";
-import {signin} from '../store/slices/authSlice'
-import routes from '../navigation/routes'
+import {signin, autoLogin} from '../store/slices/authSlice'
 import authStorage from '../store/persistStorage'
+import routes from '../navigation/routes'
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 const loginValidationSchema = yup.object().shape({
     username: yup.string().required("Veillez saisir un nom d'utilisateur"),
@@ -27,8 +28,8 @@ function LoginScreen({navigation}) {
         password: ''
     });
 
-    const [authenticated, setAuthenticated] = useState(false);
     const [loginFailed, setLoginFailed] = useState(false);
+    const isLoading = useSelector(state => state.auth.loading)
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
     const token = useSelector(state => state.auth.token);
 
@@ -37,17 +38,25 @@ function LoginScreen({navigation}) {
     const store = useStore()
 
 
+    const getNewUser = (state) => {
+        return state.auth.user
+    }
 
     const handleLogin = async (user) => {
         await dispatch(signin(user))
-       store.subscribe(() => {
-           const authToken = store.getState().auth.token;
-          if (!authToken) return;
-          navigation.goBack()
-        })
+        const error = store.getState().auth.error
+        if(error === null) {
+            navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
+        } else {
+            Alert.alert('Erreur', 'Impossible de connecter maintenant. Veuillez reessayer plutard', [
+                {text: 'ok', onPress: () => {return}}
+            ])
+        }
     }
 
     return (
+        <>
+            <AppActivityIndicator visible={isLoading}/>
              <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
                  <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/logo_solidarite.png')} />
                  <ScrollView>
@@ -67,6 +76,7 @@ function LoginScreen({navigation}) {
                     </AppForm>
             </ScrollView>
              </LinearGradient>
+            </>
     );
 }
 

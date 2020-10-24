@@ -21,7 +21,6 @@ import NewPointRelaisScreen from "../screens/NewPointRelaisScreen";
 import NewUserAdresseScreen from "../screens/NewUserAdresseScreen";
 import RegionScreen from "../screens/RegionScreen";
 import VilleScreen from "../screens/VilleScreen";
-import NewUserAdresse from "../screens/NewUserAdresse";
 import UserAdresseScreen from "../screens/UserAdresseScreen";
 
 const StackOther = createStackNavigator();
@@ -74,12 +73,12 @@ function OtherFileNavigator({navigation}) {
             <StackOther.Screen name='NewPointRelaisScreen' component={NewPointRelaisScreen} options={{
                 title: 'Nouveau point relais'
             }}/>
-            <StackOther.Screen name='NewUserAdresseScreen' component={NewUserAdresseScreen} options={{
+           {/* <StackOther.Screen name='NewUserAdresseScreen' component={NewUserAdresseScreen} options={{
                 title: 'Nouvelle adresse utilisateur'
             }}/>
             <StackOther.Screen name='UserAdresseScreen' component={UserAdresseScreen} options={{
                 title: 'Adresse utilisateur'
-            }}/>
+            }}/>*/}
             <StackOther.Screen name='RegionScreen' component={RegionScreen} options={{
                 title: 'Gestion des regions'
             }}/>

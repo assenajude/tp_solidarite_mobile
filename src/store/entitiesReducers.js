@@ -12,6 +12,13 @@ import pointRelaisSlice from '../store/slices/pointRelaisSlice';
 import regionSlice from '../store/slices/regionSlice'
 import villeSlice from '../store/slices/villeSlice'
 import userAdresseSlice from '../store/slices/userAdresseSlice'
+import factureSlice from '../store/slices/factureSlice'
+import trancheSlice from './slices/trancheSlice'
+import serviceSlice from './slices/serviceSlice'
+import mainSlice from './slices/mainSlice'
+import userLocationSlice from './slices/userLocationSlice'
+import userServiceSlice from './slices/userServiceSlice'
+import userOrderSlice from './slices/userOrderSlice'
 
 export default combineReducers({
     payement: payementSlice,
@@ -25,6 +32,13 @@ export default combineReducers({
     pointRelais: pointRelaisSlice,
     region: regionSlice,
     ville: villeSlice,
-    userAdresse: userAdresseSlice
+    userAdresse: userAdresseSlice,
+    facture: factureSlice,
+    tranche: trancheSlice,
+    service: serviceSlice,
+    main: mainSlice,
+    userLocation: userLocationSlice,
+    userService: userServiceSlice,
+    userOrder: userOrderSlice
 
 })

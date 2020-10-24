@@ -45,7 +45,6 @@ function NewUserAdresseScreen({navigation}) {
                 {text: 'ok', onPress: () => navigation.navigate(routes.LOGIN)}
             ], {cancelable: false})
         }
-        console.log(user)
         return user;
     }
 

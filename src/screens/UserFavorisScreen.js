@@ -1,11 +1,12 @@
 import React from 'react';
 import {View, Text} from 'react-native'
-function LocationScreen(props) {
+
+function UserFavorisScreen(props) {
     return (
         <View>
-            <Text>Location screen</Text>
+            <Text>My favorites screen</Text>
         </View>
     );
 }
 
-export default LocationScreen;
+export default UserFavorisScreen;

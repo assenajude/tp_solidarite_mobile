@@ -14,7 +14,7 @@ function AddToCartModal({source, designation, itemModalVisible, addItemToCart,go
                 <AppText style={{color: 'green', fontSize: 20, fontWeight: 'bold'}}>Felicitaion!</AppText>
                 </View>
                     <View style={styles.contentStyle}>
-                    <AppText style={{color: Color.or,fontWeight: 'bold' }}>Ce produit</AppText>
+                    {/*<AppText style={{color: Color.or,fontWeight: 'bold' }}>Ce produit</AppText>*/}
                     <View>
                         <Image resizeMode='contain' style={styles.imageStyle} source={source}/>
                         <AppText style={{fontWeight: 'bold'}}>{designation}</AppText>
@@ -51,8 +51,8 @@ const styles  = StyleSheet.create({
         marginBottom: 20
     },
     imageStyle: {
-        width: 80,
-        height: 80
+        width: 60,
+        height: 60
     },
     buttonContainer: {
         flexDirection: 'row',

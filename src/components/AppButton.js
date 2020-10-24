@@ -4,9 +4,9 @@ import {AntDesign} from '@expo/vector-icons'
 
 import colors from '../utilities/colors'
 
-function AppButton({title, onPress, style, iconName, iconSize, iconColor, textStyle, ...props}) {
+function AppButton({title, onPress, style, iconName, iconSize, iconColor, textStyle,disableButton, ...props }) {
     return (
-        <TouchableOpacity style={[styles.buttonColor, style]} onPress={onPress}>
+        <TouchableOpacity disabled={disableButton} style={[styles.buttonColor, style]} onPress={onPress} {...props}>
             <View style={styles.contentStyle}>
             {iconName && <AntDesign name={iconName} size={iconSize} color={iconColor} {...props}/>}
             {title && <Text style={[styles.textStyle, textStyle]} {...props}>{title}</Text>}
@@ -18,7 +18,7 @@ function AppButton({title, onPress, style, iconName, iconSize, iconColor, textSt
 
 const styles = StyleSheet.create({
     buttonColor: {
-        backgroundColor: colors.bleuFbi,
+        backgroundColor: colors.rougeBordeau,
         alignItems: 'center',
         borderRadius: 25,
         width: 'auto',
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     contentStyle: {
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center'
     },

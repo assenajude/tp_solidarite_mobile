@@ -1,17 +1,17 @@
 
 import React from 'react';
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import {FontAwesome5, MaterialCommunityIcons, Entypo} from '@expo/vector-icons'
 
 
 
-import CadeauScreen from "../screens/CadeauScreen";
 import AccueilNavigator from "./AccueilNavigator";
-import OffreScreen from "../screens/OffreScreen";
 
 import colors from "../utilities/colors";
-import NotificationScreen from "../screens/NotificationScreen";
 import AppIconWithBadge from "../components/AppIconWithBadge";
-import routes from '../navigation/routes'
+import LocationNavigator from "./LocationNavigator";
+import CommerceNavigator from "./CommerceNavigator";
+import ServiceNavigator from "./ServiceNavigator";
 
 function TabNavigation(props) {
     const Tab = createBottomTabNavigator();
@@ -20,26 +20,35 @@ function TabNavigation(props) {
     return (
 
         <Tab.Navigator tabBarOptions={{
-            activeTintColor: colors.rougeBordeau,
+            activeTintColor: colors.blanc,
+            activeBackgroundColor: colors.rougeBordeau,
             marginBottom: 20
         }}
         >
-        <Tab.Screen name="Accueil" component={AccueilNavigator}
-                    options={{tabBarIcon: ({size, color}) => <AppIconWithBadge
-                           name='home' notifStyle={{backgroundColor: colors.rougeBordeau}} badgeCount={5} size={size} color={color} />}}/>
+        <Tab.Screen name="AccueilNavigator" component={AccueilNavigator}
+                    options={{tabBarIcon: ({size, color}) => <AppIconWithBadge notifStyle={{backgroundColor: colors.bleuFbi}} badgeCount={5} >
+                            <FontAwesome5 name="home" size={size} color={color} />
+                        </AppIconWithBadge>,
+                    title: 'Accueil'}}/>
 
-        <Tab.Screen name="Offre" component={OffreScreen}
-                    options={{tabBarIcon: ({size, color}) => <AppIconWithBadge
-                            name='questioncircleo' badgeCount={1} size={size} color={color} notifStyle={{backgroundColor: colors.rougeBordeau}} />}}/>
+        <Tab.Screen name="E-commerce" component={CommerceNavigator}
+                    options={{tabBarIcon: ({size, color}) => <AppIconWithBadge badgeCount={1} notifStyle={{backgroundColor: colors.bleuFbi}}>
+                            <Entypo name="shopping-basket" size={size} color={color} />
+                        </AppIconWithBadge>,
+                    title: 'e-commerce'}} />
 
-        <Tab.Screen name="Cadeau" component = {CadeauScreen}
-                    options={{tabBarIcon: ({size, color}) => <AppIconWithBadge
-                            name='gift' notifStyle={{backgroundColor: colors.rougeBordeau}} color={color} size={size} badgeCount={4} />,
-                        title:'Cadeau du jour'}}/>
+        <Tab.Screen name="E-location" component = {LocationNavigator}
+                    options={{tabBarIcon: ({size, color}) => <AppIconWithBadge notifStyle={{backgroundColor: colors.bleuFbi}} badgeCount={4}>
+                            <MaterialCommunityIcons name="warehouse" size={size} color={color} />
+                        </AppIconWithBadge>,
+                        title:'e-location'}}/>
 
-        <Tab.Screen name="Notification"  component={NotificationScreen}
+        <Tab.Screen name="E-service"  component={ServiceNavigator}
                     options={{tabBarIcon: ({size, color}) =>  <AppIconWithBadge
-                            name='bells' badgeCount={9} size={size} color={color} notifStyle={{backgroundColor: colors.rougeBordeau}}/>}}/>
+                            badgeCount={9} notifStyle={{backgroundColor: colors.bleuFbi}}>
+                            <FontAwesome5 name="hands-helping" size={size} color={color} />
+                        </AppIconWithBadge>,
+                    title: 'e-service'}}/>
 
     </Tab.Navigator>
 

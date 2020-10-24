@@ -12,6 +12,8 @@ import AppForm from "../components/forms/AppForm";
 import AppErrorMessage from "../components/forms/AppErrorMessage";
 import {register, signin} from '../store/slices/authSlice'
 import routes from "../navigation/routes";
+import AppActivityIndicator from "../components/AppActivityIndicator";
+import {Alert} from "react-native-web";
 
 const registerValidationSchema = yup.object().shape({
     username: yup.string().min(2,'Le pseudo doit contenir au moins 2 caractère').required('Veillez choisir un nom utilisateur'),
@@ -31,7 +33,6 @@ function RegisterScreen({navigation}) {
     const error = useSelector(state => state.auth.error)
     const loading = useSelector(state => state.auth.loading)
     const [registerFailed, setRegisterFailed] = useState(false);
-    const [registerErreur, setRegisterErreur] = useState()
 
     const dispatch = useDispatch();
 
@@ -43,11 +44,20 @@ function RegisterScreen({navigation}) {
             password: user.password
         }
             await dispatch(register(userData));
-            store.subscribe(() => {
-                const token = store.getState().auth.token
-                if(!token) return;
-                navigation.navigate(routes.ACCUEIL)
-            })
+            const error = store.getState().auth.error
+            if(error === null) {
+                await dispatch(signin(user))
+                const newError = store.getState().auth.error
+                if(newError === null) {
+                    navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
+                } else {
+                    Alert.alert('ERREUR', 'Vous avez creer votre compte avec succès mais nous ne pouvons pas vous connecter maintenant', [
+                        {text: 'ok', onPress: () => {return;}}
+                    ])
+                }
+            }
+
+
     }
 
 
@@ -55,6 +65,8 @@ function RegisterScreen({navigation}) {
     }, [])
 
     return (
+        <>
+            <AppActivityIndicator visible={loading}/>
         <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
             <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/logo_solidarite.png')} />
             <ScrollView style={{marginBottom: 20}}>
@@ -83,6 +95,7 @@ function RegisterScreen({navigation}) {
 
             </ScrollView>
         </LinearGradient>
+            </>
     );
 }
 

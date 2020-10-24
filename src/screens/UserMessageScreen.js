@@ -1,12 +1,12 @@
 import React from 'react';
 import {View, Text} from 'react-native'
 
-function UserNotifScreen(props) {
+function UserMessageScreen(props) {
     return (
         <View>
-            <Text>her is user notif screen</Text>
+            <Text>My message screen</Text>
         </View>
     );
 }
 
-export default UserNotifScreen;
+export default UserMessageScreen;

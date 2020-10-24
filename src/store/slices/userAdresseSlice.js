@@ -8,7 +8,8 @@ const userAdresseSlice = createSlice({
         loading: false,
         error: null,
         userAdresses: [],
-        selectedAdresse: {}
+        selectedAdresse: {},
+        adresseRelais: {}
     },
     reducers: {
         userAdresseRequested: (state, action) => {
@@ -34,14 +35,23 @@ const userAdresseSlice = createSlice({
         },
         selectAdress: (state, action) => {
             const selectAdress = state.userAdresses.find(adress => adress.id === action.payload);
-            state.selectedAdresse  = selectAdress
+            state.selectedAdresse  = selectAdress;
             if (selectAdress.selected) {
             selectAdress.selected = false
             } else {
                 selectAdress.selected = true
-            }
+            };
+            state.adresseRelais = selectAdress.pointRelai;
             const otherAdress = state.userAdresses.filter(adress => adress.id !== selectAdress.id);
             otherAdress.forEach(adress => adress.selected = false)
+
+        },
+        resetAdresse: (state) => {
+            state.adresseRelais = {}
+            state.selectedAdresse = {}
+            state.userAdresses.forEach(adresse => {
+                adresse.selected = false
+            })
         }
     }
 
@@ -49,7 +59,7 @@ const userAdresseSlice = createSlice({
 
 export default userAdresseSlice.reducer;
 
-const {userAdresseAdded, userAdresseFailed, userAdresseReceived, userAdresseRequested, adressByUser, selectAdress} = userAdresseSlice.actions
+const {userAdresseAdded, resetAdresse, userAdresseFailed, userAdresseReceived, userAdresseRequested, adressByUser, selectAdress} = userAdresseSlice.actions
 
 
 const url = '/userAdresses'
@@ -78,4 +88,8 @@ export const getAdresseByUser = (userId) => dispatch => {
 
 export const getSelectedAdress = (adressId) => dispatch => {
     dispatch(selectAdress(adressId))
+}
+
+export const getAdresseReset = () => dispatch => {
+    dispatch(resetAdresse())
 }
