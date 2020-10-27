@@ -4,95 +4,86 @@ import {View, FlatList, StyleSheet, ActivityIndicator,ScrollView, Alert} from "r
 import dayjs from "dayjs";
 
 import {
-    getItemDetail, getStatusEditing,
+    decrementOrderCompter,
+    getItemDetail, getStatusEditing, incrementOrderCompter,
     saveStatusEditing,
     updateHistory
 } from '../store/slices/orderSlice'
 import FactureListItem from "../components/list/FactureListItem";
 import routes from "../navigation/routes";
 import useCreateOrderContrat from "../hooks/useCreateOrderContrat";
+import {getOrderPayementMode} from "../store/selectors/payementSelector";
+import AppText from "../components/AppText";
+import AppButton from "../components/AppButton";
+import useManageUserOrder from "../hooks/useManageUserOrder";
+import GetLogin from "../components/user/GetLogin";
 
 function UserOrderScreen({navigation}) {
     const store = useStore();
     const dispatch  = useDispatch()
-    const {createContrat} = useCreateOrderContrat()
+    const {startEditingAccord,saveAccordEdit, createOrderContrat, moveOrderToHistory} = useManageUserOrder()
+
+
 
     const userOrders = useSelector(state => state.entities.order.currentUserOrders)
-    const isLoading = useSelector(state => state.entities.order.loading)
+    const compter = useSelector(state => state.entities.order.demandeCompter)
+    const error = useSelector(state => state.entities.order.error)
     const user = useSelector(state => state.auth.user)
-    const [editLivraisonStatus, setEditLivraisonStatus] = useState(false)
-    const [statusLivraison, setStatusLivraison] = useState('editer le status..')
     const [accordEditValue, setAccordEditValue] = useState('Editer le status')
 
-
-    const  startEditingAccord = (item) => {
-        const data = {
-            id: item.id,
-            libelle: 'editAccord'
-        }
-        dispatch(getStatusEditing(data))
-    }
-
-    const handleAccordEditSave = (currentItem) => {
-        const data = {
-            orderId: currentItem.id,
-            statusAccord: accordEditValue
-        }
-        dispatch(saveStatusEditing(data))
-        const editData = {
-            id: currentItem.id,
-            libelle: 'editAccord'
-        }
-        dispatch(getStatusEditing(editData))
-    }
-
-
-    const setItemHistory = (item) => {
-        const itemData = {
-            orderId: item.id,
-            history: true
-        }
-        dispatch(updateHistory(itemData))
-    }
-
-    const createItemContrat = (value) => {
-        Alert.alert('Info...', 'Voulez-vous passer en contrat pour cette commande?', [
-            {text: 'oui', onPress: async () => {
-                  await createContrat(value)
-                }},
-            {
-                text: 'non', onPress: () => {return;}
-            }
-        ], {cancelable: false})
-
-    }
 
 
     useEffect(() => {
     }, [])
 
+    if(!user) {
+        return <GetLogin message='Connectez vous pour consulter vos demandes'/>
+    }
+
+
+    if(error !== null) {
+        return <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}>
+            <AppText>Erreur...Impossible de consulter vos demandes.Veuillez reessayer plutard.</AppText>
+        </View>
+    }
+
+    if(error === null && compter === 0) {
+        return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <AppText>Vous n'avez aucune demande en cours..</AppText>
+            <AppButton title='Commander maintenant' onPress={() => navigation.navigate('E-commerce')}/>
+
+        </View>
+    }
 
 
     return (
-            <ScrollView>
-                {userOrders.map((item, index) => {
-                    if(item.contrats && item.contrats.length === 0 && !item.historique) {
-                        return (
-                            <FactureListItem key={index.toString()} numero={item.numero} montant={item.montant} label='commande'
-                                             getDetails={() => dispatch(getItemDetail(item.id))} showDetail={item.showDetails} getLink={() => navigation.navigate(routes.FACTURE_DETAILS, item)}
-                                             debut={dayjs(item.dateCmde).format('DD/MM/YYYY HH:mm:ss')}  header='CMD N°:'
-                                             linkTitle='Voir la facrture' orderItems={item.cartItems} fraisLivraison={item.fraisTransport} tauxInteret={item.interet}
-                                             labelDate1='Commandé le' labelDate2='Livré le ' fin={dayjs(item.dateLivraison).format('DD/MM/YYYY HH:mm:ss')}
-                                             labelDatePrevue='Date livraison prevue' labelAccord='Status accord' statusAccordValue={item.statusAccord}
-                                             editStatusAccord={item.editAccord} getAccordStatusEdit={() => startEditingAccord(item)} undoAccordEdit={() => startEditingAccord(item)}
-                                             accordEditingValue={accordEditValue} changeAccordEditValue={(value, item) => setAccordEditValue(value)}
-                                             saveAccordEditing={() => handleAccordEditSave(item)}
-                                             orderEspace='demande' moveItemToHistory={() => setItemHistory(item)}
-                                             leaveItemToContract={() => createItemContrat(item)} isDemande={true} />
-                        )
-                    }
-                })}
-            </ScrollView>
+       <FlatList data={userOrders} keyExtractor={(item, index) => index.toString()}
+       renderItem={({item}) => {
+           if(item.contrats && item.contrats.length === 0 && !item.historique) {
+               return (
+                   <FactureListItem numero={item.numero} montant={item.montant} label='commande'
+                                    getDetails={() => dispatch(getItemDetail(item.id))} showDetail={item.showDetails} getLink={() => navigation.navigate(routes.FACTURE_DETAILS, item)}
+                                    debut={dayjs(item.dateCmde).format('DD/MM/YYYY HH:mm:ss')}  header='A'
+                                    linkTitle='Voir la facrture' orderItems={item.cartItems} fraisLivraison={item.fraisTransport} tauxInteret={item.interet}
+                                    labelDate1='Commandé le' labelDate2='Livré le ' fin={dayjs(item.dateLivraison).format('DD/MM/YYYY HH:mm:ss')}
+                                    labelDatePrevue='Date livraison prevue' labelAccord='Status accord' statusAccordValue={item.statusAccord}
+                                    editStatusAccord={item.editAccord} getAccordStatusEdit={() => startEditingAccord(item.id)} undoAccordEdit={() => startEditingAccord(item.id)}
+                                    accordEditingValue={accordEditValue} changeAccordEditValue={(value, item) => setAccordEditValue(value)}
+                                    saveAccordEditing={() => saveAccordEdit({orderId: item.id, statusAccord:accordEditValue})}
+                                    orderEspace='demande' moveItemToHistory={() =>{
+                                        moveOrderToHistory(item.id)
+                                    }}
+                                    leaveItemToContract={() => {
+                                        createOrderContrat(item)
+                                    }} isDemande={true} datePrevue={dayjs(item.dateLivraisonDepart).format('DD/MM/YYYY HH:mm:ss')}
+                                    modePayement={getOrderPayementMode(store.getState())[item.id].payementMode}/>
+               )
+           }
+       }}/>
     );
 }
 

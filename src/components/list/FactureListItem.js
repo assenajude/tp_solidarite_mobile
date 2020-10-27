@@ -13,6 +13,7 @@ import ItemIconButton from "./ItemIconButton";
 import EditItemStatus from "../order/EditItemStatus";
 import ContratWatch from "../order/ContratWatch";
 import FactureItemLabel from "./FactureItemLabel";
+import ListItemHeader from "./ListItemHeader";
 
 function FactureListItem({numero,okPayement,showDetail,orderItems, label,labelDatePrevue,datePrevue,undoEdit,saveEdit,
                              contratLabel,contrats,contratStatus,isDemande,isContrat,isHistorique,contratStatusStyle,
@@ -22,16 +23,17 @@ function FactureListItem({numero,okPayement,showDetail,orderItems, label,labelDa
                              statusLivraisonValue,changeStatusText,getAccordStatusEdit,editStatusAccord,orderEspace,
                              notPayed,showProgress,soldeFacture, progress,payTranche,getLink,linkTitle,trancheButtonTitle2,modePayement,
                              getDetails,header,description, montant,debut, tranches, fin, showTranche=false,
-                             loopItemWatch, playItemWatch,solde
+                             loopItemWatch, playItemWatch,solde,permitAccordEdit,permitLivraisonEdit,
                           }) {
 const store = useStore()
 
     return (
+        <>
         <View style={styles.container}>
             <View>
                 <View>
                     {orderItems && <ScrollView horizontal>
-                        {orderItems.map((item, index) => <TouchableOpacity  key={index} onPress={() => console.log(item)}>
+                        {orderItems.map((item, index) => <TouchableOpacity  key={index}>
                             <Image resizeMode='stretch' style={{height: 50, width: 50, margin: 10}} source={{uri: item.image}}/>
                         </TouchableOpacity>)}
 
@@ -39,10 +41,12 @@ const store = useStore()
 
                 </View>
                 <View style={styles.factureInfo}>
-                    <View style={{flexDirection: 'row', justifyContent:'space-between'}}>
-                        <AppText style={{fontSize: 20, fontWeight: 'bold'}}>{header}  </AppText>
+                    <View style={{flexDirection: 'row', justifyContent:'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <ListItemHeader headerTitle={header}/>
                         <AppText style={{fontWeight: 'bold', fontSize: 20, color: colors.or}}>{numero}</AppText>
-                        {okPayement && <LottieView style={{ width: 50, marginLeft: 10}} autoPlay loop={false} source={require('../../assets/animations/done')}/>}
+                        {label == 'facture' && okPayement && <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={false} source={require('../../assets/animations/done')}/>}
                     </View>
 
                     {description && <AppText>{description}</AppText>}
@@ -71,20 +75,20 @@ const store = useStore()
                         flexDirection: 'row'
                     }}>
                         {modePayement && <View style={{flexDirection: 'row'}}>
-                            <AppText>Mode de payement: </AppText>
-                            <AppText style={{fontWeight: 'bold'}}>{modePayement}</AppText>
+                            <AppText style={{fontWeight: 'bold', fontSize: 15}}> Mode de payement: </AppText>
+                            <AppText style={{fontSize: 15}}>{modePayement}</AppText>
                         </View>}
                     </View>
                    <View style={{marginBottom: 10}}>
-                   {isDemande && <EditItemStatus labelStatus={labelAccord} statusValue={statusAccordValue} getStatusEditing={getAccordStatusEdit} editStatus={editStatusAccord}
+                   {label=='commande' && !isContrat && <EditItemStatus labelStatus={labelAccord} permitEdit={permitAccordEdit} statusValue={statusAccordValue} getStatusEditing={getAccordStatusEdit} editStatus={editStatusAccord}
                     undoEditing={undoAccordEdit} editingStatusValue={accordEditingValue} changeEditingStatusValue={changeAccordEditValue} saveEditing={saveAccordEditing}
                     statusValueStyle={{
                         color: statusAccordValue.toLowerCase() === 'accepté'?'green': statusAccordValue.toLowerCase() === 'refusé'?'red': 'grey',
                         fontWeight: 'bold'
                     }}/>}
 
-                       {isContrat && <EditItemStatus labelStatus={labelStatusLivr} statusValue={statusLivraison} editStatus={editStatusLivraison}
-                        changeEditingStatusValue={changeStatusText} editingStatusValue={statusLivraisonValue} getStatusEditing={getStatusLivraisonEdit}
+                       {label === 'commande' && !isDemande && <EditItemStatus labelStatus={labelStatusLivr} statusValue={statusLivraison} editStatus={editStatusLivraison}
+                        changeEditingStatusValue={changeStatusText} permitEdit={permitLivraisonEdit} editingStatusValue={statusLivraisonValue} getStatusEditing={getStatusLivraisonEdit}
                         saveEditing={saveEdit} undoEditing={undoEdit}
                         statusValueStyle={{
                             color: statusLivraison.toLowerCase() === 'livré'?'green':statusLivraison.toLowerCase() === 'partiel'?'orange':'grey',
@@ -137,7 +141,7 @@ const store = useStore()
                             <View>
                                 <AppText>{labelDatePrevue}: {datePrevue}</AppText>
                             </View>
-                          {!isDemande && statusLivraisonValue.toLowerCase() === 'livré' &&  <View>
+                          {!isDemande && statusLivraison.toLowerCase() === 'livré' &&  <View>
                                 <AppText>{labelDate2}: {fin}</AppText>
                             </View>}
                         </View>
@@ -146,36 +150,44 @@ const store = useStore()
                 </View>
 
             </View>
-            <View>
+                {/*{label=='facture' && <LottieView style={{height: 150, width: 150}} autoPlay={factureAnimPlay} loop={factureAnimLoop} source={require('../../assets/animations/bill')}/>}*/}
 
-           { isDemande && <View>
+        </View>
+            <View style={{
+                position: 'absolute',
+                right: -25,
+                top: -20
+            }}>
+            {label == 'commande' && !isDemande && <ContratWatch autoPlay={playItemWatch} loop={loopItemWatch}/>}
+            </View>
+            { isDemande && <View style={{
+                position: 'absolute',
+                right: 10,
+                top: 20
+            }}>
                 { statusAccordValue &&  <View style={{marginBottom: 50}}>
                     { statusAccordValue.toLowerCase() === 'accepté' &&  <ItemIconButton iconName='like1' iconSize={40} onPress={leaveItemToContract} color={colors.vert}
-                        otherStyle={{
-                            borderRadius: 20,
-                        }}/>}
-                        {statusAccordValue && statusAccordValue.toLowerCase() === 'refusé' &&  <ItemIconButton iconName='dislike1' iconSize={40} color='red'
-                        otherStyle={{
-                            borderRadius: 20,
-                        }}/>}
+                       otherStyle={{
+                           borderRadius: 20,
+                       }}/>}
+                    {statusAccordValue && statusAccordValue.toLowerCase() === 'refusé' &&  <ItemIconButton iconName='dislike1' iconSize={40} color='red'
+                       otherStyle={{
+                           borderRadius: 20,
+                       }}/>}
                 </View>}
 
             </View>}
-            {isContrat && <ContratWatch autoPlay={playItemWatch} loop={loopItemWatch}/>}
-            <View>
-                <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-                {!isHistorique && <TouchableOpacity onPress={moveItemToHistory}>
+
+            <View style={{position: 'absolute',right:10,top: 200, alignItems: 'center'}}>
+                {label == 'commande' && !isHistorique && <TouchableOpacity onPress={moveItemToHistory}>
                     <FontAwesome name="history" size={25} color={colors.dark} />
                 </TouchableOpacity>}
-                    {orderEspace === 'historique' && <TouchableOpacity>
-                        <Entypo name='reply' color={colors.dark} size={25}/>
-                    </TouchableOpacity>}
+                {orderEspace === 'historique' && <TouchableOpacity>
+                    <Entypo name='reply' color={colors.dark} size={25}/>
+                </TouchableOpacity>}
                 <ItemIconButton otherStyle={{marginTop: 20}} iconSize={24} iconName='delete' color={colors.rougeBordeau} onPress={deleteItem}/>
-                </View>
             </View>
-
-            </View>
-        </View>
+       </>
     );
 }
 
@@ -183,12 +195,12 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'flex-start',
         backgroundColor: colors.blanc,
         marginTop: 20,
+        paddingLeft: 10,
         paddingBottom: 10,
         borderBottomWidth: 0.5,
-        marginLeft: 10,
         padding: 5
     },
     content: {

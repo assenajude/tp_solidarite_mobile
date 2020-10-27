@@ -14,7 +14,6 @@ function AddToCartModal({source, designation, itemModalVisible, addItemToCart,go
                 <AppText style={{color: 'green', fontSize: 20, fontWeight: 'bold'}}>Felicitaion!</AppText>
                 </View>
                     <View style={styles.contentStyle}>
-                    {/*<AppText style={{color: Color.or,fontWeight: 'bold' }}>Ce produit</AppText>*/}
                     <View>
                         <Image resizeMode='contain' style={styles.imageStyle} source={source}/>
                         <AppText style={{fontWeight: 'bold'}}>{designation}</AppText>
@@ -22,8 +21,8 @@ function AddToCartModal({source, designation, itemModalVisible, addItemToCart,go
                 <AppText style={{color: Color.or, fontWeight: 'bold'}}>a été ajouté au panier avec succès</AppText>
                 </View>
                 <View style={styles.buttonContainer}>
-                    <AppButton style={{padding: 10}} title='Poursuivre mes achats' onPress={goToHomeScreen}/>
-                    <AppButton style={{padding: 10}} title='Commander maintenant' onPress={goToShoppingCart}/>
+                    <AppButton style={{ fontSize: 15, padding: 5, width: '40%'}} title="J'achettes encors" onPress={goToHomeScreen}/>
+                    <AppButton style={{fontSize: 15, padding: 5, width: '40%'}} title='je commande' onPress={goToShoppingCart}/>
                 </View>
             </View>
         </Modal>

@@ -7,41 +7,44 @@ import {AntDesign, FontAwesome,Entypo} from "@expo/vector-icons";
 import EditItemStatus from "./EditItemStatus";
 import ItemIconButton from "../list/ItemIconButton";
 import ContratWatch from "./ContratWatch";
+import {HeaderTitle} from "@react-navigation/stack";
+import ListItemHeader from "../list/ListItemHeader";
+import FactureItemLabel from "../list/FactureItemLabel";
 
-function UserServiceItem({serviceDescrip,showOrderDetail,showDetail, dateFourniture,payement,
-                            libStatusContrat,statusContratValue, statusAccordValue,editStatusAccord,
-                             dateDemande, itemIndex, itemImage, itemMontant, header, headerValue,
+function UserServiceItem({showOrderDetail,showDetail, dateFourniture,payement,
+                            statusContratValue, statusAccordValue,editStatusAccord,
+                             dateDemande,itemImage, itemMontant, header, headerValue,
                              contrats,accordValueStyle,changeAccordEditValue,accordEditValue,
                              saveAccording,startEditingAccord,undoAccordEditing,createOrderContrat,
                              isHistorique,moveItemToHistorique, isDemande,loopItemWatch, playItemWatch,
-                             saveContratEdit,statusContratStyle,editContratStatus,changeEditingContrat,
-                             editingValue,undoContratEdit,getContratEdit
+                             contratValueStyle,deleteItem, isContrat,permitLivraisonEdit,statusLivraisonLabel,
+                             statusLivraisonValue, getLivraisonEdit, editLivraison, saveLivraisonEdit,
+                             undoLivraisonEdit,editingLivraisonValue,changeLivraisonEditValue,statusLivraisonStyle,
+                             permitAccordEdit
+
 
 }) {
     return (
-        <ScrollView>
+        <>
             <View style={{flexDirection: 'row',
                 justifyContent: 'space-around',
                 padding: 10,
-                backgroundColor: colors.blanc, marginTop: 20, paddingBottom: 5,
+                width: '100%',
+                backgroundColor: colors.blanc, marginTop: 10, paddingBottom: 5,
                 borderBottomWidth: 0.2}}>
-                <View>
-                <View style={{ width: 100}}>
-                <Image resizeMode='stretch' source={{uri: itemImage}} style={{width: 80, padding: 5,height: 150}}/>
 
+                <View style={{ width: 80,justifyContent: 'center', marginRight: 10}}>
+                <Image resizeMode='stretch' source={{uri: itemImage}} style={{width: 80,height: 150}}/>
                 </View>
-                </View>
-                <View style={styles.contentStyle}>
-                <View>
+
+                <View style={{
+                    margin: 20
+                }}>
                     <View style={{
                         flexDirection: 'row'
                     }}>
-                        <AppText style={{fontWeight: 'bold'}}>{header}</AppText>
+                        <ListItemHeader headerTitle={header}/>
                         <AppText style={{fontWeight: 'bold', color:colors.or}}>{headerValue}</AppText>
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                      <AppText style={{fontSize: 18, fontWeight: 'bold'}}>Service: </AppText>
-                      <AppText>{serviceDescrip}</AppText>
                     </View>
 
                     <View style={{flexDirection: 'row'}}>
@@ -53,19 +56,21 @@ function UserServiceItem({serviceDescrip,showOrderDetail,showDetail, dateFournit
                       <AppText>F CFA</AppText>
                     </View>
                     <View style={{flexDirection: 'row'}}>
-                        <AppText style={{fontSize: 18, fontWeight: 'bold'}}>Reglement: </AppText>
-                        <AppText style={{fontWeight: 'bold'}}>{payement}</AppText>
+                        <AppText style={{fontSize: 15, fontWeight: 'bold'}}>Reglement: </AppText>
+                        <AppText style={{fontWeight: 'bold', fontSize: 15}}>{payement}</AppText>
                     </View>
-                    <EditItemStatus statusValueStyle={accordValueStyle}  labelStatus='Status accord' statusValue={statusAccordValue} editStatus={editStatusAccord}
+                    {!isContrat && <EditItemStatus permitEdit={permitAccordEdit}  statusValueStyle={accordValueStyle}  labelStatus='Status accord' statusValue={statusAccordValue} editStatus={editStatusAccord}
                                     saveEditing={saveAccording} getStatusEditing={startEditingAccord} undoEditing={undoAccordEditing}
-                                    editingStatusValue={accordEditValue} changeEditingStatusValue={changeAccordEditValue}/>
-                   {!isDemande &&
+                                    editingStatusValue={accordEditValue} changeEditingStatusValue={changeAccordEditValue}/>}
 
-                   <EditItemStatus labelStatus={libStatusContrat}statusValue={statusContratValue}
-                                   statusValueStyle={statusContratStyle} editStatus={editContratStatus}
-                                   changeEditingStatusValue={changeEditingContrat} editingStatusValue={editingValue} undoEditing={undoContratEdit}
-                                   getStatusEditing={getContratEdit} saveEditing={saveContratEdit}/>
-                   }
+                    {contrats && contrats.length>=1 && <EditItemStatus permitEdit={permitLivraisonEdit} labelStatus={statusLivraisonLabel}
+                                                       statusValue={statusLivraisonValue} editStatus={editLivraison} saveEditing={saveLivraisonEdit}
+                                                        getStatusEditing={getLivraisonEdit} undoEditing={undoLivraisonEdit}
+                                                       editingStatusValue={editingLivraisonValue} changeEditingStatusValue={changeLivraisonEditValue}
+                                                       statusValueStyle={statusLivraisonStyle}/>}
+
+                                    {!isDemande && <FactureItemLabel itemLabel='Status contrat' labelValue={statusContratValue}
+                                     labelStyle={{fontSize: 15, fontWeight: 'bold'}} labelValueStyle={contratValueStyle}/>}
                 {showDetail &&    <View>
                     <View style={{flexDirection: 'row'}}>
                       <AppText style={{fontSize: 18, fontWeight: 'bold'}}>Demandé le: </AppText>
@@ -82,19 +87,8 @@ function UserServiceItem({serviceDescrip,showOrderDetail,showDetail, dateFournit
                        {!isDemande &&  <AppButton title='Voir la facture'/>}
                     </View>
 
-                </View>
             </View>
-                <View style={{alignItems: 'center'}}>
-                   {isDemande && <View>
-                        {statusAccordValue && statusAccordValue.toLowerCase() === 'accepté' && <ItemIconButton iconSize={40} iconName='like1'
-                                   onPress={createOrderContrat} color='green'/>}
-                        {statusAccordValue && statusAccordValue.toLowerCase() === 'refusé' && <ItemIconButton iconName='dislike1'
-                                   iconSize={40} color='red' />}
-                    </View>}
-                    {!isDemande && <ContratWatch loop={loopItemWatch} autoPlay={playItemWatch}/>}
-                    <View style={{
-                        alignItems: 'center'
-                    }}>
+                <View style={{justifyContent: 'flex-end', alignItems: 'center', margin: 20}}>
               {!isHistorique &&  <View >
                 <TouchableOpacity onPress={moveItemToHistorique}>
                     <View style={{marginTop: 20}}>
@@ -103,23 +97,35 @@ function UserServiceItem({serviceDescrip,showOrderDetail,showDetail, dateFournit
                 </TouchableOpacity>
 
                 </View>}
-                    <TouchableOpacity>
-                        <View style={{marginTop: 20}}>
+                    {isHistorique &&  <View>
+                        <TouchableOpacity>
+                            <View>
+                                <Entypo name='reply' size={30}/>
+                            </View>
+                        </TouchableOpacity>
+                    <TouchableOpacity onPress={deleteItem}>
+                        <View style={{marginTop: 30}}>
                             <AntDesign name='delete' color='red' size={25}/>
-                        </View>
-                    </TouchableOpacity>
-                    </View>
-              {isHistorique &&  <View>
-                    <TouchableOpacity>
-                        <View style={{marginTop: 10}}>
-                            <Entypo name='reply' size={30}/>
                         </View>
                     </TouchableOpacity>
                 </View>}
 
                 </View>
             </View>
-        </ScrollView>
+    {!isDemande && <View style={{position: 'absolute', top: -30, right:-30}}>
+        <ContratWatch loop={loopItemWatch} autoPlay={playItemWatch}/>
+    </View>}
+            {isDemande && <View style={{
+                position: 'absolute',
+                top: 20,
+                right: 10
+            }}>
+                {statusAccordValue && statusAccordValue.toLowerCase() === 'accepté' && <ItemIconButton iconSize={40} iconName='like1'
+                                                                                                       onPress={createOrderContrat} color='green'/>}
+                {statusAccordValue && statusAccordValue.toLowerCase() === 'refusé' && <ItemIconButton iconName='dislike1'
+                                                                                                      iconSize={40} color='red' />}
+            </View>}
+    </>
     );
 }
 

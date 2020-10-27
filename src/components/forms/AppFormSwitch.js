@@ -12,7 +12,6 @@ function AppFormSwitch({name, title, ...props}) {
         <>
             <AppSwitch thumbColor={values[name] ? colors.or : "#f4f3f4"} title={title} switchValue={values[name]} switchValueChange={() => {
                 setFieldValue(name, !values[name])
-                console.log(values[name])
             }} />
             <AppErrorMessage error={errors[name]} visible={touched[name]}/>
         </>

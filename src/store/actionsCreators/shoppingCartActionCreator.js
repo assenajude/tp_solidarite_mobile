@@ -7,9 +7,9 @@ export const addToCart = createAction('shoppingCart/addToCart', function (item) 
                 id: item.id,
                 libelle: item.libelleLocation,
                 image: item.imageLocation,
-                prix: item.coutLocation,
+                prix: item.coutPromo,
                 quantite: 1,
-                montant: item.coutLocation,
+                montant: item.coutPromo,
                 caution: item.nombreCaution,
                 type: item.category.typeCateg
             }

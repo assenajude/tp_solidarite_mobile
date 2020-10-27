@@ -7,7 +7,7 @@ import {AntDesign} from "@expo/vector-icons";
 import colors from "../../utilities/colors";
 
 function EditItemStatus({labelStatus, editStatus, statusValue,
-                            saveEditing,undoEditing,statusValueStyle,
+                            saveEditing,undoEditing,statusValueStyle,permitEdit=true,
                             editingStatusValue,changeEditingStatusValue, getStatusEditing}) {
     const store = useStore()
     return (
@@ -29,12 +29,12 @@ function EditItemStatus({labelStatus, editStatus, statusValue,
                 </View>
                 {editStatus && <TextInput style={{height: 40,borderRadius: 10, width: 120, borderWidth: 0.5, borderColor:'grey'}} value={editingStatusValue} onChangeText={changeEditingStatusValue}/>}
             </View>
-            <TouchableOpacity onPress={getStatusEditing}>
+          {permitEdit &&  <TouchableOpacity onPress={getStatusEditing}>
 
                 {getRoleAdmin(store.getState()) && !editStatus && <View>
                     <AntDesign name='edit' size={24} color='green'/>
                 </View>}
-            </TouchableOpacity>
+            </TouchableOpacity>}
             {editStatus && <View style={{
                 flexDirection: 'row',
                 justifyContent: 'center',

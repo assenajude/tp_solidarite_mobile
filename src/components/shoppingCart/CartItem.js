@@ -8,7 +8,9 @@ import AppButton from "../AppButton";
 import CartItemQuantite from "./CartItemQuantite";
 
 
-function CartItem({source, designation,icon=false, activeDecrement, price, min, max, montantMin,montantMax,  montant, activeIncrement,quantite, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement}) {
+function CartItem({source, designation,icon=false, activeDecrement,deleteItem,
+                      price, min, max, montantMin,montantMax,  montant, activeIncrement,showItemDetails,
+                      quantite, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement}) {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.itemContainer}>
@@ -18,8 +20,8 @@ function CartItem({source, designation,icon=false, activeDecrement, price, min, 
                     <AppText>{designation}</AppText>
                     </TouchableOpacity>
                     <View style={styles.buttonContainer}>
-                        <AppButton style={{backgroundColor: Color.lightGrey}} iconName='search1' iconSize={20} iconColor='black'/>
-                        <AppButton style={{backgroundColor: Color.lightGrey}} iconName='delete' iconSize={20} iconColor={Color.rougeBordeau}/>
+                        <AppButton onPress={showItemDetails} style={{backgroundColor: Color.lightGrey}} iconName='search1' iconSize={20} iconColor='black'/>
+                        <AppButton onPress={deleteItem} style={{backgroundColor: Color.lightGrey}} iconName='delete' iconSize={20} iconColor={Color.rougeBordeau}/>
                     </View>
                 </View>
                 <View style={styles.secondContainer}>

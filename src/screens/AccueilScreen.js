@@ -149,7 +149,7 @@ function AccueilScreen({navigation, route}) {
                                       }} button2='Acheter' title={item.designArticle} subtitle1={+item.prixPromo} subtitle2={item.prixReel}
 
                                                 dispo={item.qteStock} image={{uri: item.imageArticle}}
-                                                aideInfo={item.aide ?(<MaterialCommunityIcons name="help-circle-outline" size={24} color={Color.bleuFbi}/>):''}
+                                                aideInfo={item.aide}
                                                 onPress={() => navigation.navigate(routes.ARTICLE_DETAIL, item)}>
                                           <AppButton onPress={() => navigation.navigate(routes.ARTICLE_DETAIL, item)} textStyle={{fontSize: 10}} title='Détails' style={{padding: 5,width: '20%', backgroundColor: Color.rougeBordeau, fontWeight: 'bold'}} />
                                       </AppCard>
@@ -163,7 +163,8 @@ function AccueilScreen({navigation, route}) {
                                               setSelectedItem(item)
                                               setShowModal(true)
                                           }
-                                      }}>
+                                      }} itemType={item.category.typeCateg} frequence={item.frequenceLocation.toLowerCase() == 'mensuelle'?' / mois':' / jour'}
+                                      dispo={item.qteDispo} aideInfo={item.aide} subtitle1={item.coutPromo} subtitle2={item.coutReel}>
                                           <AppButton textStyle={{fontSize: 10}} style={{backgroundColor: Color.rougeBordeau, padding: 5,width: '20%'}} title='Visiter'/>
                                       </AppCard>
                                   )

@@ -81,7 +81,7 @@ function EcommerceScreen({navigation}) {
                           setSelectedItem(item)
                           setShowItemModal(true)
                       }
-                  }}>
+                  }} aideInfo={item.aide} dispo={item.qteStock} title={item.designArticle} subtitle1={item.prixPromo} subtitle2={item.prixReel}>
                       <AppButton textStyle={{fontSize: 10}} title='Detail' style={{backgroundColor: colors.rougeBordeau, width: '20%', padding: 5}}/>
                   </AppCard>}/>
                  {getRoleAdmin(store.getState()) && <View style={{position: 'absolute', bottom:80, right: 20}}>

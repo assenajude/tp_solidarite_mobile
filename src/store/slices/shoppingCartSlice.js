@@ -24,6 +24,30 @@ const shoppingCartSlice = createSlice({
         },
         addServiceMontant: (state, action) => {
             state.totalAmount = action.payload
+        },
+        deleteCartItem: (state, action) => {
+            let selectedItem = state.items[action.payload.id]
+            if (selectedItem.quantite === 1) {
+                delete state.items[selectedItem.id]
+                state.itemsLenght--
+                if(state.type == 'e-service') {
+                    state.totalAmount = 0
+                }else if(state.type == 'e-location') {
+                    state.totalAmount -= selectedItem.prix*selectedItem.caution
+                } else {
+                state.totalAmount -= selectedItem.prix
+                }
+            }
+             else {
+            selectedItem.quantite--
+            selectedItem.montant-= selectedItem.prix
+            state.items[selectedItem.id] = selectedItem
+                state.itemsLenght--
+                state.totalAmount -= selectedItem.prix
+            }
+             if(state.itemsLenght === 0) {
+                 state.type = ''
+             }
         }
     },
     extraReducers: {
@@ -36,7 +60,7 @@ const shoppingCartSlice = createSlice({
                 state.items[newProduit.id].montant += newProduit.prix;
                 state.itemsLenght ++
                 if (newProduit.type === 'e-location') {
-                    state.totalAmount+=newProduit.caution * newProduit.montant
+                    state.totalAmount+=newProduit.caution * newProduit.prix
                 } else {
                 state.totalAmount+=newProduit.prix
                 }
@@ -45,7 +69,7 @@ const shoppingCartSlice = createSlice({
                 state.itemsLenght ++;
                 state.type = state.items[newProduit.id].type
                 if (newProduit.type === 'e-location') {
-                    state.totalAmount+=newProduit.caution * newProduit.montant
+                    state.totalAmount+=newProduit.caution * newProduit.prix
                 } else {
                 state.totalAmount += newProduit.prix
                 }
@@ -68,7 +92,7 @@ const shoppingCartSlice = createSlice({
 });
 
 export default shoppingCartSlice.reducer;
-const {clearCart, dismissItemModal, addServiceMontant} = shoppingCartSlice.actions
+const {clearCart, dismissItemModal, addServiceMontant, deleteCartItem} = shoppingCartSlice.actions
 //action creators
 
 export const getCartClear = () => dispatch => {
@@ -81,4 +105,8 @@ export const getModalDismiss = () => dispatch => {
 
 export const setItemServiceMontant = (montant) => dispatch => {
     dispatch(addServiceMontant(montant))
+}
+
+export const getCartItemDelete = (item) => dispatch => {
+    dispatch(deleteCartItem(item))
 }

@@ -1,6 +1,6 @@
 import {createSelector} from "@reduxjs/toolkit";
 
-const orderList = state => state.entities.order.currentUserOrders
+const orderList = state => state.entities.order.list
 const payementList = state => state.entities.payement.list
 const planList = state => state.entities.plan.list
 

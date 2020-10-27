@@ -76,7 +76,8 @@ function ElocationScreen({navigation}) {
                            setShowItemModal(true)
                            setSelectedItem(item)
                        }
-                  }}>
+                  }} aideInfo={item.aide} subtitle1={item.coutPromo} subtitle2={item.coutReel} dispo={item.qteDispo}
+                  frequence={item.frequenceLocation.toLowerCase() == 'mensuelle'?' / mois':' / jour'} itemType={item.category.typeCateg}>
                       <AppButton textStyle={{fontSize: 10}} style={{backgroundColor: colors.rougeBordeau, width: '20%', padding: 5}} title='Visiter'/>
                   </AppCard>}/>
      {getRoleAdmin(store.getState()) &&  <View style={{

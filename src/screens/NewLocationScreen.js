@@ -13,15 +13,20 @@ import AppSubmitButton from "../components/forms/AppSubmitButton";
 import {addLocation, getAllLocation} from '../store/slices/locationSlice'
 import ActivityIndicator from "react-native-web/src/exports/ActivityIndicator";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppSwitch from "../components/AppSwitch";
+import AppFormSwitch from "../components/forms/AppFormSwitch";
 
 const locationValideSchema = Yup.object().shape({
     libelle: Yup.string(),
     description: Yup.string(),
     adresse: Yup.string(),
-    cout: Yup.number(),
+    coutReel: Yup.number(),
+    coutPromo: Yup.number(),
     frequence: Yup.string(),
     image: Yup.string(),
     caution: Yup.number(),
+    dispo: Yup.number(),
+    aide: Yup.boolean()
 
 })
 
@@ -32,6 +37,7 @@ function NewLocationScreen({navigation}) {
     const isLoading = useSelector(state => state.entities.location.loading)
     const[selectedCategorie, setSelectedCategorie] = useState(2)
     const [addLoading, setAddLoading] = useState(false)
+    const [aideCredit, setAideCredit] = useState(false)
 
 
     const addNewLocation = async(location) => {
@@ -40,10 +46,13 @@ function NewLocationScreen({navigation}) {
             libelle: location.libelle,
             description: location.description,
             adresse: location.adresse,
-            cout: location.cout,
+            coutReel: location.coutReel,
+            coutPromo: location.coutPromo,
             image: location.image,
             frequence: location.frequence,
             caution: location.caution,
+            dispo: location.dispo,
+            aide: location.aide
         }
         await dispatch(addLocation(locationData))
         const error = store.getState().entities.location.error
@@ -80,17 +89,23 @@ function NewLocationScreen({navigation}) {
                 libelle: '',
                 description: '',
                 adresse: '',
-                cout: 0,
+                coutReel: 0,
+                coutPromo: 0,
                 frequence: '',
-                caution: 1
+                caution: 1,
+                dispo: 0,
+                aide: false
             }}>
                 <AppFormField name='libelle' title='Libelle'/>
                 <AppFormField name='description' title='Description'/>
+                <AppFormField title='Disponible' name='dispo'/>
                 <AppFormField name='adresse' title='Adresse'/>
-                <AppFormField name='cout' title='Coût'/>
+                <AppFormField name='coutReel' title='Coût reel'/>
+                <AppFormField name='coutPromo' title='Coût promo'/>
                 <AppFormField name='caution' title='Nombre de part pour la caution'/>
                 <AppFormField name='frequence' title='Frequence de location'/>
                 <AppFormImagePicker name='image'/>
+                <AppFormSwitch title='Possiblité de louer à credit?' name='aide'/>
                 <AppSubmitButton showLoading={addLoading} title='Ajouter'/>
             </AppForm>
         </ScrollView>

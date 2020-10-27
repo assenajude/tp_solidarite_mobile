@@ -10,7 +10,7 @@ import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppText from "../components/AppText";
 import AppFormImagePicker from "../components/forms/AppFormImagePicker";
 import {addService} from '../store/slices/serviceSlice'
-import {getAllOrders} from "../store/slices/orderSlice";
+import { getOrdersByUser} from "../store/slices/orderSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 
 const serviceValideSchema = Yup.object().shape({
@@ -46,7 +46,7 @@ function NewServiceScreen({navigation}) {
         await dispatch(addService(serviceData))
         const error = store.getState().entities.order.error
         if(!error) {
-        await dispatch(getAllOrders())
+        await dispatch(getOrdersByUser())
          navigation.goBack()
         } else {
             Alert.alert('ERROR!', 'Une erreur est apparue, Veillez reessayer plutard', [

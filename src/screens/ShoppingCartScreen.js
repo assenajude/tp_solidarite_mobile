@@ -16,7 +16,7 @@ import {loadPlans} from "../store/slices/planSlice";
 import AppInput from "../components/AppInput";
 import AppDateTimePicker from "../components/AppDateTimePicker";
 import AppButton from "../components/AppButton";
-import {setItemServiceMontant} from "../store/slices/shoppingCartSlice";
+import {getCartItemDelete, setItemServiceMontant} from "../store/slices/shoppingCartSlice";
 
 function ShoppingCartScreen({navigation}) {
     const dispatch = useDispatch();
@@ -78,18 +78,13 @@ function ShoppingCartScreen({navigation}) {
     }, [dispatch])
 
 
-    const getSelectedPayement = useCallback(async () => {
-            await dispatch(getSelected(1))
-    }, [])
-
-
     useEffect(() => {
         getPlans();
         dispatch(loadPayements())
         if(payements.length >= 1) {
         dispatch(getSelected(1))
         }
-    }, []);
+    }, [dispatch]);
 
     if (items.length === 0) {
         return <View style={styles.emptyListStyle}>
@@ -101,7 +96,7 @@ function ShoppingCartScreen({navigation}) {
         return (
             <ScrollView>
                 <CartListHeader min={true} max={true}/>
-               <CartItem designation={items[0].libelle} source={{uri: items[0].image}}
+               <CartItem deleteItem={() => dispatch(getCartItemDelete(items[0]))} designation={items[0].libelle} source={{uri: items[0].image}}
                min={true} max={true} montantMin={items[0].montantMin} montantMax={items[0].montantMax} icon={true}/>
                 <View style={{
                     flexDirection: 'row',
@@ -149,7 +144,7 @@ function ShoppingCartScreen({navigation}) {
                      dispatch(addToOrder(items, itemsLenght, totalAmount, shoppingType))
                      navigation.navigate(routes.ORDER_PAYEMENT)}}/>} data={items}
                  keyExtractor={(item) => item.id.toString()}
-                 renderItem={({item}) => <CartItem quantite={true} montant={true} price={true}  designation={item.libelle} itemQuantite={item.quantite} quantityDecrement={() => {
+                 renderItem={({item}) => <CartItem deleteItem={() => dispatch(getCartItemDelete(item))} quantite={true} montant={true} price={true}  designation={item.libelle} itemQuantite={item.quantite} quantityDecrement={() => {
                      const newQuantite = item.quantite- 1
                      dispatch(changeItemQuantity(item.id, newQuantite))
                  }} quantityIncrement={() => {
@@ -159,7 +154,7 @@ function ShoppingCartScreen({navigation}) {
                              source={{uri: item.image}} itemBtnFirst='Détail'
                              itemBtnSecond='Supprimer' itemPrice={item.prix}
                               itemAmount={item.montant}
-                 activeDecrement={true} activeIncrement={true}/>}
+                 activeDecrement={cartType == 'e-commerce'} activeIncrement={cartType == 'e-commerce'}/>}
        />
 
         </View>

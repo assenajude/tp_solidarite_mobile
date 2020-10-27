@@ -12,24 +12,21 @@ import AppButton from "../components/AppButton";
 import authStorage from '../store/persistStorage'
 import {makeOrder, getOrderReset} from '../store/slices/orderSlice'
 import {getCartClear} from '../store/slices/shoppingCartSlice'
-import {addFacture} from "../store/slices/factureSlice";
-import {addTranche} from '../store/slices/trancheSlice'
 import {getResetPayement} from '../store/slices/payementSlice'
 import {getAdresseReset} from '../store/slices/userAdresseSlice'
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function OrderScreen({navigation}) {
     const store = useStore()
     const dispatch = useDispatch();
 
-    const orders = useSelector(state => state.entities.order.list);
     const selectedPayemet = useSelector(state => state.entities.payement.selectedPayement)
     const currentPlan = useSelector(state => state.entities.payement.currentPlan);
     const currentOrder = useSelector(state => state.entities.order.currentOrder);
     const selectedAdesse = useSelector(state => state.entities.userAdresse.selectedAdresse)
     const selectedAdesseRelais = useSelector(state => state.entities.userAdresse.adresseRelais)
     const serviceDate = useSelector(state => state.entities.order.servicePayementDate)
-
-    const [successModel, setSuccessModal] = useState(false)
+    const loading = useSelector(state => state.entities.order.loading)
 
     const saveOrder = async () => {
         const user = await authStorage.getUser();
@@ -90,6 +87,7 @@ function OrderScreen({navigation}) {
     } else {
     return (
         <>
+            <AppActivityIndicator visible={loading}/>
         <View style={styles.container}>
                 <View style={styles.header}>
                     <AppText style={{color: Color.blanc}}>Verifiez les details de votre commande puis finaliser</AppText>
