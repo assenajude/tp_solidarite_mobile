@@ -1,6 +1,6 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {useSelector, useDispatch, useStore} from "react-redux";
-import {View, Text,FlatList, ActivityIndicator} from 'react-native'
+import {View,FlatList} from 'react-native'
 import {getAllLocation} from "../store/slices/locationSlice";
 import colors from "../utilities/colors";
 import AppCard from "../components/AppCard";
@@ -10,8 +10,11 @@ import ListFooter from "../components/list/ListFooter";
 import {getRoleAdmin} from "../store/selectors/authSelector";
 import routes from "../navigation/routes";
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
-import {getModalDismiss} from "../store/slices/shoppingCartSlice";
+import {getModalDismiss, getProvenanceSet} from "../store/slices/shoppingCartSlice";
 import useAddToCart from "../hooks/useAddToCart";
+import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getSelectedOptions} from "../store/slices/mainSlice";
+import {getToggleFavorite} from "../store/slices/userFavoriteSlice";
 
 
 function ElocationScreen({navigation}) {
@@ -19,9 +22,11 @@ function ElocationScreen({navigation}) {
     const store = useStore()
     const {addItemToCart} = useAddToCart()
     const loading = useSelector(state => state.entities.location.loading)
+    const cartLoading = useSelector(state => state.entities.shoppingCart.loading)
     const locations = useSelector(state => state.entities.location.list)
-    const [showItemModal, setShowItemModal] = useState(false)
-    const [selectedItem, setSelectedItem] = useState()
+    const elocationItemModal = useSelector(state => state.entities.shoppingCart.elocationModal)
+    const selectedItem = useSelector(state => state.entities.shoppingCart.newAdded)
+    const userFavorites = useSelector(state => state.entities.userFavorite.locationFavoris)
 
     const getLocations = useCallback(async () => {
         await dispatch(getAllLocation())
@@ -29,14 +34,10 @@ function ElocationScreen({navigation}) {
 
 
     useEffect(() => {
-        getLocations()
+        // getLocations()
     }, [])
 
-        if (loading) {
-        return <View style={{flex: 1,justifyContent: 'center', alignItems: 'center'}}>
-            <ActivityIndicator size='large' color={colors.rougeBordeau}/>
-        </View>
-    }
+
     if (!loading && locations.length === 0) {
         return <>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -46,49 +47,59 @@ function ElocationScreen({navigation}) {
             </>
     }
 
-    if(showItemModal) {
+    if(elocationItemModal) {
         return (
-            <AddToCartModal itemModalVisible={showItemModal} designation={selectedItem.libelleLocation}
+            <AddToCartModal itemModalVisible={elocationItemModal}  source={{uri: selectedItem.image}}  designation={selectedItem.libelle}
                             goToShoppingCart={() => {
                                 dispatch(getModalDismiss())
-                                setShowItemModal(false)
                                 navigation.navigate(routes.CART)
                             }}
                             goToHomeScreen={() => {
                                 dispatch(getModalDismiss())
-                                setShowItemModal(false)
-                            }} source={{uri: selectedItem.imageLocation}}
+                            }}
             />
         )
     }
 
     return (
+        <>
+            <AppActivityIndicator visible={loading || cartLoading}/>
         <View style={{
             justifyContent: 'center',
             alignItems: 'center'
         }}>
         <FlatList data={locations} keyExtractor={(item, index) => index.toString()}
-                  renderItem={({item}) =><AppCard title={item.libelleLocation} image={{uri: item.imageLocation}} button2='Reserver'
+                  renderItem={({item}) =><AppCard title={item.libelleLocation} image={{uri: item.imagesLocation[0]}} button2='Reserver'
                    addToCart={() => {
+                       if(item.ProductOptions.length >= 1) {
+                           dispatch(getSelectedOptions(item))
+                           navigation.navigate('AccueilNavigator', {screen: routes.LOCATION_DETAIL, params: item})
+                       } else {
+                       dispatch(getProvenanceSet('elocation'))
                        addItemToCart(item)
-                       const success = store.getState().entities.shoppingCart.addToCartSuccess
-                       if(success) {
-                           setShowItemModal(true)
-                           setSelectedItem(item)
                        }
+
                   }} aideInfo={item.aide} subtitle1={item.coutPromo} subtitle2={item.coutReel} dispo={item.qteDispo}
-                  frequence={item.frequenceLocation.toLowerCase() == 'mensuelle'?' / mois':' / jour'} itemType={item.category.typeCateg}>
-                      <AppButton textStyle={{fontSize: 10}} style={{backgroundColor: colors.rougeBordeau, width: '20%', padding: 5}} title='Visiter'/>
+                  frequence={item.frequenceLocation.toLowerCase() == 'mensuelle'?' / mois':' / jour'} itemType={item.Categorie?item.Categorie.typeCateg : 'e-location'}
+                  onPress={() => {
+                      dispatch(getSelectedOptions(item))
+                      navigation.navigate('AccueilNavigator', {screen: routes.LOCATION_DETAIL, params: item})}}
+                      isFavorite={userFavorites.some(fav => fav.id === item.id)} toggleFavorite={() => dispatch(getToggleFavorite(item))}>
+                      <AppButton onPress={() => {
+                          dispatch(getSelectedOptions(item))
+                          navigation.navigate('AccueilNavigator', {screen: routes.LOCATION_DETAIL, params: item})
+                      }} textStyle={{fontSize: 10}} style={{backgroundColor: colors.rougeBordeau, width: '20%', padding: 5}} title='Visiter'/>
                   </AppCard>}/>
      {getRoleAdmin(store.getState()) &&  <View style={{
                 position: 'absolute',
                 right: 20,
                 bottom: 80
-            }}>
+            }} >
 
                 <ListFooter onPress={() => navigation.navigate(routes.NEW_LOCATION)}/>
             </View>}
         </View>
+            </>
     );
 }
 

@@ -1,12 +1,10 @@
-import React, {useCallback, useState, useEffect} from 'react';
-import {useDispatch, useStore, useSelector} from "react-redux";
-import {View, ScrollView, Alert, FlatList} from "react-native";
-import dayjs from "dayjs";
+import React, {useCallback,useEffect} from 'react';
+import {useDispatch, useSelector} from "react-redux";
+import {View, FlatList} from "react-native";
 
 import {
-    decrementOrderCompter,
-    getCurrentOrders, getDeleteUpdate,
-    getItemDetail, getOrderDeleted, getOrdersByUser, getStatusEditing, incrementOrderCompter, saveStatusEditing
+    getCurrentOrders,
+    getItemDetail, getOrdersByUser
 } from "../store/slices/orderSlice";
 import FactureListItem from "../components/list/FactureListItem";
 import routes from "../navigation/routes";
@@ -15,19 +13,18 @@ import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import useManageUserOrder from "../hooks/useManageUserOrder";
 import GetLogin from "../components/user/GetLogin";
+import initData from '../utilities/initData'
 
 
-function UserOrderContratScreen({navigattion}) {
+function UserOrderContratScreen({navigation}) {
     const dispatch = useDispatch()
-    const store = useStore()
-    const {startEditingLivraison, saveLivraisonEdit, moveOrderToHistory, deleteOrder} = useManageUserOrder()
+    const { saveLivraisonEdit, moveOrderToHistory, deleteOrder} = useManageUserOrder()
 
     const isLoading = useSelector(state => state.entities.order.loading)
     const ordersInContract = useSelector(state => state.entities.order.currentUserOrders)
     const error = useSelector(state => state.entities.order.error)
     const user = useSelector(state => state.auth.user)
     const compter = useSelector(state => state.entities.order.contratCompter)
-    const [editLivraisonValue, setEditLivraisonValue] = useState('editer...')
 
 
     const getStarted = useCallback(async () => {
@@ -37,6 +34,8 @@ function UserOrderContratScreen({navigattion}) {
         }
         return;
     }, [dispatch])
+
+    const livraisonData = ['En cours', 'Livré', 'Partiel']
 
     useEffect(() => {
         getStarted()
@@ -73,33 +72,29 @@ function UserOrderContratScreen({navigattion}) {
         <AppActivityIndicator visible={isLoading}/>
         <FlatList data={ordersInContract} keyExtractor={(item, index) => index.toString()}
            renderItem={({item}) => {
-               if (item.contrats.length>=1 && !item.historique) {
+               if (item.Contrats.length>=1 && !item.historique) {
                    return (
-                       <FactureListItem numero={item.numero}  orderItems={item.cartItems} montant={item.montant}
-                                        trancheButtonTitle2='Afficher' labelStatusLivr='Status livraison'
-                                        label='commande' orderEspace='contrat' statusLivraison={item.statusLivraison}
+                       <FactureListItem numero={item.numero}  orderItems={item.CartItems} montant={item.montant}
+                                        trancheButtonTitle2='Afficher'
+                                        label='commande' orderEspace='contrat'
                                         getDetails={() => {
                                             dispatch(getItemDetail(item.id))
                                         }} showDetail={item.showDetails}
-                                        getLink={() => navigattion.navigate(routes.FACTURE_DETAILS, item)} debut={dayjs(item.dateCmde).format('DD/MM/YYYY HH:mm:ss')}
+                                        getLink={() => navigattion.navigate(routes.FACTURE_DETAILS, item)} dateCmde={item.dateCmde}
                                         linkTitle='voir la facture'
-                                        fraisLivraison={item.fraisTransport} tauxInteret={item.interet} labelDate1='Commandé le ' labelDate2='Livré le'
-                                        fin={dayjs(item.dateLivraison).format('DD/MM/YYYY HH:mm:ss')} labelDatePrevue='Date livraison prevue'
+                                        fraisLivraison={item.fraisTransport} tauxInteret={item.interet} labelDateCmde='Commandé le ' labelDateLivraison='Livré le'
+                                        dateLivraison={item.dateLivraisonFinal} labelDatePrevue='Date livraison prevue'
                                         datePrevue={item.dateLivraisonDepart}  header='A'
-                                        moveItemToHistory={() => {
-                                            moveOrderToHistory(item.id)
-
-                                        }} contrats={item.contrats}
-                                        isContrat={true} statusLivraisonValue={editLivraisonValue} getStatusLivraisonEdit={() => startEditingLivraison(item.id)}
-                                        editStatusLivraison={item.editLivraison} undoEdit={() => startEditingLivraison(item.id)}
-                                        saveEdit={() => saveLivraisonEdit({orderId: item.id, statusLivraison: editLivraisonValue})} changeStatusText={(value) =>setEditLivraisonValue(value)}
-                                        playItemWatch={item.facture.solde < item.contrats[0].montant}
-                                        loopItemWatch={item.facture.solde < item.contrats[0].montant}
-                                        contratLabel='Status contrat' contratStatus={item.facture.solde < item.contrats[0].montant?'En cours':'Terminé'}
-                                        contratStatusStyle={{fontSize: 15, color:item.facture.solde < item.contrats[0].montant?'grey':colors.vert, fontWeight: 'bold'}}
-                                        deleteItem={() => {
-                                            deleteOrder(item)
-                                        }}/>
+                                        moveItemToHistory={() => {moveOrderToHistory(item.id)}} contrats={item.Contrats}
+                                        isContrat={true} playItemWatch={item.Contrats[0].status.toLowerCase() === 'en cours'}
+                                        loopItemWatch={item.Contrats[0].status.toLowerCase() === 'en cours'}
+                                        contratLabel='Status contrat' contratStatus={item.Contrats[0].status}
+                                        contratStatusStyle={{fontSize: 15, color:item.Contrats[0].status.toLowerCase() === 'en cours'?'grey':item.Contrats[0].status.toLowerCase() === 'terminé'? colors.vert:'orange', fontWeight: 'bold'}}
+                                        deleteItem={() => {deleteOrder(item)}} endFacture={item.Contrats[0].status.toLowerCase() === 'terminé'}
+                                        livraisonLabel='Status livraison' livraisonValue={item.statusLivraison}
+                                        livraisonInitData={initData.livraisonData} changeLivraisonValue={(value) => saveLivraisonEdit({orderId: item.id, statusLivraison: value})}
+                                       livraisonStyle={{color: item.statusLivraison.toLowerCase() === 'livré'?colors.vert:item.statusLivraison.toLowerCase() === 'partiel'?'orange':'grey',fontWeight: 'bold'}}
+                                       solde={item.Facture.solde} goToItemDetails={() =>navigation.navigate('AccueilNavigator', {screen: routes.ORDER_DETAILS, params: item})}/>
                    )
                }
            }}/>

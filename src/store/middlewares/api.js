@@ -1,8 +1,8 @@
 import apiClient from "../../api/http-common";
 import * as actions from '../actionsCreators/apiActionCreator';
 import authStorage from "../persistStorage";
-
 const api = ({dispatch}) => next => async action => {
+
     if (action.type !== actions.apiRequest.type) return next(action);
     const {url, method, data, onStart, onSuccess, onError} = action.payload;
     const authToken = await authStorage.getStoredToken()
@@ -12,15 +12,17 @@ const api = ({dispatch}) => next => async action => {
         let response;
         if (data) {
             const dataKeys = Object.keys(data)
-            if (dataKeys.indexOf('image') !== -1) {
-                const filename = data.image.split('/').pop();
+            if (dataKeys.indexOf('images') !== -1) {
                 let formData = new FormData();
                 for (key in data) {
-                    if (key=='image') {
-                        formData.append('image', {
+                    if (key =='images') {
+                        data.images.forEach(image => {
+                       const filename = image.split('/').pop();
+                        formData.append('images', {
                             name: filename,
                             type: 'image/jpeg',
-                            uri: data.image
+                            uri: image
+                        })
                         })
                     }
                     formData.append(key, data[key])

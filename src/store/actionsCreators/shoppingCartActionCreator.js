@@ -1,7 +1,7 @@
 import {createAction} from '@reduxjs/toolkit'
 
 export const addToCart = createAction('shoppingCart/addToCart', function (item) {
-    if(item.category.typeCateg === 'e-location') {
+    if(item.Categorie.typeCateg === 'e-location') {
         return {
             payload: {
                 id: item.id,
@@ -11,10 +11,10 @@ export const addToCart = createAction('shoppingCart/addToCart', function (item) 
                 quantite: 1,
                 montant: item.coutPromo,
                 caution: item.nombreCaution,
-                type: item.category.typeCateg
+                type: item.Categorie.typeCateg
             }
         }
-    } else if(item.category.typeCateg=== 'e-service') {
+    } else if(item.Categorie.typeCateg=== 'e-service') {
         return {
             payload: {
                 id: item.id,
@@ -26,7 +26,7 @@ export const addToCart = createAction('shoppingCart/addToCart', function (item) 
                 montantMin: item.montantMin,
                 montantMax: item.montantMax,
                 montant: 0,
-                type: item.category.typeCateg
+                type: item.Categorie.typeCateg
             }
         }
     }
@@ -38,7 +38,7 @@ export const addToCart = createAction('shoppingCart/addToCart', function (item) 
             prix: item.prixPromo,
             quantite: 1,
             montant: item.prixPromo,
-            type: item.category.typeCateg
+            type: item.Categorie.typeCateg
         }
     }
 

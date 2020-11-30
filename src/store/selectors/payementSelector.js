@@ -9,9 +9,9 @@ const orderPayementList = (list,planList, payementList) => {
     let itemObject = {};
     for(let i=0; i < list.length; i++) {
         (function (i) {
-            const idPlan = list[i].planId
+            const idPlan = list[i].PlanId
             const plan = planList.find(plan => plan.id === idPlan)
-            const payement = payementList.find(payement => payement.id === plan.payementId)
+            const payement = payementList.find(payement => payement.id === plan.PayementId)
             if(payement) {
                 itemObject = {
                     numero: list[i].numero,

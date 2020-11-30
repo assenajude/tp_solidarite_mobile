@@ -1,4 +1,5 @@
 import {useStore, useDispatch} from "react-redux";
+import {Alert} from 'react-native'
 import {getOrderPayementMode} from "../store/selectors/payementSelector";
 import {addFacture} from "../store/slices/factureSlice";
 import {addTranche} from "../store/slices/trancheSlice";
@@ -10,7 +11,7 @@ export default useCreateOrderContrat = () => {
     const dispatch = useDispatch()
     
     const createContrat = async (order) => {
-        const orderPlan = order.plan
+        const orderPlan = order.Plan
         const modePayement = getOrderPayementMode(store.getState())[order.id].payementMode
         let dateFin = new Date()
         const moisDateFin = dateFin.getMonth() + orderPlan.nombreMensualite
@@ -21,12 +22,12 @@ export default useCreateOrderContrat = () => {
             orderId: order.id,
             debut: Date.now(),
             fin: dateFin.getTime(),
-            montant: order.montant
+            montant: order.montant,
+            type: order.typeCmde
         }
         await dispatch(addFacture(factureData))
 
         const newFacture = store.getState().entities.facture.newAdded
-
         if(modePayement.toLowerCase() === 'cash') {
             let datePayementTranche = new Date()
             const moisPayement= datePayementTranche.getDate()
@@ -57,11 +58,16 @@ export default useCreateOrderContrat = () => {
 
         }
         const error = store.getState().entities.tranche.error
-        if(error === null) {
+        if(error !== null) {
+            Alert.alert('Erreur', 'Une erreur est apparue', [
+                {text: 'ok', onPress: () => {return;}}
+            ])
+
+        } else {
             let finContrat = new Date()
             const moisFin = finContrat.getMonth()
-            finContrat.setDate(finContrat.getDate() + 3)
             finContrat.setMonth(moisFin + orderPlan.nombreMensualite)
+            finContrat.setDate(finContrat.getDate() + 3)
             const contratData = {
                 orderId: order.id,
                 debut: Date.now(),
@@ -70,10 +76,6 @@ export default useCreateOrderContrat = () => {
                 nbMensualite: orderPlan.nombreMensualite
             }
             dispatch(createOrderContrat(contratData))
-        } else {
-            Alert.alert('Erreur', 'Une erreur est apparue', [
-                {text: 'ok', onPress: () => {return;}}
-            ])
         }
     }
     return {createContrat}

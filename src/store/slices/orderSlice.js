@@ -19,6 +19,9 @@ const orderSlice = createSlice({
         newAdded: {},
         userAllData: [],
         servicePayementDate: Date.now(),
+        articleRefreshCompter: 0,
+        locationRefreshCompter: 0,
+        serviceRefreshCompter: 0
 
     },
     reducers: {
@@ -32,9 +35,12 @@ const orderSlice = createSlice({
         },
         orderReceived: (state, action) => {
             state.loading = false
+            state.error = null
             const orderList = action.payload
             state.list= orderList
-            state.error = null
+            state.articleRefreshCompter = 0
+            state.locationRefreshCompter = 0
+            state.serviceRefreshCompter = 0
         },
         currentOrders: (state, action) => {
          state.currentUserOrders = state.list.filter(item => item.typeCmde == action.payload)
@@ -44,7 +50,7 @@ const orderSlice = createSlice({
             state.currentUserOrders.forEach(order => {
                 if (order.historique) {
                     compterHistorique+=1
-                } else if(order.contrats.length>=1) {
+                } else if(order.Contrats.length>=1) {
                     compterContrat+=1
                 } else {
                     compterDemande+=1
@@ -56,11 +62,19 @@ const orderSlice = createSlice({
 
         },
         orderAdded: (state, action) => {
+           const justAdded = action.payload
             state.loading = false
             state.orderSuccess = true
             state.error = null
-            state.newAdded = action.payload
-            state.list.push(action.payload)
+            state.newAdded = justAdded
+            state.list.push(justAdded)
+            if(justAdded.typeCmde === 'e-commerce') {
+                state.articleRefreshCompter += 1
+            } else if(justAdded.typeCmde === 'e-location') {
+                state.locationRefreshCompter += 1
+            } else {
+                state.serviceRefreshCompter += 1
+            }
         },
         resetOrder: (state) => {
             state.currentOrder = {}
@@ -76,32 +90,6 @@ const orderSlice = createSlice({
             const otherOrders = state.currentUserOrders.filter(item => item.id !== selectedItem.id)
             otherOrders.forEach(item => item.showDetails = false)
         },
-
-        startEditStatus: (state, action) => {
-            const selectedItem =  state.currentUserOrders.find(item => item.id === action.payload.id)
-
-            const label = action.payload.libelle
-
-            if(selectedItem[label]) {
-            selectedItem[label] = false
-            } else {
-                selectedItem[label] = true
-            }
-            const otherItems = state.currentUserOrders.filter(item => item.id !== selectedItem.id)
-            otherItems.forEach(item => {
-                item[label]= false
-            })
-        },
-        editingContrat: (state, action) => {
-            const selectedOrder = state.currentUserOrders.find(order => order.id === action.payload.id)
-            if(selectedOrder.editContrat) {
-                selectedOrder.editContrat = false
-            } else {
-                selectedOrder.editContrat = true
-            }
-            const otherContrats = state.currentUserOrders.filter(item => item.id !== action.payload)
-            otherContrats.forEach(contrat => contrat.editContrat = false)
-        },
         editStatusSuccess: (state, action) => {
             state.loading = false
             let compterDemande = 0
@@ -112,14 +100,14 @@ const orderSlice = createSlice({
             state.currentUserOrders.forEach(item => {
                 if (item.historique) {
                     compterHistorique +=1
-                } else if(item.contrats[0] && !item.historique) {
+                } else if(item.Contrats[0] && !item.historique) {
                     compterContrat +=1
                 } else {
                     compterDemande +=1
                 }
             })
             state.demandeCompter = compterDemande
-            state.contratCompter = compterContrat
+            state.ContratCompter = compterContrat
             state.historiqueCompter = compterHistorique
         },
         deleteSuccess: (state)=> {
@@ -130,6 +118,14 @@ const orderSlice = createSlice({
             state.loading = false
             const deletedOrderIndex = state.currentUserOrders.findIndex(item => item.id === action.payload)
            state.currentUserOrders.splice(deletedOrderIndex,1)
+        },
+        updateContrat: (state, action) => {
+            state.error = null
+            state.loading = false
+            const orderIndex = state.list.findIndex(order => order.id === action.payload.id)
+            if(orderIndex >= 0) {
+                state.list.splice(orderIndex, 1, action.payload)
+            }
         }
     },
     extraReducers: {
@@ -150,7 +146,7 @@ const orderSlice = createSlice({
 export default orderSlice.reducer;
 const {orderAdded,resetOrder,deleteItem,
     editStatusSuccess,deleteSuccess,
-    orderReceived,showItemDetail, orderRequested, orderRequestFailed, editingContrat, currentOrders, startEditStatus} = orderSlice.actions
+    orderReceived,showItemDetail, orderRequested, orderRequestFailed, updateContrat, currentOrders} = orderSlice.actions
 
 const url = '/commandes'
 
@@ -188,10 +184,6 @@ export const getItemDetail = (orderId) => dispatch => {
     dispatch(showItemDetail(orderId))
 }
 
-export const getStatusEditing = (data) => dispatch => {
-    dispatch(startEditStatus(data))
-}
-
 export const saveStatusEditing = (data) => apiRequest({
     url: url+'/update',
     data,
@@ -204,7 +196,7 @@ export const saveStatusEditing = (data) => apiRequest({
 
 
 export const createOrderContrat = (data) => apiRequest({
-    url: url+'/contrats',
+    url: url+'/Contrats',
     data,
     method: 'post',
     onStart: orderRequested.type,
@@ -226,3 +218,13 @@ export const getOrderDeleted = (data) => apiRequest({
 export const getDeleteUpdate = (orderId) => dispatch => {
     dispatch(deleteItem(orderId))
 }
+
+
+export const getOrderContratUpdate = (data) => apiRequest({
+    url: url+'/contrats/update',
+    data,
+    method: 'patch',
+    onStart: orderRequested.type,
+    onSuccess: updateContrat.type,
+    onError: orderRequestFailed.type
+})

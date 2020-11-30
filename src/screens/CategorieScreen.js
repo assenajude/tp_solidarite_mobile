@@ -1,42 +1,21 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux'
-import {View, StyleSheet, ActivityIndicator, Text, FlatList, TouchableWithoutFeedback} from 'react-native';
-import * as Yup from 'yup';
+import React, {useEffect} from 'react';
+import {useSelector} from 'react-redux'
+import {View, StyleSheet,Text, FlatList} from 'react-native';
 import ListHeader from "../components/list/ListHeader";
 import ListFooter from "../components/list/ListFooter";
 import ListItem from "../components/list/ListItem";
-import {loadCategories} from '../store/slices/categorieSlice'
-import ItemSeparator from "../components/list/ItemSeparator";
-import color from '../utilities/colors';
+
 import routes  from '../navigation/routes';
 
-import configureStore from "../store/configureStore";
-import categorieService from "../api/categorieService";
 
 function CategorieScreen({navigation}) {
-    const store = configureStore();
-    const dispatch = useDispatch();
-    const  [getFailed, setGetFailed] = useState(false);
-    const [loadingData,setLoadingData] = useState(true)
-    const categories = [];
+
         const categoriesData = useSelector(state => state.entities.categorie.list);
-    const [allCategorie, setAllCategorie] = useState([])
 
 
     useEffect(() => {
     }, [])
 
-
-/*
-    if (loadingData) {
-        return(
-            <View style={styles.activityIndicator}>
-            <ActivityIndicator size='large' color={color.rougeBordeau}/>
-            </View>
-
-            )
-    }
-*/
 
 return (
     <View style={styles.mainContainer}>

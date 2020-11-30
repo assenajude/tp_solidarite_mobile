@@ -7,7 +7,7 @@ import {apiRequest} from "../actionsCreators/apiActionCreator";
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        user: null,
+        user: {},
         loading: false,
         isLoggedIn: false,
         error: null
@@ -24,13 +24,13 @@ const authSlice = createSlice({
             state.isLoggedIn = true;
             state.loading = false;
         },
-        getAutoLogin: (state, action) => {
+        autoLogin: (state, action) => {
+            state.user = action.payload;
             state.isLoggedIn = true;
             state.loading = false;
-            state.user = action.payload;
         },
         registerSucccess: (state, action) => {
-            state.info = action.payload;
+            state.user = action.payload;
             state.loading = false;
             state.isLoggedIn = true
         },
@@ -40,19 +40,17 @@ const authSlice = createSlice({
             state.error = action.payload
         },
         logout: (state) =>{
-            state.roles = []
-                state.token = null
-                state.info = ''
-                state.user = null
+                state.user = {}
                 state.isLoggedIn = false
                 state.loading = false
                 state.error = null
-        }
+        },
+
     }
 })
 
 export default authSlice.reducer
-const {authFailed, authRequested, authSuccess, getAutoLogin, logout} = authSlice.actions
+const {authFailed, authRequested, authSuccess, autoLogin, logout} = authSlice.actions
 
 
  //action creators
@@ -61,17 +59,6 @@ const signupUrl = '/auth/signup';
 const loginUrl = '/auth/signin'
 
 
-
-/*export const signin = (user) => async dispatch => {
-    dispatch (authApiRequest({
-        url: loginUrl,
-        method: 'post',
-        data: user,
-        onStart: authRequested.type,
-        onSuccess: authSuccess.type,
-        onError: authFailed.type
-    }))
-}*/
 
 export const signin = (user) => apiRequest({
     url: loginUrl,
@@ -94,11 +81,14 @@ export const register = (user) => async dispatch=> {
 
 }
 
-export const autoLogin = (user) => dispatch => {
-    dispatch(getAutoLogin(user))
+export const getAutoLogin = (user) => dispatch => {
+    dispatch(autoLogin(user))
 }
 
 export const getLogout = () => dispatch => {
     dispatch(logout())
     authStorage.removeToken()
 }
+
+
+

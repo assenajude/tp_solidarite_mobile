@@ -9,12 +9,13 @@ import * as Yup from 'yup'
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
-import AppFormImagePicker from "../components/forms/AppFormImagePicker";
 import AppText from "../components/AppText";
 import {loadCategories} from '../store/slices/categorieSlice';
-import {saveArticle, loadArticles} from '../store/slices/articleSlice'
+import {saveArticle, loadArticles, saveEditedArticle} from '../store/slices/articleSlice'
 import AppFormSwitch from "../components/forms/AppFormSwitch";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getHomeCounterIncrement} from "../store/slices/mainSlice";
+import FormImageListPicker from "../components/forms/FormImageListPicker";
 
 
 const articleValidationSchema = Yup.object().shape({
@@ -24,17 +25,20 @@ const articleValidationSchema = Yup.object().shape({
     aide: Yup.boolean(),
     designation: Yup.string(),
     description: Yup.string(),
-    articleImage: Yup.string()
+    images: Yup.array().min(1, 'Veuillez choisir au moins une image')
 })
 
-function NewArticleScreen({navigation}) {
+function NewArticleScreen({route, navigation}) {
     const store = useStore()
-    const [image, setImage] = useState(null);
+    const article = route.params
     const [categorieId, setCategorieId] = useState(1)
     const loading = useSelector(state => state.entities.article.loading)
     const dispatch = useDispatch();
     const categories = useSelector(state => state.entities.categorie.list);
     const [addLoading, setAddLoading] = useState(false)
+    const [initValues, setInitValues] = useState({})
+    const [editMode, setEditMode] = useState(false)
+
 
     const getCategories = useCallback(async () => {
         await dispatch(loadCategories())
@@ -45,30 +49,68 @@ function NewArticleScreen({navigation}) {
     }
 
 
-    const handleAddArticle = async (article) => {
-        const articleData = {
-            categorieId,
-            designation: article.designation,
-            quantite: article.quantite,
-            prixReel: article.prixReel,
-            prixPromo: article.prixPromo,
-            aide: article.aide,
-            description: article.designation,
-            image: article.articleImage
+    const handleAddArticle = async (newArticle) => {
+        if(!editMode) {
+            const articleData = {
+                categorieId,
+                designation: newArticle.designation,
+                quantite: newArticle.quantite,
+                prixReel: newArticle.prixReel,
+                prixPromo: newArticle.prixPromo,
+                aide: newArticle.aide,
+                description: newArticle.description,
+                images: newArticle.images
+            }
+            await dispatch(saveArticle(articleData))
+            const error = store.getState().entities.article.error
+            if(error === null) {
+                await dispatch(loadArticles())
+                dispatch(getHomeCounterIncrement())
+                navigation.goBack()
+            } else {
+                Alert.alert('Erreur', "Une erreur est apparue", [
+                    {text: 'ok', onPress: () => {return;}}
+                ], {cancelable: false})
+            }
+        } else {
+            const editedData= {
+                categorieId,
+                articleId: article.id,
+                designation: newArticle.designation,
+                quantite: newArticle.quantite,
+                prixReel: newArticle.prixReel,
+                prixPromo: newArticle.prixPromo,
+                aide: newArticle.aide,
+                description: newArticle.designation,
+                images: newArticle.images
+            }
+            await dispatch(saveEditedArticle(editedData))
         }
-        await dispatch(saveArticle(articleData))
-        const error = store.getState().entities.article.error
-       if(error === null) {
-           await dispatch(loadArticles())
-           navigation.goBack()
-       } else {
-           Alert.alert('Erreur', "Une erreur est apparue", [
-               {text: 'ok', onPress: () => {return;}}
-           ], {cancelable: false})
-       }
     }
 
     useEffect(()=> {
+        if(article) {
+          setInitValues({
+              designation: article.designArticle,
+              quantite: String(article.qteStock),
+              prixReel: String(article.prixReel),
+              prixPromo: String(article.prixPromo),
+              aide: article.aide,
+              description: article.descripArticle,
+              images: article.imagesArticle
+          })
+            setEditMode(true)
+        } else {
+            setInitValues({
+                designation: '',
+                quantite: '',
+                prixReel: '',
+                prixPromo: '',
+                aide: false,
+                description: '',
+                images: []
+            })
+        }
         getCategories()
     }, [])
 
@@ -89,31 +131,28 @@ function NewArticleScreen({navigation}) {
                 <View style={styles.listContainer}>
                     <AppText style={{marginRight: 20, fontWeight: 'bold'}}>Categorie: </AppText>
                     <Picker mode='dropdown' style={{height: 50, width: 150}} selectedValue={categorieId} onValueChange={(id) => {
-                        console.log(id)
                         setCategorieId(id)}}>
                         {listCategories()}
                     </Picker>
                 </View>
                 <View style={styles.formStyle}>
                     <AppForm initialValues={{
-                        designation: '',
-                        quantite: 0,
-                        prixReel: 0,
-                        prixPromo: 0,
-                        aide: false,
-                        description: '',
-                        articleImage:null
+                        designation: initValues.designation,
+                        quantite: initValues.quantite,
+                        prixReel: initValues.prixReel,
+                        prixPromo: initValues.prixPromo,
+                        aide: initValues.aide,
+                        description: initValues.description,
+                        images: initValues.images
                     }}
                              validationSchema={articleValidationSchema}
-                             onSubmit={handleAddArticle}
-
-                    >
+                             onSubmit={handleAddArticle}>
+                        <FormImageListPicker name='images'/>
                         <AppFormField name='designation' title='designation'/>
                         <AppFormField name='quantite' title='Quantite'/>
                         <AppFormField name='prixReel' title='Prix réel'/>
                         <AppFormField name='prixPromo' title='Prix promo'/>
                         <AppFormField name='description' title='Description'/>
-                        <AppFormImagePicker name='articleImage'/>
                         <AppFormSwitch name='aide' title='Possibilité de vente à credit?'/>
                         <AppSubmitButton  title='Ajouter' showLoading={addLoading}/>
                     </AppForm>

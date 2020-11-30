@@ -7,6 +7,8 @@ import LeftUserCompte from "../components/user/LeftUserCompte";
 import NewArticleScreen from "../screens/NewArticleScreen";
 import CartIconRight from "../components/shoppingCart/CartIconRight";
 import routes from "./routes";
+import AppSearchBar from "../components/AppSearchBar";
+import ArticleDetailScreen from "../screens/ArticleDetailScreen";
 
 const CommerceStackNav = createStackNavigator()
 
@@ -21,7 +23,7 @@ function CommerceNavigator({navigation}) {
             headerRight: () => <CartIconRight cartLenght={cartItemsLenght} getToCartScreen={() => navigation.navigate('AccueilNavigator', {screen: routes.CART})}/>
         }}>
             <CommerceStackNav.Screen name='CommerceScreen' component={EcommerceScreen} options={{
-                title: 'e-commerce',
+                headerTitle: () => <AppSearchBar/>,
                 headerLeft: () => <LeftUserCompte getUserCompteNavigator={() =>navigation.openDrawer()}/>
             }}/>
             <CommerceStackNav.Screen name='NewArticleScreen' component={NewArticleScreen} options={{

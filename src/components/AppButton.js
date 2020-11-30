@@ -1,13 +1,14 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity,ActivityIndicator, View} from "react-native";
 import {AntDesign} from '@expo/vector-icons'
 
 import colors from '../utilities/colors'
 
-function AppButton({title, onPress, style, iconName, iconSize, iconColor, textStyle,disableButton, ...props }) {
+function AppButton({title, buttonLoading, onPress, style, iconName, iconSize, iconColor, textStyle,disableButton, ...props }) {
     return (
         <TouchableOpacity disabled={disableButton} style={[styles.buttonColor, style]} onPress={onPress} {...props}>
             <View style={styles.contentStyle}>
+                {buttonLoading && <ActivityIndicator size='small' color={colors.blanc}/>}
             {iconName && <AntDesign name={iconName} size={iconSize} color={iconColor} {...props}/>}
             {title && <Text style={[styles.textStyle, textStyle]} {...props}>{title}</Text>}
             </View>

@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux'
 import {useNavigation} from '@react-navigation/native'
 import {createStackNavigator, HeaderBackButton} from "@react-navigation/stack";
-import {StyleSheet, TextInput,View, TouchableOpacity, Image, Keyboard} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 
 import AccueilScreen from "../screens/AccueilScreen";
 import Color from "../utilities/colors";
-import DetailScreen from '../screens/DetailScreen';
+import ArticleDetailScreen from '../screens/ArticleDetailScreen';
 import ShoppingCartScreen from "../screens/ShoppingCartScreen";
 import OrderScreen from "../screens/OrderScreen";
 import LeftUserCompte from "../components/user/LeftUserCompte";
@@ -34,7 +34,11 @@ import UserServiceNavigator from "./UserServiceNavigator";
 import UserOrderNavigator from "./UserOrderNavigator";
 import UserFactureNavigator from "./UserFactureNavigator";
 import routes from "./routes";
-import OrderItemEditScreen from "../screens/OrderItemEditScreen";
+import AppSearchBar from "../components/AppSearchBar";
+import EditUserInfoScreen from "../screens/EditUserInfoScreen";
+import LocationDetailScreen from "../screens/LocationDetailScreen";
+import NewOptionScreen from "../screens/NewOptionScreen";
+import AppAvatar from "../components/AppAvatar";
 
 
 
@@ -54,13 +58,10 @@ const navigation = useNavigation()
             <ArticleStackNavigator.Screen name='AccueilScreen' component={AccueilScreen}
                options={{
                    headerTitleAlign: 'center',
-                   headerLeft: () => <LeftUserCompte getUserCompteNavigator={() =>navigation.openDrawer()}/>,
-                   headerTitle: 'Accueil',
+                   headerLeft: () => <AppAvatar imageStyle={{width: 40, height: 40}} onPress={() =>navigation.openDrawer()}/>,
+                   headerTitle: () => <AppSearchBar/>,
                }}/>
-            <ArticleStackNavigator.Screen name='DetailScreen' component={DetailScreen}
-             options={
-               ({route}) =>
-              ({title: 'Detail '+route.params.designArticle })}/>
+
               <ArticleStackNavigator.Screen name='ShoppingCartScreen' component={ShoppingCartScreen}
               options={{title: 'Panier' }}/>
 
@@ -99,6 +100,9 @@ const navigation = useNavigation()
             <ArticleStackNavigator.Screen name='NewUserAdresseScreen' component={NewUserAdresseScreen} options={{
                 title: 'Ajout nouvelle adresse'
             }}/>
+            <ArticleStackNavigator.Screen name='EditUserInfoScreen' component={EditUserInfoScreen} options={{
+                title: 'Editez votre profile'
+            }}/>
 
 
             <ArticleStackNavigator.Screen name='UserServiceScreen' component={UserServiceNavigator} options={{
@@ -113,9 +117,19 @@ const navigation = useNavigation()
                     navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})}
                 }/>
             }}/>
-            <ArticleStackNavigator.Screen name='OrderItemEditScreen' component={OrderItemEditScreen} options={{
-                title: 'Edition'
+            <ArticleStackNavigator.Screen name='ArticleDetailScreen' component={ArticleDetailScreen}
+                  options={({route}) =>
+                  ({title: 'Detail '+route.params.designArticle })}/>
+
+            <ArticleStackNavigator.Screen name='LocationDetailScreen' component={LocationDetailScreen} options={({route}) => ({
+                title: 'Detail '+route.params.libelleLocation
+            })}/>
+
+            <ArticleStackNavigator.Screen name='NewOptionScreen' component={NewOptionScreen} options={{
+                title: 'Ajouter un detail'
             }}/>
+
+
         </ArticleStackNavigator.Navigator>
 )};
 

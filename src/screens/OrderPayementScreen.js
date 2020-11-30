@@ -5,14 +5,16 @@ import {useSelector, useStore, useDispatch} from "react-redux";
 
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
-import {Picker} from "@react-native-community/picker";
-import {getSelected, getSelectedPlan} from '../store/slices/payementSlice'
+import {getPayementActive, getSelected, getSelectedPlan, loadPayements} from '../store/slices/payementSlice'
 import PayementListItem from "../components/list/PayementListItem";
 import AppButton from "../components/AppButton";
-import {getInteretValue, getTaux, getTotalWithPayement} from '../store/selectors/orderSelector'
+import {getInteretValue, getTotalWithPayement} from '../store/selectors/orderSelector'
 import routes from '../navigation/routes';
-import {getAdresse, getAdresseByUser} from '../store/slices/userAdresseSlice'
+import {getAdresse} from '../store/slices/userAdresseSlice'
 import {getAllVilles} from '../store/slices/villeSlice'
+import ModeItemCheck from "../components/payement/ModeItemCheck";
+import AppActivityIndicator from "../components/AppActivityIndicator";
+import {loadPlans} from "../store/slices/planSlice";
 
 function OrderPayementScreen({navigation}) {
     const dispatch = useDispatch()
@@ -22,25 +24,32 @@ function OrderPayementScreen({navigation}) {
     const payements = useSelector(state => state.entities.payement.list)
     const currentOrder = useSelector(state => state.entities.order.currentOrder)
     const payementPlans = useSelector(state => state.entities.payement.payementPlans)
-    const [selectedPayement, setSelectedPayement] = useState(1)
+    const loading = useSelector(state => state.entities.payement.loading)
+    const livraisonLoading = useSelector(state => state.entities.userAdresse.loading)
     const [checkItem, setCheckItem] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
 
-
-
-    const getVilles = useCallback(async() => {
-        dispatch(getAllVilles())
-    }, [])
+   const getStarted = useCallback(async () => {
+       dispatch(loadPayements())
+       dispatch(getSelected(1))
+       // dispatch(loadPlans())
+   }, [])
 
 
   useEffect(() => {
-      dispatch(getAdresse())
-      getVilles()
+      dispatch(getSelected(1))
   }, [])
 
 
 
+    if(loading) {
+        return (
+            <AppActivityIndicator visible={loading}/>
+        )
+    }
+
+
     return (
+        <>
         <View style={styles.container}>
             <View style={styles.summary}>
                 <View style={styles.itemLine}>
@@ -58,37 +67,59 @@ function OrderPayementScreen({navigation}) {
             </View>
             <View>
                 <View style={styles.headerStyle}>
-                <AppText style={{color: colors.blanc, fontWeight: 'bold'}}>Choisissez le mode de payement et un plan</AppText>
+                <AppText style={{color: colors.blanc, fontWeight: 'bold', fontSize: 12}}>Dites nous comment vous voulez payer votre commande</AppText>
                 </View>
                 <ScrollView style={{paddingBottom: 20}}>
                 <View style={styles.modePayement}>
-                    <AppText style={{fontWeight: 'bold', marginRight: 20}}>Mode de payement: </AppText>
-                    <Picker mode='dropdown' style={{height: 50, width: 120}} selectedValue={selectedPayement} onValueChange={(id) => {
-                      setSelectedPayement(id)
-                        dispatch(getSelected(id))
+                    <View style={{
+                        height: 35,
+                        backgroundColor: colors.rougeBordeau,
+                        justifyContent: 'center'
                     }}>
-                        {payements.map((item, index) => <Picker.Item label={item.mode} value={item.id} key={index}/>)}
-                    </Picker>
+                    <AppText style={{fontWeight: 'bold', color: colors.blanc}}>Mode</AppText>
+                    </View>
+                    <View style={{marginLeft: 20}}>
+                    <ScrollView horizontal>
+                        {payements.map((item, index) => <View key={index.toString()}>
+                            <ModeItemCheck isActive={item.active} modeTitle={item.mode} getModeActive={() => dispatch(getPayementActive(item.id))}/>
+                        </View>)}
+                    </ScrollView>
+                    </View>
+
                 </View>
                 <View style={styles.listContainer}>
+                    <View style={{
+                        backgroundColor: colors.rougeBordeau,
+                        width: '50%',
+                        alignSelf: 'center',
+                        marginBottom: 20
+                    }}>
+                        <AppText style={{color: colors.blanc}}>Choisissez un plan</AppText>
+                    </View>
+                    {!payementPlans || payementPlans.length === 0 && <View>
+                        <AppText>Il n'y a pas de plans dans ce mode.</AppText>
+                    </View>}
+                    <View style={{justifyContent: 'flex-start'}}>
                     {payementPlans.map((plan, index) =>
                         <PayementListItem libelle={plan.libelle} description={plan.descripPlan} key={index}
                                           checked={plan.checked} selectItem={() => {
                             dispatch(getSelectedPlan(plan))
-                                              setCheckItem(true)}}/>)}
+                            setCheckItem(true)}}/>)}
+                    </View>
 
                 </View>
-                    <AppButton disable={true} style={styles.buttonStyle} textStyle={{fontSize: 20}} title='continuer'
+                    <AppButton buttonLoading={livraisonLoading}  disable={true} style={styles.buttonStyle} textStyle={{fontSize: 20}} title='continuer'
                                onPress={() => {
                                    if(currentOrder.type === 'e-location' || currentOrder.type === 'e-service') {
                                        navigation.navigate(routes.ORDER)
                                    } else {
-                                   navigation.navigate(routes.ORDER_LIVRAISON)
+                                       navigation.navigate(routes.ORDER_LIVRAISON)
                                    }
                                }}/>
             </ScrollView>
         </View>
         </View>
+       </>
     );
 }
 
@@ -107,10 +138,16 @@ const styles = StyleSheet.create({
     },
     modePayement: {
         flexDirection: 'row',
-        margin: 10
+        alignItems: 'center',
+        margin: 10,
+        paddingTop: 10,
+        paddingBottom: 10,
+        borderWidth: 1
     },
     listContainer: {
-        margin: 5
+        margin: 5,
+        marginLeft: 20,
+        paddingTop: 10,
     },
     headerStyle: {
         backgroundColor: colors.rougeBordeau,

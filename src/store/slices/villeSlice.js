@@ -35,19 +35,22 @@ const villeSlice = createSlice({
             const villeRelais = relais[0].pointRelais;*/
             const selectedVille = state.list.find(ville => ville.nom === action.payload);
             state.selectedVille = selectedVille
-                state.villeRelais = selectedVille.pointRelais
+            state.villeRelais = selectedVille.PointRelais
 
         },
         getLivraisonVille: (state, action) => {
             const selectedVille = state.list.find(ville => ville.id === action.payload);
             state.userVille = selectedVille
+        },
+        resetUserVille: (state, action) => {
+            state.userVille = {}
         }
     }
 });
 
 export default villeSlice.reducer;
 
-const {villeAdded, villeReceived, villeRequested, villeRequestFailed, getVilleRelais, getLivraisonVille} = villeSlice.actions
+const {villeAdded, villeReceived, villeRequested, villeRequestFailed, getVilleRelais, getLivraisonVille, resetUserVille} = villeSlice.actions
 
 
 const url = '/villes'
@@ -76,4 +79,9 @@ export const selectedVilleRelais = (ville) => dispatch => {
 
 export const getSelectedLivraisonVille = (villeId) => dispatch => {
     dispatch(getLivraisonVille(villeId))
+}
+
+
+export const getUserVilleReset = () => dispatch => {
+    dispatch(resetUserVille())
 }

@@ -11,13 +11,16 @@ import AppButton from "../AppButton";
 import AppIconWithBadge from "../AppIconWithBadge";
 import {getLogout} from '../../store/slices/authSlice'
 import {getRoleAdmin} from "../../store/selectors/authSelector";
-import {getUserOrdersPopulate} from "../../store/slices/orderSlice";
+import LeftUserCompte from "./LeftUserCompte";
 
 function DrawerContent(props) {
     const store = useStore()
     const dispatch = useDispatch()
     const user = useSelector(state => state.auth.user)
+    const favoriteCompter = useSelector(state => state.entities.userFavorite.favoriteCompter)
     const isLogin = useSelector(state => state.auth.isLoggedIn)
+
+    const isUser = Object.entries(user).length !== 0
 
 
     useEffect(() => {
@@ -31,10 +34,8 @@ function DrawerContent(props) {
                    <View>
                        <View style={styles.avatar}>
                        <View style={styles.avatarStyle}>
-                           <AppAvatar style={{borderRadius: 100}} onPress={() => props.navigation.navigate(routes.COMPTE)}>
-                              {isLogin && <Image source={require('../../assets/avatar.jpg')} style={styles.avatarImage}/>}
-                               {!isLogin && <AntDesign name='user' size={30} color={Color.leger}/>}
-                           </AppAvatar>
+                           <LeftUserCompte avatarNotif={false} imageStyle={{width: 80, height: 80}}
+                                           getUserCompteNavigator={() => props.navigation.navigate(routes.COMPTE)}/>
                        </View>
                            <View>
                            <TouchableOpacity onPress={() => props.navigation.navigate(routes.NOTIFICATION)}>
@@ -44,14 +45,14 @@ function DrawerContent(props) {
                            </TouchableOpacity>
                            </View>
                        </View>
-                       <View style={styles.usernameStyle}>
-                       {isLogin && <TouchableOpacity onPress={() => props.navigation.navigate(routes.COMPTE)}>
+                       <View style={styles.isUsernameStyle}>
+                       {isUser && <TouchableOpacity onPress={() => props.navigation.navigate(routes.COMPTE)}>
                        <View style={styles.usernameContainer}>
                            <Text>{user.username}</Text>
                            <EvilIcons name="chevron-right" size={24} color="black" />
                        </View>
                        </TouchableOpacity>}
-                        {!isLogin && <View style={styles.logStyle}>
+                        {!isUser && <View style={styles.logStyle}>
                         <AppButton title='Se connecter'  style={{fontSize: 10, marginRight: 5}} onPress={() => {
                             props.navigation.navigate(routes.LOGIN)
                         }}/>
@@ -76,7 +77,10 @@ function DrawerContent(props) {
                            label='Messages' onPress={() => {props.navigation.navigate(routes.USER_MESSAGE)}} />
                    </View>
                    <View>
-                       <DrawerItem icon={({size, color}) => <MaterialIcons name="favorite-border" size={30} color={color} /> }
+                       <DrawerItem icon={({size, color}) => <AppIconWithBadge badgeCount={favoriteCompter}
+                                   notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
+                                  <MaterialIcons name="favorite-border" size={30} color={color}/>
+                       </AppIconWithBadge> }
                                    label='Favoris' onPress={() => {props.navigation.navigate(routes.USER_FAVORIS)}} />
                    </View>
                    <View>
@@ -107,10 +111,6 @@ function DrawerContent(props) {
                        <DrawerItem icon={({size, color}) => <MaterialCommunityIcons name="dots-horizontal" size={size} color={color} />}
                                    label='Gerer' onPress={() => {props.navigation.navigate('OtherMain')}} />
                    </View>}
-                   <View>
-                       <DrawerItem icon={({size, color}) => <AntDesign name="setting" size={size} color={color} />}
-                                   label='Paramètres' onPress={() => {props.navigation.navigate(routes.PARAM)}} />
-                   </View>
                </View>
                </View>
            </DrawerContentScrollView>
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     avatarStyle:{
-        marginLeft: 10,
+        margin:20,
         width: 50
     },
     usernameStyle: {

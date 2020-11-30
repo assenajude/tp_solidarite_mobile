@@ -5,7 +5,7 @@ import AppButton from "../AppButton";
 import AppText from "../AppText";
 import Color from '../../utilities/colors'
 
-function AddToCartModal({source, designation, itemModalVisible, addItemToCart,goToHomeScreen,goToShoppingCart}) {
+function AddToCartModal({source, designation, itemModalVisible,goToHomeScreen,goToShoppingCart}) {
     return (
 
         <Modal transparent={true} animationType='slide' visible={itemModalVisible}>

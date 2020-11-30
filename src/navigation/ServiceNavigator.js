@@ -7,7 +7,8 @@ import LeftUserCompte from "../components/user/LeftUserCompte";
 import NewServiceScreen from "../screens/NewServiceScreen";
 import CartIconRight from "../components/shoppingCart/CartIconRight";
 import routes from "./routes";
-import UserServiceScreen from "../screens/UserServiceScreen";
+import AppSearchBar from "../components/AppSearchBar";
+import ServiceDetailScreen from "../screens/ServiceDetailScreen";
 
 const ServiceStackNav = createStackNavigator()
 
@@ -22,12 +23,15 @@ function ServiceNavigator({navigation}) {
             headerRight: () => <CartIconRight cartLenght={itemsLenght} getToCartScreen={() => navigation.navigate('AccueilNavigator', {screen: routes.CART})} />
         }}>
             <ServiceStackNav.Screen name='ServiceScreen' component={EserviceScreen} options={{
-                title: 'e-service',
+                headerTitle: () => <AppSearchBar/>,
                 headerLeft: () => <LeftUserCompte getUserCompteNavigator={() =>navigation.openDrawer()}/>
             }}/>
             <ServiceStackNav.Screen name='NewServiceScreen' component={NewServiceScreen} options={{
                 title: 'Ajout nouveau service',
             }}/>
+            <ServiceStackNav.Screen name='ServiceDetailScreen' component={ServiceDetailScreen} options={({route}) => ({
+                title: 'Detail '+route.params.libelle
+            })}/>
 
         </ServiceStackNav.Navigator>
     );

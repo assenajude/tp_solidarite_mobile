@@ -7,80 +7,99 @@ import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import routes from "../navigation/routes";
 import PayementListItem from "../components/list/PayementListItem";
-import {getSelectedLivraisonVille} from '../store/slices/villeSlice'
-import {getSelectedAdress, getAdresseByUser} from '../store/slices/userAdresseSlice'
+import {getAllVilles, getSelectedLivraisonVille} from '../store/slices/villeSlice'
+import {getSelectedAdress, getAdresse} from '../store/slices/userAdresseSlice'
 import AppButton from "../components/AppButton";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function OrderLivraisonScreen({navigation}) {
-    const store  = useStore();
+    const store = useStore();
     const dispatch = useDispatch()
-    const user = useSelector(state => state.auth.user)
-    const adresseByUser = useSelector(state => state.entities.userAdresse.userAdresses);
-
-    const [isLoading, setIsLoading] = useState(true)
+    const loading = useSelector(state => state.entities.userAdresse.loading)
+    const adresseByUser = useSelector(state => state.entities.userAdresse.list);
 
 
+    const getUserAdresses = useCallback(async () => {
+        dispatch(getAdresse())
+        dispatch(getAllVilles())
+    }, [])
 
 
     useEffect(() => {
-        if(user) dispatch(getAdresseByUser(user.id))
-
     }, [])
 
-    if(user && adresseByUser.length >= 1) {
+
+    if (loading) {
         return (
-            <View style={styles.container}>
-                <View style={styles.summary}>
-                    <View style={styles.itemLine}>
-                        <AppText style={{fontWeight: 'bold'}} >Montant actuel commande: </AppText>
-                        <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{getTotalWithPayement(store.getState())} FCFA</AppText>
-                    </View>
-                    <View style={styles.itemLine}>
-                        <AppText style={{fontWeight: 'bold'}}>Frais de livraison: </AppText>
-                        <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{getFraisLivraison(store.getState())} FCFA</AppText>
-                    </View>
-                    <View style={styles.itemLine}>
-                        <AppText style={{fontWeight: 'bold'}}>Net actuel à payer: </AppText>
-                        <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{getTotalFinal(store.getState())} FCFA</AppText>
-                    </View>
-                </View>
-                <View>
-                    <View style={styles.adressHeader}>
-                        <AppText style={{color: colors.blanc}}>Choisissez votre adresse de livraison</AppText>
-                    </View>
-                    <ScrollView>
-                        {adresseByUser.map((item, index) => <PayementListItem libelle={item.nom} description={`${item.tel} --- ${item.adresse}`} key={index}
-                                                                              selectItem={() =>
-                                                                              {
-                                                                                  dispatch(getSelectedLivraisonVille(item.pointRelai.villeId))
-                                                                                  dispatch(getSelectedAdress(item.id))
-                                                                              }
-                                                                              } checked={item.selected}/>)}
-                    </ScrollView>
-                    <AppButton title='continuer' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.ORDER)}/>
-                </View>
-            </View>
-        );
-    } else if(user && adresseByUser.length ===0) {
+            <AppActivityIndicator visible={loading}/>
+        )
+    }
+
+    if (!loading && adresseByUser.length === 0) {
         return (
             <View style={styles.emptyStyle}>
                 <AppText>Vous n'avez pas d'adresses de livraison. Veillez en ajouter pour continuer</AppText>
                 <AppButton title='Ajouter des adresses' onPress={() => navigation.navigate(routes.USER_ADDRESS)}/>
             </View>
         )
-    } else {
-        return (
-            <View style={styles.emptyStyle}>
-                <AppText>Desolé...Vous devez vous connecter pour continuer</AppText>
-                <AppButton title='Me connecter' onPress={() => navigation.navigate(routes.LOGIN)}/>
-            </View>
-        )
     }
 
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.summary}>
+                <View style={styles.itemLine}>
+                    <AppText style={{fontWeight: 'bold'}}>Montant actuel commande: </AppText>
+                    <AppText style={{
+                        fontWeight: 'bold',
+                        color: colors.rougeBordeau
+                    }}>{getTotalWithPayement(store.getState())} FCFA</AppText>
+                </View>
+                <View style={styles.itemLine}>
+                    <AppText style={{fontWeight: 'bold'}}>Frais de livraison: </AppText>
+                    <AppText style={{
+                        fontWeight: 'bold',
+                        color: colors.rougeBordeau
+                    }}>{getFraisLivraison(store.getState())} FCFA</AppText>
+                </View>
+                <View style={styles.itemLine}>
+                    <AppText style={{fontWeight: 'bold'}}>Net actuel à payer: </AppText>
+                    <AppText style={{
+                        fontWeight: 'bold',
+                        color: colors.rougeBordeau
+                    }}>{getTotalFinal(store.getState())} FCFA</AppText>
+                </View>
+            </View>
+            <View>
+                <View style={styles.adressHeader}>
+                    <AppText style={{color: colors.blanc}}>Choisissez votre adresse de livraison</AppText>
+                </View>
+                <ScrollView>
+                    <View style={{
+                        marginLeft: 20
+                    }}>
+
+
+                    {adresseByUser.map((item, index) => <PayementListItem libelle={item.nom}
+                                                                          description={`${item.tel} --- ${item.adresse}`}
+                                                                          key={index}
+                                                                          selectItem={() => {
+                                                                              dispatch(getSelectedLivraisonVille(item.PointRelai.VilleId))
+                                                                              dispatch(getSelectedAdress(item.id))
+                                                                          }
+                                                                          } checked={item.selected}/>)}
+                    </View>
+                </ScrollView>
+                <AppButton title='continuer' style={styles.buttonStyle}
+                           onPress={() => {navigation.navigate(routes.ORDER)}}/>
+            </View>
+        </View>
+    );
 }
+
 const styles = StyleSheet.create({
     container: {
-      flex: 1
+        flex: 1
     },
     summary: {
         margin: 10,

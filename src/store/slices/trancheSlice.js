@@ -33,6 +33,8 @@ const trancheSlice = createSlice({
             state.list = action.payload
         },
         payTranche: (state, action) => {
+            state.loading = false
+            state.error = null
             let tranche = state.list.find(tranche => tranche.id === action.payload.id)
             tranche.solde = action.payload.montant
             tranche.payed = true

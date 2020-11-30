@@ -3,15 +3,15 @@ import {View, TextInput,TouchableOpacity, StyleSheet} from 'react-native'
 import {EvilIcons} from '@expo/vector-icons'
 import Color from '../utilities/colors'
 
-function AppSearchBar({children, style, getInput, leaveInput}) {
+function AppSearchBar({style, leaveInput, changeSearchValue, searchValue}) {
     return (
-        <TouchableOpacity>
+
         <View style={[styles.searchContainer, style]}>
-            <TextInput style={styles.inputStyle} autoFocus={true} onBlur={leaveInput} placeholder='chercher ici...'/>
+            <TextInput style={styles.inputStyle} onBlur={leaveInput} value={searchValue} onChangeText={changeSearchValue} placeholder='chercher ici...'/>
+            <TouchableOpacity>
             <EvilIcons name='search' size={24} style={styles.iconStyle}/>
-            {children}
-        </View>
         </TouchableOpacity>
+        </View>
     );
 }
 
@@ -21,18 +21,20 @@ const styles = StyleSheet.create({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            color: Color.blanc
+            color: Color.blanc,
+            borderWidth: 1,
+            backgroundColor: Color.blanc,
+            borderRadius: 20
 
         },
     inputStyle:{
-        width:'90%',
+        width:'80%',
         paddingBottom: 5,
-        borderBottomWidth: 1,
-        color:Color.blanc,
+        color:Color.dark,
         borderColor: Color.blanc
     },
     iconStyle:{
-        color:Color.blanc
+        color:Color.dark
     }
 })
 

@@ -29,27 +29,23 @@ const userAdresseSlice = createSlice({
             state.error = null;
             state.list.push(action.payload)
         },
-        adressByUser: (state, action) => {
-            const adressesByUser = state.list.filter(adresse => adresse.userId === action.payload);
-            state.userAdresses = adressesByUser
-        },
         selectAdress: (state, action) => {
-            const selectAdress = state.userAdresses.find(adress => adress.id === action.payload);
+            const selectAdress = state.list.find(adress => adress.id === action.payload);
             state.selectedAdresse  = selectAdress;
             if (selectAdress.selected) {
             selectAdress.selected = false
             } else {
                 selectAdress.selected = true
             };
-            state.adresseRelais = selectAdress.pointRelai;
-            const otherAdress = state.userAdresses.filter(adress => adress.id !== selectAdress.id);
+            state.adresseRelais = selectAdress.PointRelai;
+            const otherAdress = state.list.filter(adress => adress.id !== selectAdress.id);
             otherAdress.forEach(adress => adress.selected = false)
 
         },
         resetAdresse: (state) => {
             state.adresseRelais = {}
             state.selectedAdresse = {}
-            state.userAdresses.forEach(adresse => {
+            state.list.forEach(adresse => {
                 adresse.selected = false
             })
         }
@@ -59,7 +55,7 @@ const userAdresseSlice = createSlice({
 
 export default userAdresseSlice.reducer;
 
-const {userAdresseAdded, resetAdresse, userAdresseFailed, userAdresseReceived, userAdresseRequested, adressByUser, selectAdress} = userAdresseSlice.actions
+const {userAdresseAdded, resetAdresse, userAdresseFailed, userAdresseReceived, userAdresseRequested, selectAdress} = userAdresseSlice.actions
 
 
 const url = '/userAdresses'
@@ -82,9 +78,6 @@ export const getAdresse = () => apiRequest({
 
 })
 
-export const getAdresseByUser = (userId) => dispatch => {
-    dispatch(adressByUser(userId))
-}
 
 export const getSelectedAdress = (adressId) => dispatch => {
     dispatch(selectAdress(adressId))

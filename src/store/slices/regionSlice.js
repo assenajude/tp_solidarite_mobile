@@ -27,8 +27,8 @@ const regionSlice = createSlice({
         },
         selestedRegion: (state, action) => {
             let selectedRegion = state.list.filter(region => region.id === action.payload);
-            if (selectedRegion[0].villes) {
-                state.regionVilles = selectedRegion[0].villes
+            if (selectedRegion[0].Villes) {
+                state.regionVilles = selectedRegion[0].Villes
             }
         }
     }

@@ -1,9 +1,7 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack'
 
 import OtherFileMain from "../screens/OtherFileMain";
-import OtherFileScreen from "../screens/OtherFileScreen";
 import color from '../utilities/colors'
 import LeftUserCompte from "../components/user/LeftUserCompte";
 import CategorieScreen from "../screens/CategorieScreen";
@@ -18,10 +16,9 @@ import ShippingAdresseScreen from "../screens/ShippingAdresseScreen";
 import NewShippingAdScreen from "../screens/NewShippingAdScreen";
 import PointRelaisScreen from "../screens/PointRelaisScreen";
 import NewPointRelaisScreen from "../screens/NewPointRelaisScreen";
-import NewUserAdresseScreen from "../screens/NewUserAdresseScreen";
 import RegionScreen from "../screens/RegionScreen";
 import VilleScreen from "../screens/VilleScreen";
-import UserAdresseScreen from "../screens/UserAdresseScreen";
+import ColorAndSizeScreen from "../screens/ColorAndSizeScreen";
 
 const StackOther = createStackNavigator();
 
@@ -35,7 +32,6 @@ function OtherFileNavigator({navigation}) {
                 headerLeft: () => <LeftUserCompte getUserCompteNavigator={() => navigation.openDrawer()}/>,
                 title: 'Gestion des autres fichiers'
             }}/>
-            <StackOther.Screen name='OtherFileScreen' component={OtherFileScreen}/>
             <StackOther.Screen name='CategorieScreen' component={CategorieScreen} options={{
                 title: 'Gestion des categories'
             }}/>
@@ -73,17 +69,15 @@ function OtherFileNavigator({navigation}) {
             <StackOther.Screen name='NewPointRelaisScreen' component={NewPointRelaisScreen} options={{
                 title: 'Nouveau point relais'
             }}/>
-           {/* <StackOther.Screen name='NewUserAdresseScreen' component={NewUserAdresseScreen} options={{
-                title: 'Nouvelle adresse utilisateur'
-            }}/>
-            <StackOther.Screen name='UserAdresseScreen' component={UserAdresseScreen} options={{
-                title: 'Adresse utilisateur'
-            }}/>*/}
+
             <StackOther.Screen name='RegionScreen' component={RegionScreen} options={{
                 title: 'Gestion des regions'
             }}/>
             <StackOther.Screen name='VilleScreen' component={VilleScreen} options={{
                 title: 'Liste des villes'
+            }}/>
+            <StackOther.Screen name='ColorAndSizeScreen' component={ColorAndSizeScreen} options={{
+                title: 'Ajouter une couleur ou une taille'
             }}/>
         </StackOther.Navigator>
     );

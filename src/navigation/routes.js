@@ -1,5 +1,7 @@
 export default Object.freeze({
-    ARTICLE_DETAIL: 'DetailScreen',
+    ARTICLE_DETAIL: 'ArticleDetailScreen',
+    LOCATION_DETAIL: 'LocationDetailScreen',
+    SERVICE_DETAIL: 'ServiceDetailScreen',
     ACCUEIL: 'AccueilScreen',
     NOTIFICATION: 'NotificationScreen',
     GIFT: 'Cadeau',

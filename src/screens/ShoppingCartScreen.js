@@ -1,18 +1,16 @@
-import React, {useEffect, useCallback, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {View, Text, FlatList, StyleSheet, ScrollView} from 'react-native'
+import {View, FlatList, StyleSheet, ScrollView} from 'react-native'
 import CartListFooter from "../components/shoppingCart/CartListFooter";
 import dayjs from "dayjs";
 
 
 import CartItem from "../components/shoppingCart/CartItem";
 import AppText from "../components/AppText";
-import {getSelected, loadPayements} from '../store/slices/payementSlice'
 import CartListHeader from "../components/shoppingCart/CartListHeader";
 import routes from "../navigation/routes";
 import {addToOrder} from '../store/actionsCreators/orderActionCreator'
 import {changeItemQuantity} from '../store/actionsCreators/shoppingCartActionCreator'
-import {loadPlans} from "../store/slices/planSlice";
 import AppInput from "../components/AppInput";
 import AppDateTimePicker from "../components/AppDateTimePicker";
 import AppButton from "../components/AppButton";
@@ -24,7 +22,6 @@ function ShoppingCartScreen({navigation}) {
     const totalAmount = useSelector(state => state.entities.shoppingCart.totalAmount);
     const itemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght);
     const cartType = useSelector(state => state.entities.shoppingCart.type)
-    const payements = useSelector(state => state.entities.payement.list)
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [dateMode, setDateMode] = useState('date')
     const [showDatePicker, setShowDatePicker] = useState(false)
@@ -71,19 +68,24 @@ function ShoppingCartScreen({navigation}) {
         showMode('time')
     }
 
+    const handleDeleteItem = (item) => {
+        const itemData = {
+            id: item.id,
+            libelle: item.libelle,
+            image: item.image,
+            prix: item.prix,
+            quantite: 1,
+            montant: item.prix,
+            couleur: item.couleur,
+            taille: item.taille,
+            typeCmde: item.type
+        }
+        dispatch(getCartItemDelete(itemData))
 
-
-    const getPlans =  useCallback(async () => {
-        await dispatch(loadPlans())
-    }, [dispatch])
+    }
 
 
     useEffect(() => {
-        getPlans();
-        dispatch(loadPayements())
-        if(payements.length >= 1) {
-        dispatch(getSelected(1))
-        }
     }, [dispatch]);
 
     if (items.length === 0) {
@@ -96,7 +98,7 @@ function ShoppingCartScreen({navigation}) {
         return (
             <ScrollView>
                 <CartListHeader min={true} max={true}/>
-               <CartItem deleteItem={() => dispatch(getCartItemDelete(items[0]))} designation={items[0].libelle} source={{uri: items[0].image}}
+               <CartItem deleteItem={handleDeleteItem(items[0])} designation={items[0].libelle} source={{uri: items[0].image}}
                min={true} max={true} montantMin={items[0].montantMin} montantMax={items[0].montantMax} icon={true}/>
                 <View style={{
                     flexDirection: 'row',
@@ -111,7 +113,7 @@ function ShoppingCartScreen({navigation}) {
                     <View>
                         <AppButton style={{padding: 5}} title='Appliquer' onPress={() => {
                            const montant = Number(serviceMontant)
-                            dispatch(setItemServiceMontant(montant))
+                            dispatch(setItemServiceMontant({id: items[0].id, montant}))
                         }}/>
                     </View>
                 </View>
@@ -144,7 +146,7 @@ function ShoppingCartScreen({navigation}) {
                      dispatch(addToOrder(items, itemsLenght, totalAmount, shoppingType))
                      navigation.navigate(routes.ORDER_PAYEMENT)}}/>} data={items}
                  keyExtractor={(item) => item.id.toString()}
-                 renderItem={({item}) => <CartItem deleteItem={() => dispatch(getCartItemDelete(item))} quantite={true} montant={true} price={true}  designation={item.libelle} itemQuantite={item.quantite} quantityDecrement={() => {
+                 renderItem={({item}) => <CartItem deleteItem={handleDeleteItem(item)} quantite={true} montant={true} price={true}  designation={item.libelle} itemQuantite={item.quantite} quantityDecrement={() => {
                      const newQuantite = item.quantite- 1
                      dispatch(changeItemQuantity(item.id, newQuantite))
                  }} quantityIncrement={() => {

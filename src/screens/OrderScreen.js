@@ -15,6 +15,7 @@ import {getCartClear} from '../store/slices/shoppingCartSlice'
 import {getResetPayement} from '../store/slices/payementSlice'
 import {getAdresseReset} from '../store/slices/userAdresseSlice'
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getSelectedLivraisonVille, getUserVilleReset} from "../store/slices/villeSlice";
 
 function OrderScreen({navigation}) {
     const store = useStore()
@@ -30,7 +31,7 @@ function OrderScreen({navigation}) {
 
     const saveOrder = async () => {
         const user = await authStorage.getUser();
-        let adresseId = null
+        let adresseId;
         if(selectedAdesse) {
             adresseId = selectedAdesse.id
         }
@@ -45,7 +46,6 @@ function OrderScreen({navigation}) {
         }
 
         const order = {
-            userId: user.id,
             userAdresseId: adresseId,
             planId: currentPlan.id,
             items: currentOrder.items,
@@ -57,23 +57,25 @@ function OrderScreen({navigation}) {
             typeCmde: currentOrder.type
         }
          await dispatch(makeOrder(order))
-        const success =  store.getState().entities.order.orderSuccess
-        if(success) {
-            await dispatch(getCartClear())
-            await dispatch(getOrderReset())
-            await dispatch(getResetPayement())
-            await dispatch(getAdresseReset())
-            navigation.navigate(routes.ORDER_SUCCESS)
-        } else {
+        const error =  store.getState().entities.order.error
+        if(error !== null) {
             Alert.alert('Echec!!', 'Impossible de faire la commande maintenant', [
                 {text: 'ok', onPress: () => navigation.navigate(routes.ACCUEIL)}
             ], {cancelable: false})
+
+        } else {
+            dispatch(getCartClear())
+            dispatch(getOrderReset())
+            dispatch(getResetPayement())
+            dispatch(getAdresseReset())
+            dispatch(getUserVilleReset())
+            navigation.navigate(routes.ORDER_SUCCESS)
         }
     }
 
 
     useEffect(() => {
-    }, [dispatch, currentOrder])
+    }, [])
 
 
 

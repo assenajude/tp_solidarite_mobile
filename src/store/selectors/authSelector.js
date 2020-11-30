@@ -3,7 +3,7 @@ import {createSelector} from "@reduxjs/toolkit";
 const user = state => state.auth.user
 
 const userRoleAdmin = (user) => {
-    if (user){
+    if (Object.entries(user).length !== 0){
         const adminIndex = user.roles.indexOf('ROLE_ADMIN')
         if(adminIndex !== -1) {
             return true

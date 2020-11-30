@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useState} from 'react';
 import {useDispatch, useStore,useSelector} from "react-redux";
 import {View, StyleSheet, ScrollView, Alert} from "react-native"
 import {Picker} from "@react-native-community/picker";
@@ -8,17 +8,19 @@ import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppText from "../components/AppText";
-import AppFormImagePicker from "../components/forms/AppFormImagePicker";
 import {addService} from '../store/slices/serviceSlice'
 import { getOrdersByUser} from "../store/slices/orderSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppFormSwitch from "../components/forms/AppFormSwitch";
+import FormImageListPicker from "../components/forms/FormImageListPicker";
 
 const serviceValideSchema = Yup.object().shape({
     libelle: Yup.string(),
     description: Yup.string(),
     montantMin: Yup.number(),
     montantMax: Yup.number(),
-    imageService: Yup.string()
+    images: Yup.array().min(1, "Veuillez choisir au moins une image"),
+    isDispo: Yup.boolean()
 })
 
 function NewServiceScreen({navigation}) {
@@ -41,7 +43,8 @@ function NewServiceScreen({navigation}) {
             description: service.description,
             montantMin: service.montantMin,
             montantMax: service.montantMax,
-            image: service.imageService
+            images: service.images,
+            isDispo:service.isDispo
         }
         await dispatch(addService(serviceData))
         const error = store.getState().entities.order.error
@@ -68,16 +71,18 @@ function NewServiceScreen({navigation}) {
             <AppForm initialValues={{
                 libelle: '',
                 description: '',
-                montantMin: 0,
-                montantMax: 0,
-                imageService: ''
+                montantMin: '',
+                montantMax: '',
+                images: [],
+                isDispo: false
             }} validationSchema={serviceValideSchema} onSubmit={handleNewService}>
+                <FormImageListPicker name='images'/>
                 <AppFormField name='libelle' title='Libelle'/>
                 <AppFormField name='description' title='Description'/>
                 <AppFormField name='montantMin' title='Montant minimum'/>
                 <AppFormField name='montantMax' title='Montant Maximum'/>
-                <AppFormImagePicker name='imageService'/>
-                <AppSubmitButton showLoading={loading} title='Ajouter'/>
+                <AppFormSwitch title='Service disponible? ' name='isDispo'/>
+                <AppSubmitButton title='Ajouter'/>
             </AppForm>
         </ScrollView>
        </>

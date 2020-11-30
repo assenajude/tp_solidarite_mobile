@@ -24,33 +24,11 @@ function NewPlanScreen({navigation, route}) {
     const dispatch = useDispatch();
     const listPayements = useSelector(state => state.entities.payement.list)
 
-    const [addFailed, setAddFailed] = useState(false);
     const [payementId, setPayementId]  = useState(1);
     const [allPayements, setAllPayements] = useState([]);
-
-    const [showPicker, setShowPicker] = useState(false);
-
     const loadPayement = useCallback(async () => {
         await dispatch(loadPayements());
     }, [dispatch]);
-
-
-    const payementsPlan = [
-           {
-               id: 1,
-               modePayement: 'Cash'
-           },
-           {
-             id: 2,
-             modePayement: 'Credit'
-           },
-           {
-               id: 3,
-               modePayement: 'Cheque'
-           }
-
-        ]
-    const [listPayement, setListPayement] = useState([]);
 
 
 
@@ -64,32 +42,6 @@ function NewPlanScreen({navigation, route}) {
         }, [dispatch, loadPayement])
 
 
-
-    const getList = () => {
-        return (
-            allPayements.map((item, index) => <Picker.Item label={item.modePayement} value={item.id} key={index}/>)
-        )
-    }
-
-     /*   const getList = () => {
-            return (
-                planPayements.map((item, index) =>
-                    <Picker.Item label={item.modePayement} value={item.id} key={index}/>)
-            )
-        }*/
-
-     const areEqual = (prevList, nextList) => true;
-
-    const ListPicker = React.memo(({list})=> {
-        return (
-            <Picker mode='dropdown' style={styles.listStyle}
-                    selectedValue={payementId}
-                    onValueChange={(id) => setPayementId(id)}>
-                {listPayements.map((item, index) =>
-                    <Picker.Item label={item.mode} value={item.id} key={index}/>)}
-            </Picker>
-        )
-    }, areEqual)
 
 
     const addNewPlan = async (plan) => {
@@ -119,8 +71,8 @@ function NewPlanScreen({navigation, route}) {
                         <AppForm initialValues={{
                             libelle: '',
                             description: '',
-                            mensualite: 0,
-                            compensation: 0
+                            mensualite: '',
+                            compensation: ''
                         }} validationSchema={planValideSchema} onSubmit={addNewPlan}>
                             <AppFormField title='Libelle' name='libelle'/>
                             <AppFormField title='Description' name='description'/>

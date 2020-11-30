@@ -19,6 +19,8 @@ import mainSlice from './slices/mainSlice'
 import userLocationSlice from './slices/userLocationSlice'
 import userServiceSlice from './slices/userServiceSlice'
 import userOrderSlice from './slices/userOrderSlice'
+import colorAndSizeSlice from './slices/colorAndSizeSlice'
+import userFavoriteSlice from './slices/userFavoriteSlice'
 
 export default combineReducers({
     payement: payementSlice,
@@ -39,6 +41,8 @@ export default combineReducers({
     main: mainSlice,
     userLocation: userLocationSlice,
     userService: userServiceSlice,
-    userOrder: userOrderSlice
+    userOrder: userOrderSlice,
+    colorAndSize: colorAndSizeSlice,
+    userFavorite: userFavoriteSlice
 
 })

@@ -58,6 +58,8 @@ const getUserAdresses = useCallback(async () => {
            <AppButton title='Ville' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.VILLE)}/>
             <AppButton title='Point relais' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.POINT_RELAIS)}/>
             <AppButton title='Adresse utilisateur' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.USER_ADDRESS)}/>
+            <AppButton title='Couleur et Taille' style={styles.buttonStyle} onPress={() => navigation.navigate('ColorAndSizeScreen')}/>
+
         </ScrollView>
 
     );

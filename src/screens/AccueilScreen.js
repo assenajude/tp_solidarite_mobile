@@ -1,7 +1,7 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {useDispatch, useSelector, useStore} from "react-redux";
-import {MaterialCommunityIcons} from '@expo/vector-icons'
-import {View, Text, FlatList, StyleSheet, Image, ActivityIndicator, StatusBar, Alert, Modal} from "react-native";
+import {Text, FlatList, StyleSheet, StatusBar, View} from "react-native";
+import Constants from 'expo-constants'
 
 import AppInfo from "../components/AppInfo";
 import AppButton from "../components/AppButton";
@@ -9,19 +9,25 @@ import AppCard from "../components/AppCard";
 import Color from '../utilities/colors';
 import routes from '../navigation/routes';
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
-import {loadArticles} from '../store/slices/articleSlice'
 import {loadPayements} from "../store/slices/payementSlice";
 import authStorage from '../store/persistStorage'
 import { getOrdersByUser} from '../store/slices/orderSlice'
-import {getFactures, getFacturesByUser} from '../store/slices/factureSlice'
+import {getFacturesByUser} from '../store/slices/factureSlice'
 import {getTranches} from '../store/slices/trancheSlice'
-import {autoLogin} from "../store/slices/authSlice";
-import {getAllLocation} from '../store/slices/locationSlice'
+import {getAutoLogin} from "../store/slices/authSlice";
 import {loadCategories} from '../store/slices/categorieSlice'
-import {getModalDismiss} from "../store/slices/shoppingCartSlice";
+import {getCartItems, getModalDismiss} from "../store/slices/shoppingCartSlice";
 import useAddToCart from "../hooks/useAddToCart";
 import {loadPlans} from "../store/slices/planSlice";
-import {getAllMainData, getRefreshing} from "../store/slices/mainSlice";
+import {getAllMainData, getRefreshing, getSelectedOptions} from "../store/slices/mainSlice";
+import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getAdresse} from "../store/slices/userAdresseSlice";
+import {getAllVilles} from "../store/slices/villeSlice";
+import {getConnectedUserData, getUserProfileAvatar} from "../store/slices/userProfileSlice";
+import {loadArticles} from "../store/slices/articleSlice";
+import {getAllLocation} from "../store/slices/locationSlice";
+import {getToggleFavorite, getUserFavoris} from "../store/slices/userFavoriteSlice";
+import {loadRelais} from "../store/slices/pointRelaisSlice";
 
 function AccueilScreen({navigation, route}) {
     const store = useStore()
@@ -29,27 +35,36 @@ function AccueilScreen({navigation, route}) {
     const error = useSelector(state => state.entities.main.error)
     const refresh =  useSelector(state => state.entities.main.refresh)
     const dispatch = useDispatch();
-    const [showModal, setShowModal] = useState(false);
-    const [selectedItem, setSelectedItem] = useState({})
+    const selectedItem = useSelector(state => state.entities.shoppingCart.newAdded)
     const {addItemToCart} = useAddToCart()
     const mainDatas = useSelector(state => state.entities.main.list)
+    const articleFavorites = useSelector(state => state.entities.userFavorite.articleFavoris)
+    const locationFavorites = useSelector(state => state.entities.userFavorite.locationFavoris)
+    const showCartModal = useSelector(state => state.entities.shoppingCart.showModal)
+    const cartLoading = useSelector(state => state.entities.shoppingCart.loading)
 
 
     const getAllCategories = useCallback(async () => {
                 await dispatch(loadCategories());
     }, []);
 
-    const getPayements =  useCallback(async () => {
-        await dispatch(loadPayements())
+    const getUserAdresses = useCallback(async () => {
+        dispatch(getAdresse())
+        dispatch(getAllVilles())
     }, [])
 
-    const getAllTranches = () => {
-         dispatch(getTranches())
-    }
 
     const restoreUser = async () => {
         const user = await authStorage.getUser();
-        if (user) dispatch(autoLogin(user))
+        if (user) {
+            await dispatch(getAutoLogin(user))
+            dispatch(getOrdersByUser())
+            dispatch(getFacturesByUser())
+            dispatch(getTranches())
+            dispatch(getConnectedUserData())
+            dispatch(getUserFavoris())
+            getUserAdresses()
+        }
     }
 
 
@@ -58,31 +73,24 @@ function AccueilScreen({navigation, route}) {
     }, [dispatch])
 
 
+    const getPayements = useCallback(async () => {
+        dispatch(loadPayements())
+    }, [])
+
+
+
     useEffect(() => {
         restoreUser()
         getMainDatas()
         getPayements();
-        dispatch(getTranches())
-        dispatch(getOrdersByUser())
         getAllCategories()
-        dispatch(getFactures())
         dispatch(loadPlans())
+        dispatch(loadArticles())
+        dispatch(getAllLocation())
+        dispatch(loadRelais())
+        dispatch(getCartItems())
     }, []);
 
-    if (isLoading) {
-        return <>
-            <StatusBar barStyle='light-content'/>
-            <View style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <ActivityIndicator size='large' color={Color.rougeBordeau}/>
-            </View>
-            {/*<AppActivityIndicator visible={isLoading}/>*/}
-        </>
-
-    }
 
     if (error) {
         return <AppInfo buttonTitle='essayer encore..'>
@@ -99,31 +107,27 @@ function AccueilScreen({navigation, route}) {
         </>
     };
 
-    if (showModal) {
-        if (selectedItem && selectedItem.category.typeCateg==='e-location') {
+    if (showCartModal) {
+        if (selectedItem && selectedItem.type==='e-location') {
             return (
-                <AddToCartModal itemModalVisible={showModal} source={{uri: selectedItem.imageLocation}} designation={selectedItem.libelleLocation}
+                <AddToCartModal itemModalVisible={showCartModal} source={{uri: selectedItem.image}} designation={selectedItem.libelle}
                                 goToHomeScreen={() => {
                                     dispatch(getModalDismiss())
-                                    setShowModal(false)
                                 }}
                                 goToShoppingCart={() => {
                                     dispatch(getModalDismiss())
-                                    setShowModal(false)
                                     navigation.navigate(routes.CART)
                                 }
                                 }/>
             )
         }
         return (
-            <AddToCartModal itemModalVisible={showModal} source={{uri: selectedItem.imageArticle}} designation={selectedItem.designArticle}
+            <AddToCartModal itemModalVisible={showCartModal} source={{uri: selectedItem.image}} designation={selectedItem.libelle}
                             goToHomeScreen={() => {
                                 dispatch(getModalDismiss())
-                                setShowModal(false)
                             }}
                             goToShoppingCart={() => {
                                 dispatch(getModalDismiss())
-                                setShowModal(false)
                                 navigation.navigate(routes.CART)
                             }
                             }/>
@@ -133,39 +137,56 @@ function AccueilScreen({navigation, route}) {
 
     return (
         <>
-            <View style={styles.container}>
+            <StatusBar barStyle="light-content" backgroundColor={Color.rougeBordeau}/>
+            <AppActivityIndicator visible={isLoading || cartLoading}/>
                 <FlatList onRefresh={() => dispatch(getRefreshing())} refreshing={refresh} data={mainDatas}
                 keyExtractor={(item, index) => index.toString()}
                           renderItem={({item}) => {
-                              if(item.category && item.category.typeCateg == 'e-commerce') {
+                              if(item.Categorie && item.Categorie.typeCateg == 'e-commerce') {
                                   return (
                                       <AppCard  addToCart={() => {
+                                          if(item.ProductOptions.length > 1) {
+                                              dispatch(getSelectedOptions(item))
+                                              navigation.navigate('AccueilNavigator',{screen: routes.ARTICLE_DETAIL, params: item})
+                                          }else {
                                           addItemToCart(item)
-                                          const success = store.getState().entities.shoppingCart.addToCartSuccess
-                                          if(success) {
-                                              setSelectedItem(item)
-                                              setShowModal(true)
                                           }
-                                      }} button2='Acheter' title={item.designArticle} subtitle1={+item.prixPromo} subtitle2={item.prixReel}
+                                      }} button2='Acheter'  title={item.designArticle} subtitle1={+item.prixPromo} subtitle2={item.prixReel}
 
-                                                dispo={item.qteStock} image={{uri: item.imageArticle}}
+                                                dispo={item.qteStock} image={{uri: item.imagesArticle[0]}}
                                                 aideInfo={item.aide}
-                                                onPress={() => navigation.navigate(routes.ARTICLE_DETAIL, item)}>
-                                          <AppButton onPress={() => navigation.navigate(routes.ARTICLE_DETAIL, item)} textStyle={{fontSize: 10}} title='Détails' style={{padding: 5,width: '20%', backgroundColor: Color.rougeBordeau, fontWeight: 'bold'}} />
+                                                onPress={() => {
+                                                    dispatch(getSelectedOptions(item))
+                                                    navigation.navigate('AccueilNavigator',{screen: routes.ARTICLE_DETAIL, params: item})
+                                                }}
+                                                isFavorite={articleFavorites.some(fav => fav.id === item.id)}
+                                                toggleFavorite={() => dispatch(getToggleFavorite(item))}>
+                                          <AppButton onPress={() => {
+                                              dispatch(getSelectedOptions(item))
+                                              navigation.navigate('AccueilNavigator', {screen: routes.ARTICLE_DETAIL, params: item})
+                                          }} textStyle={{fontSize: 10}} title='Détails' style={{padding: 5,width: '20%', backgroundColor: Color.rougeBordeau, fontWeight: 'bold'}} />
                                       </AppCard>
                                   )
-                              } else if(item.category && item.category.typeCateg === 'e-location') {
+                              } else if(item.Categorie && item.Categorie.typeCateg === 'e-location') {
                                   return (
-                                      <AppCard title={item.libelleLocation} image={{uri: item.imageLocation}} button2='Louer' addToCart={() =>{
-                                          addItemToCart(item)
-                                          const success = store.getState().entities.shoppingCart.addToCartSuccess
-                                          if(success) {
-                                              setSelectedItem(item)
-                                              setShowModal(true)
+                                      <AppCard title={item.libelleLocation} image={{uri: item.imagesLocation[0]}} button2='Louer' addToCart={() =>{
+                                          if(item.ProductOptions.length > 1) {
+                                              dispatch(getSelectedOptions(item))
+                                              navigation.navigate(routes.LOCATION_DETAIL, item)
+                                          }else {
+                                              addItemToCart(item)
                                           }
-                                      }} itemType={item.category.typeCateg} frequence={item.frequenceLocation.toLowerCase() == 'mensuelle'?' / mois':' / jour'}
-                                      dispo={item.qteDispo} aideInfo={item.aide} subtitle1={item.coutPromo} subtitle2={item.coutReel}>
-                                          <AppButton textStyle={{fontSize: 10}} style={{backgroundColor: Color.rougeBordeau, padding: 5,width: '20%'}} title='Visiter'/>
+                                      }} itemType={item.Categorie.typeCateg} frequence={item.frequenceLocation.toLowerCase() == 'mensuelle'?' / mois':' / jour'}
+                                      dispo={item.qteDispo} aideInfo={item.aide} subtitle1={item.coutPromo} subtitle2={item.coutReel}
+                                      onPress={() => {
+                                          dispatch(getSelectedOptions(item))
+                                          navigation.navigate('AccueilNavigator', {screen: routes.LOCATION_DETAIL, params: item})
+                                      }} isFavorite={locationFavorites.some(fav => fav.id === item.id)}
+                                        toggleFavorite={() => dispatch(getToggleFavorite(item))}>
+                                          <AppButton textStyle={{fontSize: 10}} style={{backgroundColor: Color.rougeBordeau, padding: 5,width: '20%'}} title='Visiter'
+                                                     onPress={() => {
+                                                         dispatch(getSelectedOptions(item))
+                                                         navigation.navigate('AccueilNavigator', {screen: routes.LOCATION_DETAIL, params: item})}} />
                                       </AppCard>
                                   )
                               }
@@ -173,7 +194,6 @@ function AccueilScreen({navigation, route}) {
 
                           }
                 />
-            </View>
                 </>
     );
 }
@@ -184,9 +204,7 @@ const styles = StyleSheet.create({
     },
     container: {
         justifyContent: 'center',
-        alignItems: 'center',
-        top: 5,
-        bottom: 5
+       paddingTop: Constants.statusBarHeight
     },
     isLoadingStyle: {
         flex: 1,

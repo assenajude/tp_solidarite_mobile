@@ -8,6 +8,8 @@ import LeftUserCompte from "../components/user/LeftUserCompte";
 import CartIconRight from "../components/shoppingCart/CartIconRight";
 import {useSelector} from "react-redux";
 import routes from "./routes";
+import AppSearchBar from "../components/AppSearchBar";
+import LocationDetailScreen from "../screens/LocationDetailScreen";
 
 const LocationStackNav = createStackNavigator()
 
@@ -21,7 +23,7 @@ function LocationNavigator({navigation}) {
         }}>
             <LocationStackNav.Screen name='LocationScreen' component={ElocationScreen} options={{
                 headerLeft: () => <LeftUserCompte getUserCompteNavigator={() =>navigation.openDrawer()}/>,
-                title: 'e-location',
+                headerTitle: () => <AppSearchBar/>,
                 headerRight: () => <CartIconRight cartLenght={cartItemLenght} getToCartScreen={() =>navigation.navigate('AccueilNavigator', {screen: routes.CART})}/>
             }}/>
             <LocationStackNav.Screen name='UserLocationScreen' component={UserLocationScreen} options={{
@@ -30,6 +32,7 @@ function LocationNavigator({navigation}) {
             <LocationStackNav.Screen name='NewLocationScreen' component={NewLocationScreen} options={{
                 title: 'Nouvelle location',
             }}/>
+
 
         </LocationStackNav.Navigator>
     );

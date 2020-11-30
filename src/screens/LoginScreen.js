@@ -16,6 +16,13 @@ import {signin, autoLogin} from '../store/slices/authSlice'
 import authStorage from '../store/persistStorage'
 import routes from '../navigation/routes'
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getOrdersByUser} from "../store/slices/orderSlice";
+import {getFacturesByUser} from "../store/slices/factureSlice";
+import {getTranches} from "../store/slices/trancheSlice";
+import {getUserProfileAvatar} from "../store/slices/userProfileSlice";
+import {getAdresse} from "../store/slices/userAdresseSlice";
+import {getAllVilles} from "../store/slices/villeSlice";
+import {getUserFavoris} from "../store/slices/userFavoriteSlice";
 
 const loginValidationSchema = yup.object().shape({
     username: yup.string().required("Veillez saisir un nom d'utilisateur"),
@@ -45,13 +52,19 @@ function LoginScreen({navigation}) {
     const handleLogin = async (user) => {
         await dispatch(signin(user))
         const error = store.getState().auth.error
-        if(error === null) {
-            navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
-        } else {
-            Alert.alert('Erreur', 'Impossible de connecter maintenant. Veuillez reessayer plutard', [
+        if(error !== null) {
+            Alert.alert('Erreur', 'Impossible de vous connecter maintenant. Veuillez reessayer plutard', [
                 {text: 'ok', onPress: () => {return}}
             ])
         }
+        dispatch(getOrdersByUser())
+        dispatch(getFacturesByUser())
+        dispatch(getTranches())
+        dispatch(getUserProfileAvatar())
+        dispatch(getUserFavoris())
+        dispatch(getAdresse())
+        dispatch(getAllVilles())
+        navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
     }
 
     return (

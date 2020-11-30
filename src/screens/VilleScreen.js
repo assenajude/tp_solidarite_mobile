@@ -57,8 +57,8 @@ function VilleScreen(props) {
                 </View>
                 <AppForm initialValues={{
                     nom: '',
-                    kilometrage: 0,
-                    prixKilo: 0
+                    kilometrage: '',
+                    prixKilo: ''
                 }} validationSchema={villeValideSchema} onSubmit={handleSaveVille}>
                     <AppFormField title='nom' name='nom'/>
                     <AppFormField title='distance' name='kilometrage'/>

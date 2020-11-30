@@ -1,27 +1,22 @@
-import React, {useEffect, useState, useCallback} from 'react';
-import {useSelector, useDispatch, useStore} from "react-redux";
-import {View, FlatList, StyleSheet, ActivityIndicator,ScrollView, Alert} from "react-native";
-import dayjs from "dayjs";
+import React, {useEffect} from 'react';
+import {useSelector, useDispatch} from "react-redux";
+import {View, FlatList} from "react-native";
 
-import {
-    decrementOrderCompter,
-    getItemDetail, getStatusEditing, incrementOrderCompter,
-    saveStatusEditing,
-    updateHistory
-} from '../store/slices/orderSlice'
+import {getItemDetail} from '../store/slices/orderSlice'
 import FactureListItem from "../components/list/FactureListItem";
 import routes from "../navigation/routes";
-import useCreateOrderContrat from "../hooks/useCreateOrderContrat";
-import {getOrderPayementMode} from "../store/selectors/payementSelector";
 import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
 import useManageUserOrder from "../hooks/useManageUserOrder";
 import GetLogin from "../components/user/GetLogin";
+import colors from "../utilities/colors";
+import initData from "../utilities/initData";
+import useOrderInfos from "../hooks/useOrderInfos";
 
 function UserOrderScreen({navigation}) {
-    const store = useStore();
     const dispatch  = useDispatch()
-    const {startEditingAccord,saveAccordEdit, createOrderContrat, moveOrderToHistory} = useManageUserOrder()
+    const {saveAccordEdit, createOrderContrat, moveOrderToHistory} = useManageUserOrder()
+    const {getModePayement} = useOrderInfos()
 
 
 
@@ -29,8 +24,6 @@ function UserOrderScreen({navigation}) {
     const compter = useSelector(state => state.entities.order.demandeCompter)
     const error = useSelector(state => state.entities.order.error)
     const user = useSelector(state => state.auth.user)
-    const [accordEditValue, setAccordEditValue] = useState('Editer le status')
-
 
 
     useEffect(() => {
@@ -63,36 +56,27 @@ function UserOrderScreen({navigation}) {
     return (
        <FlatList data={userOrders} keyExtractor={(item, index) => index.toString()}
        renderItem={({item}) => {
-           if(item.contrats && item.contrats.length === 0 && !item.historique) {
+           if(item.Contrats && item.Contrats.length === 0 && !item.historique) {
                return (
                    <FactureListItem numero={item.numero} montant={item.montant} label='commande'
                                     getDetails={() => dispatch(getItemDetail(item.id))} showDetail={item.showDetails} getLink={() => navigation.navigate(routes.FACTURE_DETAILS, item)}
-                                    debut={dayjs(item.dateCmde).format('DD/MM/YYYY HH:mm:ss')}  header='A'
-                                    linkTitle='Voir la facrture' orderItems={item.cartItems} fraisLivraison={item.fraisTransport} tauxInteret={item.interet}
-                                    labelDate1='Commandé le' labelDate2='Livré le ' fin={dayjs(item.dateLivraison).format('DD/MM/YYYY HH:mm:ss')}
-                                    labelDatePrevue='Date livraison prevue' labelAccord='Status accord' statusAccordValue={item.statusAccord}
-                                    editStatusAccord={item.editAccord} getAccordStatusEdit={() => startEditingAccord(item.id)} undoAccordEdit={() => startEditingAccord(item.id)}
-                                    accordEditingValue={accordEditValue} changeAccordEditValue={(value, item) => setAccordEditValue(value)}
-                                    saveAccordEditing={() => saveAccordEdit({orderId: item.id, statusAccord:accordEditValue})}
-                                    orderEspace='demande' moveItemToHistory={() =>{
-                                        moveOrderToHistory(item.id)
-                                    }}
-                                    leaveItemToContract={() => {
-                                        createOrderContrat(item)
-                                    }} isDemande={true} datePrevue={dayjs(item.dateLivraisonDepart).format('DD/MM/YYYY HH:mm:ss')}
-                                    modePayement={getOrderPayementMode(store.getState())[item.id].payementMode}/>
+                                    dateCmde={item.dateCmde}  header='A'
+                                    linkTitle='Voir la facrture' orderItems={item.CartItems} fraisLivraison={item.fraisTransport} tauxInteret={item.interet}
+                                    labelDateCmde='Commandé le' labelDateLivraison='Livré le ' dateLivraison={item.dateLivraisonFinal}
+                                    labelDatePrevue='Date livraison prevue'
+                                    orderEspace='demande' moveItemToHistory={() =>{moveOrderToHistory(item.id)}}
+                                    leaveItemToContract={() => {createOrderContrat(item)}}
+                                    isDemande={true} datePrevue={item.dateLivraisonDepart}
+                                    modePayement={getModePayement(item.id)}
+                                    labelAccord='Status accord' statusAccordValue={item.statusAccord} accordInitData={initData.accordData}
+                                    changeAccordEditValue={(value) => {
+                                        saveAccordEdit({orderId: item.id, statusAccord: value})
+                                    }} accordStyle={{color: item.statusAccord.toLowerCase() === 'accepté'?colors.vert:item.statusAccord.toLowerCase() === 'refusé'?'red':'grey', fontWeight: 'bold'}}
+                                   goToItemDetails={() =>navigation.navigate('AccueilNavigator', {screen: routes.ORDER_DETAILS, params: item})}/>
                )
            }
        }}/>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
-})
 
 export default UserOrderScreen;

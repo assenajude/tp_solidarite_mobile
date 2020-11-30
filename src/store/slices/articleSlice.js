@@ -7,7 +7,7 @@ const articleSlice = createSlice({
         availableArticles: [],
         loading: false,
         error: null,
-        creditArticles: []
+        creditArticles: [],
     },
     reducers: {
         articlesRequested: (state, action) => {
@@ -28,12 +28,22 @@ const articleSlice = createSlice({
             state.availableArticles.push(action.payload)
             state.loading = false
             state.articleAddedSuccess = true
+        },
+        articleEditSuccess: (state, action) => {
+            state.loading = false
+            state.error = null
+            const editIndex = state.findIndex(article => article.id === action.payload.id)
+            if(editIndex >= 0) {
+            const articleList = state.availableArticles.splice(editIndex, 1, action.payload)
+                state.availableArticles = articleList
+            }
         }
     }
 });
 
 export default articleSlice.reducer;
-const {articlesReceived, articlesRequested, articlesRequestFailed, articleAdded} = articleSlice.actions
+const {articlesReceived, articlesRequested, articlesRequestFailed,
+    articleAdded, articleEditSuccess} = articleSlice.actions
 
 const url = '/articles'
 export const loadArticles = () => apiRequest({
@@ -57,3 +67,11 @@ export const saveArticle = (article) =>(dispatch)=> {
     )
 }
 
+export const saveEditedArticle = (data) => apiRequest({
+    url:url+'/update',
+    method: 'patch',
+    data,
+    onStart: articlesRequested.type,
+    onSuccess: articleEditSuccess.type,
+    onError: articlesRequestFailed.type
+})

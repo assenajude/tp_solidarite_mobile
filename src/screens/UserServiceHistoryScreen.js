@@ -1,16 +1,17 @@
 import React from 'react';
-import {View, FlatList, ScrollView} from "react-native";
+import {View, FlatList} from "react-native";
 import AppText from "../components/AppText";
-import {useDispatch, useSelector, useStore} from "react-redux";
+import {useDispatch, useSelector } from "react-redux";
 import UserServiceItem from "../components/order/UserServiceItem";
-import {getOrderPayementMode} from "../store/selectors/payementSelector";
 import {getItemDetail} from "../store/slices/orderSlice";
-import {color} from "react-native-reanimated";
 import colors from "../utilities/colors";
 import GetLogin from "../components/user/GetLogin";
+import initData from "../utilities/initData";
+import routes from "../navigation/routes";
+import useOrderInfos from "../hooks/useOrderInfos";
 
-function UserServiceHistoryScreen(props) {
-    const store = useStore()
+function UserServiceHistoryScreen({navigation}) {
+    const {getModePayement} = useOrderInfos()
     const dispatch = useDispatch()
     const userServicesData = useSelector(state => state.entities.order.currentUserOrders)
     const compter = useSelector(state => state.entities.order.historiqueCompter)
@@ -49,15 +50,19 @@ function UserServiceHistoryScreen(props) {
                      if(item.historique) {
                          return (
                              <UserServiceItem isHistorique={true} isDemande={false} header='S' headerValue={item.numero}
-                                              itemImage={item.cartItems[0].image} statusAccordValue={item.statusAccord}
-                                              dateDemande={item.dateCmde} serviceDescrip={item.cartItems[0].libelle}
-                                              libStatusContrat='Status contrat' contrats={item.contrats} statusContratValue={item.contrats[0].montant === item.facture.solde?'Terminé':'aucun contrat'}
+                                              itemImage={item.CartItems[0].image} statusAccordValue={item.statusAccord}
+                                              dateDemande={item.dateCmde} serviceDescrip={item.CartItems[0].OrderItem.libelle}
+                                              dateFourniture={item.dateLivraisonDepart} dateFournitureFinal={item.dateLivraisonFinal}
+                                              libStatusContrat='Status contrat' contrats={item.Contrats} statusContratValue={item.Contrats[0].montant === item.Facture.solde?'Terminé':'aucun contrat'}
                                               accordValueStyle={{color: item.statusAccord.toLowerCase()=== 'accepté'?colors.vert:item.statusAccord.toLowerCase()==='refusé'?'red':'grey', fontWeight: 'bold'}}
-                                              itemMontant={item.montant} showDetail={item.showDetails} payement={getOrderPayementMode(store.getState())[item.id].payementMode}
-                                              showOrderDetail={() => dispatch(getItemDetail(item.id))} permitLivraisonEdit={false} permitAccordEdit={false}
+                                              itemMontant={item.montant} showDetail={item.showDetails} payement={getModePayement(item.id)}
+                                              getDetails={() => dispatch(getItemDetail(item.id))} permitLivraisonEdit={false} permitAccordEdit={false}
                                              statusLivraisonLabel='Status livraison' statusLivraisonValue={item.statusLivraison}
                                             statusLivraisonStyle={{color: item.statusLivraison.toLowerCase() =='livré'?colors.vert:'grey', fontWeight: 'bold'}}
-                                            contratValueStyle={{color: item.contrats[0].montant === item.facture.solde?colors.vert:'grey', fontWeight:'bold'}}/>
+                                            contratValueStyle={{color: item.Contrats[0].montant === item.Facture.solde?colors.vert:'grey', fontWeight:'bold'}}
+                                           accordInitdata={initData.accordData} livraisonData={initData.livraisonData} livraisonLabel='Status livraison' accordLabel='Status accord'
+                                              goToItemDetails={() =>navigation.navigate('AccueilNavigator', {screen: routes.ORDER_DETAILS, params: item})}
+                                              serviceLabel={item.CartItems[0].OrderItem.libelle} />
                          )
                      }
                  }}/>

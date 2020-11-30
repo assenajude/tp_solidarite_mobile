@@ -10,17 +10,19 @@ import {getRoleAdmin} from "../store/selectors/authSelector";
 import routes from "../navigation/routes";
 import AppButton from "../components/AppButton";
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
-import {getModalDismiss} from "../store/slices/shoppingCartSlice";
+import {getModalDismiss, getProvenanceSet} from "../store/slices/shoppingCartSlice";
 import useAddToCart from "../hooks/useAddToCart";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function EserviceScreen({navigation}) {
     const store = useStore()
     const dispatch = useDispatch()
     const {addItemToCart} = useAddToCart()
     const loading = useSelector(state =>state.entities.service.loading)
+    const addToCartLoading = useSelector(state => state.entities.shoppingCart.loading)
     const serviceData = useSelector(state => state.entities.service.list)
-    const [showItemModal, setShowItemModal] = useState(false)
-    const [selectedItem, setSelectedItem] = useState()
+    const showItemModal = useSelector(state => state.entities.shoppingCart.eserviceModal)
+    const selectedItem = useSelector(state => state.entities.shoppingCart.newAdded)
 
     const getServiceData = useCallback(() => {
         dispatch(getServices())
@@ -30,12 +32,7 @@ function EserviceScreen({navigation}) {
         getServiceData()
     }, [])
 
-    if(loading){
-        return <View style={{
-        flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-               <ActivityIndicator size='large' color={colors.rougeBordeau} />
-            </View>
-    }
+
 
     if(!loading && serviceData.length === 0) {
         return <>
@@ -51,40 +48,38 @@ function EserviceScreen({navigation}) {
     }
     if (showItemModal) {
         return (
-            <AddToCartModal source={{uri: selectedItem.imageService}} designation={selectedItem.libelle}
+            <AddToCartModal source={{uri: selectedItem.image}} designation={selectedItem.libelle}
             goToHomeScreen={() => {
                 dispatch(getModalDismiss())
-                setShowItemModal(false)
             }}
             itemModalVisible={showItemModal}
             goToShoppingCart={() => {
                 dispatch(getModalDismiss())
-                setShowItemModal(false)
                 navigation.navigate(routes.CART)
             }}/>
         )
     }
     return (
+        <>
+            <AppActivityIndicator visible={loading || addToCartLoading}/>
         <View style={{
             justifyContent: 'center',
             alignItems: 'center'
         }}>
         <FlatList data={serviceData} keyExtractor={item =>item.id.toString()}
-                  renderItem={({item})=><AppCard image={{uri: item.imageService}} button2='Utiliser' title={item.libelle}
+                  renderItem={({item})=><AppCard itemType={item.Categorie.typeCateg || 'e-service'} image={{uri: item.imagesService[0]}} button2='Utiliser' title={item.libelle}
                     addToCart={() => {
+                        dispatch(getProvenanceSet('eservice'))
                         addItemToCart(item)
-                        const success = store.getState().entities.shoppingCart.addToCartSuccess
-                        if(success) {
-                            setSelectedItem(item)
-                            setShowItemModal(true)
-                        }
-                    }}>
+                    }} dispo={item.isDispo?'oui':'non'} serviceMin={item.montantMin} serviceMax={item.montantMax} otherImgaeStyle={{height: 190}}
+                  onPress={() => navigation.navigate(routes.SERVICE_DETAIL, item)}>
                       <AppButton textStyle={{fontSize: 10}} title='+ Infos' style={{backgroundColor: colors.rougeBordeau, padding: 5, width: '20%'}}/>
                   </AppCard>}/>
                  {getRoleAdmin(store.getState()) && <View style={{position: 'absolute', bottom: 80, right: 20}}>
                       <ListFooter onPress={() => navigation.navigate(routes.NEW_SERVICE)}/>
                   </View>}
         </View>
+            </>
     );
 }
 

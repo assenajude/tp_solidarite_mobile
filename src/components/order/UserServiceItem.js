@@ -10,41 +10,42 @@ import ContratWatch from "./ContratWatch";
 import {HeaderTitle} from "@react-navigation/stack";
 import ListItemHeader from "../list/ListItemHeader";
 import FactureItemLabel from "../list/FactureItemLabel";
+import StatusPicker from "./StatusPicker";
+import dayjs from "dayjs";
+import AppLabelWithValue from "../AppLabelWithValue";
 
-function UserServiceItem({showOrderDetail,showDetail, dateFourniture,payement,
-                            statusContratValue, statusAccordValue,editStatusAccord,
+function UserServiceItem({showDetail, dateFourniture,payement,
+                            statusContratValue,accordStyle,iconContainerStyle,
                              dateDemande,itemImage, itemMontant, header, headerValue,
-                             contrats,accordValueStyle,changeAccordEditValue,accordEditValue,
-                             saveAccording,startEditingAccord,undoAccordEditing,createOrderContrat,
+                             contrats,createOrderContrat,accordLabel,accordValue,
                              isHistorique,moveItemToHistorique, isDemande,loopItemWatch, playItemWatch,
-                             contratValueStyle,deleteItem, isContrat,permitLivraisonEdit,statusLivraisonLabel,
-                             statusLivraisonValue, getLivraisonEdit, editLivraison, saveLivraisonEdit,
-                             undoLivraisonEdit,editingLivraisonValue,changeLivraisonEditValue,statusLivraisonStyle,
-                             permitAccordEdit
+                             contratValueStyle,deleteItem, isContrat,changeLivraisonValue,
+                             endFacture=true,changeAccordValue,accordInitdata,
+                             livraisonLabel,livraisonValue,livraisonStyle,livraisonData,
+                             goToItemDetails,getDetails,getLink,dateFournitureFinal,serviceLabel
 
 
 }) {
     return (
-        <>
+        <TouchableOpacity onPress={goToItemDetails}>
+            <View>
             <View style={{flexDirection: 'row',
-                justifyContent: 'space-around',
+                justifyContent: 'flex-start',
                 padding: 10,
                 width: '100%',
                 backgroundColor: colors.blanc, marginTop: 10, paddingBottom: 5,
                 borderBottomWidth: 0.2}}>
 
-                <View style={{ width: 80,justifyContent: 'center', marginRight: 10}}>
+                <View style={{ marginRight: 20,justifyContent: 'center'}}>
                 <Image resizeMode='stretch' source={{uri: itemImage}} style={{width: 80,height: 150}}/>
                 </View>
 
-                <View style={{
-                    margin: 20
-                }}>
+                <View>
                     <View style={{
                         flexDirection: 'row'
                     }}>
                         <ListItemHeader headerTitle={header}/>
-                        <AppText style={{fontWeight: 'bold', color:colors.or}}>{headerValue}</AppText>
+                        <AppText style={{fontWeight: 'bold', color:colors.or, fontSize: 20}}>{headerValue}</AppText>
                     </View>
 
                     <View style={{flexDirection: 'row'}}>
@@ -59,56 +60,61 @@ function UserServiceItem({showOrderDetail,showDetail, dateFourniture,payement,
                         <AppText style={{fontSize: 15, fontWeight: 'bold'}}>Reglement: </AppText>
                         <AppText style={{fontWeight: 'bold', fontSize: 15}}>{payement}</AppText>
                     </View>
-                    {!isContrat && <EditItemStatus permitEdit={permitAccordEdit}  statusValueStyle={accordValueStyle}  labelStatus='Status accord' statusValue={statusAccordValue} editStatus={editStatusAccord}
-                                    saveEditing={saveAccording} getStatusEditing={startEditingAccord} undoEditing={undoAccordEditing}
-                                    editingStatusValue={accordEditValue} changeEditingStatusValue={changeAccordEditValue}/>}
+                    {!isContrat &&
+                        <StatusPicker labelStatus={accordLabel} statusData={accordInitdata} statusValue={accordValue}
+                                      changeStatusValue={changeAccordValue} otherStatusStyle={accordStyle}
+                        />
+                    }
 
-                    {contrats && contrats.length>=1 && <EditItemStatus permitEdit={permitLivraisonEdit} labelStatus={statusLivraisonLabel}
-                                                       statusValue={statusLivraisonValue} editStatus={editLivraison} saveEditing={saveLivraisonEdit}
-                                                        getStatusEditing={getLivraisonEdit} undoEditing={undoLivraisonEdit}
-                                                       editingStatusValue={editingLivraisonValue} changeEditingStatusValue={changeLivraisonEditValue}
-                                                       statusValueStyle={statusLivraisonStyle}/>}
+                    {contrats && contrats.length>=1 &&
+                        <StatusPicker labelStatus={livraisonLabel} statusValue={livraisonValue} statusData={livraisonData}
+                                      otherStatusStyle={livraisonStyle} changeStatusValue={changeLivraisonValue}/>
+                    }
 
                                     {!isDemande && <FactureItemLabel itemLabel='Status contrat' labelValue={statusContratValue}
                                      labelStyle={{fontSize: 15, fontWeight: 'bold'}} labelValueStyle={contratValueStyle}/>}
-                {showDetail &&    <View>
-                    <View style={{flexDirection: 'row'}}>
-                      <AppText style={{fontSize: 18, fontWeight: 'bold'}}>Demandé le: </AppText>
-                      <AppText>{dateDemande}</AppText>
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                      <AppText style={{fontSize: 18, fontWeight: 'bold'}}>Fourni le: </AppText>
-                      <AppText>{dateFourniture}</AppText>
-                    </View>
+                   {showDetail &&    <View style={{borderWidth: 1, marginTop: 15}}>
+                       <AppLabelWithValue label='Type service: ' labelValue={serviceLabel}/>
+                       <AppLabelWithValue label='Demandé le: ' labelValue={dayjs(dateDemande).format('DD/MM/YYYY HH:mm:ss')}/>
+                       <AppLabelWithValue label={dateFournitureFinal?'Fourni le: ':'Sera fourni le: '}
+                                       labelValue={dateFournitureFinal?dayjs(dateFournitureFinal).format('DD/MM/YYYY HH:mm:ss'):dayjs(dateFourniture).format('DD/MM/YYYY HH:mm:ss')}/>
+
                     </View>}
-                    <View style={{flexDirection: 'row'}}>
-                        <AppButton title='Details' style={{marginRight: 30}} iconSize={20} iconName={showDetail? 'minus':'plus'} iconColor={colors.blanc}
-                        textStyle={{marginLeft: 10}} onPress={showOrderDetail}/>
-                       {!isDemande &&  <AppButton title='Voir la facture'/>}
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                        marginTop: 20,
+                        marginBottom: 15
+                    }}>
+                        <AppButton iconName={showDetail ?'caretup':'caretdown'} iconColor={colors.blanc} style={{width: 'auto'}} textStyle={{marginLeft: 5}} title={showDetail ?'Fermer':'Deplier'} onPress={getDetails}/>
+                        <AppButton iconName='plus' iconColor={colors.blanc} style={{width: 'auto', marginLeft: 20 }} textStyle={{marginLeft: 5}} title='Details' onPress={goToItemDetails}/>
+                        {!isDemande &&  <AppButton style={{marginLeft: 20}} title='Voir la facture' onPress={getLink}/>}
                     </View>
 
             </View>
-                <View style={{justifyContent: 'flex-end', alignItems: 'center', margin: 20}}>
+                <View style={[{
+                    position: 'absolute',
+                    top: 100,
+                    right: 20,
+                    justifyContent: "center",
+                    alignItems: "center"
+                },iconContainerStyle]}>
               {!isHistorique &&  <View >
                 <TouchableOpacity onPress={moveItemToHistorique}>
                     <View style={{marginTop: 20}}>
-                    <FontAwesome name='history' size={30}/>
+                    <FontAwesome name='history' size={24}/>
                     </View>
                 </TouchableOpacity>
 
                 </View>}
-                    {isHistorique &&  <View>
-                        <TouchableOpacity>
+                   <View>
+                       {isHistorique && <TouchableOpacity>
                             <View>
-                                <Entypo name='reply' size={30}/>
+                                <Entypo name='reply' size={24}/>
                             </View>
-                        </TouchableOpacity>
-                    <TouchableOpacity onPress={deleteItem}>
-                        <View style={{marginTop: 30}}>
-                            <AntDesign name='delete' color='red' size={25}/>
-                        </View>
-                    </TouchableOpacity>
-                </View>}
+                        </TouchableOpacity>}
+                        <ItemIconButton otherStyle={{marginTop: 10}} iconName='delete' iconSize={24} color='red'/>
+                    </View>
 
                 </View>
             </View>
@@ -120,12 +126,13 @@ function UserServiceItem({showOrderDetail,showDetail, dateFourniture,payement,
                 top: 20,
                 right: 10
             }}>
-                {statusAccordValue && statusAccordValue.toLowerCase() === 'accepté' && <ItemIconButton iconSize={40} iconName='like1'
+                {accordValue && accordValue.toLowerCase() === 'accepté' && <ItemIconButton iconSize={40} iconName='like1'
                                                                                                        onPress={createOrderContrat} color='green'/>}
-                {statusAccordValue && statusAccordValue.toLowerCase() === 'refusé' && <ItemIconButton iconName='dislike1'
+                {accordValue && accordValue.toLowerCase() === 'refusé' && <ItemIconButton iconName='dislike1'
                                                                                                       iconSize={40} color='red' />}
             </View>}
-    </>
+            </View>
+    </TouchableOpacity>
     );
 }
 

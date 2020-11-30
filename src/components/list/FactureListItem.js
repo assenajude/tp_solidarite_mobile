@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useStore} from "react-redux";
-import {View,TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, FlatList} from 'react-native'
+import {View,TextInput, StyleSheet, TouchableOpacity,TouchableHighlight, TouchableWithoutFeedback, ScrollView, Image, FlatList} from 'react-native'
 import dayjs from 'dayjs'
 import LottieView from 'lottie-react-native'
 import * as Progress  from 'react-native-progress'
@@ -14,27 +14,31 @@ import EditItemStatus from "../order/EditItemStatus";
 import ContratWatch from "../order/ContratWatch";
 import FactureItemLabel from "./FactureItemLabel";
 import ListItemHeader from "./ListItemHeader";
+import StatusPicker from "../order/StatusPicker";
+import TrancheItem from "../TrancheItem";
+import OrderDetailItem from "../OrderDetailItem";
+import AppLabelWithValue from "../AppLabelWithValue";
 
-function FactureListItem({numero,okPayement,showDetail,orderItems, label,labelDatePrevue,datePrevue,undoEdit,saveEdit,
+function FactureListItem({numero,okPayement,showDetail,orderItems, label,labelDatePrevue,datePrevue,
                              contratLabel,contrats,contratStatus,isDemande,isContrat,isHistorique,contratStatusStyle,
-                             labelStatusLivr,statusLivraison,deleteItem,editStatusLivraison,getStatusLivraisonEdit,
-                             fraisLivraison,tauxInteret,labelDate1, labelDate2,statusAccordValue, labelAccord,undoAccordEdit,
-                             accordEditingValue,changeAccordEditValue,saveAccordEditing,leaveItemToContract,moveItemToHistory,
-                             statusLivraisonValue,changeStatusText,getAccordStatusEdit,editStatusAccord,orderEspace,
-                             notPayed,showProgress,soldeFacture, progress,payTranche,getLink,linkTitle,trancheButtonTitle2,modePayement,
-                             getDetails,header,description, montant,debut, tranches, fin, showTranche=false,
-                             loopItemWatch, playItemWatch,solde,permitAccordEdit,permitLivraisonEdit,
+                             deleteItem,changeLivraisonValue,livraisonLabel,livraisonValue,goToItemDetails,
+                             fraisLivraison,tauxInteret,labelDateCmde, labelDateLivraison,statusAccordValue, labelAccord,
+                             changeAccordEditValue,leaveItemToContract,moveItemToHistory,orderEspace,
+                             showProgress, progress,payTranche,getLink,linkTitle,modePayement,
+                             getDetails,header,description, montant,dateCmde, tranches, dateLivraison,
+                             loopItemWatch, playItemWatch,solde,endFacture=true,
+                             accordStyle,accordInitData,livraisonStyle,livraisonInitData,showTranches,dateEmission,dateEcheance
                           }) {
 const store = useStore()
 
     return (
-        <>
-        <View style={styles.container}>
+          <View>
+          <View style={styles.container}>
             <View>
                 <View>
                     {orderItems && <ScrollView horizontal>
                         {orderItems.map((item, index) => <TouchableOpacity  key={index}>
-                            <Image resizeMode='stretch' style={{height: 50, width: 50, margin: 10}} source={{uri: item.image}}/>
+                            <Image resizeMode='stretch' style={{height: 50, width: 50, margin: 10}} source={{uri: item.OrderItem.image}}/>
                         </TouchableOpacity>)}
 
                     </ScrollView>}
@@ -46,7 +50,6 @@ const store = useStore()
                     }}>
                         <ListItemHeader headerTitle={header}/>
                         <AppText style={{fontWeight: 'bold', fontSize: 20, color: colors.or}}>{numero}</AppText>
-                        {label == 'facture' && okPayement && <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={false} source={require('../../assets/animations/done')}/>}
                     </View>
 
                     {description && <AppText>{description}</AppText>}
@@ -56,17 +59,19 @@ const store = useStore()
                         <AppText style={{fontSize: 20, fontWeight: 'bold', color: colors.rougeBordeau}}>{montant} </AppText>
                         <AppText style={{fontSize: 20, fontWeight: 'bold'}}>FCFA</AppText>
                     </View>
-                    {label === 'facture' && <View>
-                        <View style={{flexDirection: 'row'}}>
+                     <View>
+                      {!isDemande &&  <View style={{flexDirection: 'row'}}>
                             <AppText style={{fontSize: 15, fontWeight: 'bold'}}>Déjà payé: </AppText>
-                            <AppText style={{fontSize: 15, fontWeight: 'bold', color: colors.rougeBordeau}}>{solde} </AppText>
+                            <AppText style={{fontSize: 15, fontWeight: 'bold', color: colors.rougeBordeau}}>{solde || 0} </AppText>
                             <AppText style={{fontSize: 15, fontWeight: 'bold'}}>FCFA</AppText>
-                        </View>
-                        <FactureItemLabel itemLabel='Debut:' labelValue={debut}
+                        </View>}
+                         {label === 'facture' && <View>
+                        <FactureItemLabel itemLabel='Debut:' labelValue={dayjs(dateEmission).format('DD/MM/YYYY HH:mm:ss')}
                                           labelStyle={{fontSize: 15, fontWeight: 'bold'}} labelValueStyle={{fontSize: 15}}/>
-                         <FactureItemLabel itemLabel='Fin: ' labelValue={fin} labelStyle={{fontSize: 15, fontWeight: 'bold'}}
+                         <FactureItemLabel itemLabel='Fin: ' labelValue={dayjs(dateEcheance).format('DD/MM/YYYY HH:mm:ss')} labelStyle={{fontSize: 15, fontWeight: 'bold'}}
                                            labelValueStyle={{fontSize: 15}}/>
-                    </View>}
+                         </View>}
+                    </View>
                     {showProgress &&  <View style={{flexDirection: 'row'}}>
                         <AppText>Status: </AppText>
                         <Progress.Bar progress={progress} borderColor={colors.rougeBordeau} height={30} borderWidth={0.3} borderRadius={10} width={200} color={colors.marronClair}/>
@@ -80,77 +85,50 @@ const store = useStore()
                         </View>}
                     </View>
                    <View style={{marginBottom: 10}}>
-                   {label=='commande' && !isContrat && <EditItemStatus labelStatus={labelAccord} permitEdit={permitAccordEdit} statusValue={statusAccordValue} getStatusEditing={getAccordStatusEdit} editStatus={editStatusAccord}
-                    undoEditing={undoAccordEdit} editingStatusValue={accordEditingValue} changeEditingStatusValue={changeAccordEditValue} saveEditing={saveAccordEditing}
-                    statusValueStyle={{
-                        color: statusAccordValue.toLowerCase() === 'accepté'?'green': statusAccordValue.toLowerCase() === 'refusé'?'red': 'grey',
-                        fontWeight: 'bold'
-                    }}/>}
+                   {label=='commande' && !isContrat &&
+                   <StatusPicker labelStatus={labelAccord} statusValue={statusAccordValue} statusData={accordInitData}
+                                 changeStatusValue={changeAccordEditValue} otherStatusStyle={accordStyle}/>
+                   }
 
-                       {label === 'commande' && !isDemande && <EditItemStatus labelStatus={labelStatusLivr} statusValue={statusLivraison} editStatus={editStatusLivraison}
-                        changeEditingStatusValue={changeStatusText} permitEdit={permitLivraisonEdit} editingStatusValue={statusLivraisonValue} getStatusEditing={getStatusLivraisonEdit}
-                        saveEditing={saveEdit} undoEditing={undoEdit}
-                        statusValueStyle={{
-                            color: statusLivraison.toLowerCase() === 'livré'?'green':statusLivraison.toLowerCase() === 'partiel'?'orange':'grey',
-                            fontWeight: 'bold'
-                        }}/>}
+                       {label === 'commande' && !isDemande &&
+                        <StatusPicker labelStatus={livraisonLabel} statusValue={livraisonValue} otherStatusStyle={livraisonStyle} statusData={livraisonInitData}
+                                      changeStatusValue={changeLivraisonValue}/>
+                       }
 
                        {contrats && contrats.length >=1 && <FactureItemLabel labelStyle={{fontSize: 15, fontWeight: 'bold'}} labelValueStyle={contratStatusStyle} itemLabel={contratLabel} labelValue={contratStatus}/>}
                    </View>
 
-                    <View style={{flexDirection: 'row'}}>
-                       {label=='facture' && <AppButton iconName={showTranche?'caretup':'caretdown'} iconColor={colors.blanc} style={{width: 'auto', alignSelf: 'flex-end', padding: 5}} textStyle={{marginLeft: 5}} title={showTranche?'Fermer':'Deplier'} onPress={getDetails}/>}
-                       {label=='commande' && <AppButton iconName={showDetail?'minus':'plus'} iconColor={colors.blanc} style={{width: 'auto', alignSelf: 'flex-end', padding: 5}} textStyle={{marginLeft: 5}} title='Details' onPress={getDetails}/>}
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-around'
+                    }}>
+                      <AppButton iconName={showDetail || showTranches ?'caretup':'caretdown'} iconColor={colors.blanc} style={{width: 'auto', padding: 5}} textStyle={{marginLeft: 5}} title={showDetail || showTranches?'Fermer':'Deplier'} onPress={getDetails}/>
+                       <AppButton iconName='plus' iconColor={colors.blanc} style={{width: 'auto', padding: 5, marginLeft: 20 }} textStyle={{marginLeft: 5}} title='Details' onPress={goToItemDetails}/>
                       {!isDemande &&  <AppButton style={{marginLeft: 20}} title={linkTitle} onPress={getLink}/>}
                     </View>
-                    {showTranche && <View style={styles.tranches} >
-                        {tranches && tranches.length >=1 && <View>
-                            {tranches.map((tranche, i) =><View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems:'center', marginRight:50}}  key={i.toString()}>
-                                <AppText style={{fontWeight: 'bold'}}>trch{i+1}: {tranche.montant} fcfa</AppText>
-                                <AppText>Avant le: </AppText>
-                                <AppText style={{fontSize: 11}}>{dayjs(tranche.dateEcheance).format('DD/MM/YYYY HH:mm:ss')}</AppText>
-                                {tranche.payed ? <AntDesign name="check" size={24} color="green" />:<AppButton onPress={() => payTranche(tranche)} style={{backgroundColor: 'green', width: 'auto', height: 16, marginLeft: 5, paddingRight:5}} title={trancheButtonTitle2}/>}
-                            </View>)}
-                        </View>}
-                        {!tranches || tranches.length === 0 && <View>
-                        <AppText>Aucune tranche pour cette facture, voulez-vous payer la totalité?</AppText>
-                            {notPayed && <AppButton style={{backgroundColor: 'green', width: '50%'}} title='payer' onPress={soldeFacture}/>}
-                           {!notPayed && <View style={{flexDirection: 'row'}}>
-                                <AppText>dejà payé</AppText>
-                                <AntDesign name="check" size={24} color="green" />
-                            </View>}
+                    {showTranches && tranches && <View style={styles.tranches} >
+                        {tranches.length >=1 && <View>
+                            {tranches.map((tranche, i) =>
+                                <TrancheItem key={tranche.id.toString()} trancheIndex={i+1} isTranchePayed={tranche.payed} trancheMontant={tranche.montant}
+                                             tranchePayedDate={tranche.updatedAt} trancheDateEcheance={tranche.dateEcheance}
+                                             payTranche={() => payTranche(tranche)}/>
+                            )}
                         </View>}
                     </View>}
-                    {showDetail && <View style={{ minWidth: '90%', backgroundColor: colors.blanc, marginTop: 5}}>
-                        {orderItems.map((order, index) => <View style={{flexDirection: 'row',minHeight: 50}} key={index.toString()}>
-                            <AppText>{order.orderItem.quantite}</AppText>
-                            <AppText>{order.libelle}</AppText>
-                            <AppText> => </AppText>
-                            <AppText>{order.orderItem.montant} fcfa</AppText>
-                        </View>)}
-                        <View style={{alignSelf: 'flex-start'}}>
-                            <AppText style={{fontWeight: 'bold'}}>Frais livraison: {fraisLivraison} fcfa </AppText>
-                            <AppText style={{fontWeight: 'bold'}}>Taux d'interet: {tauxInteret} fcfa</AppText>
-                        </View>
-                        <View style={{
-                            alignItems: 'flex-start'
-                        }}>
-                            <View>
-                                <AppText>{labelDate1}: {debut}</AppText>
-                            </View>
-                            <View>
-                                <AppText>{labelDatePrevue}: {datePrevue}</AppText>
-                            </View>
-                          {!isDemande && statusLivraison.toLowerCase() === 'livré' &&  <View>
-                                <AppText>{labelDate2}: {fin}</AppText>
-                            </View>}
-                        </View>
+                    {showDetail && orderItems && <View style={{ minWidth: '90%', backgroundColor: colors.blanc, marginTop: 5}}>
+                        {orderItems.map((order, index) =>
+                            <OrderDetailItem key={order.id.toString()} quantite={order.OrderItem.quantite} libelle={order.OrderItem.libelle} montant={order.OrderItem.montant}/>
+                        )}
+                        <AppLabelWithValue label='Frais livraison: ' labelValue={fraisLivraison} secondLabel='fcfa'/>
+                        <AppLabelWithValue label="Taux d'interêt: " labelValue={tauxInteret} secondLabel='fcfa'/>
+                        <AppLabelWithValue label={labelDateCmde} labelValue={dayjs(dateCmde).format('DD/MM/YYYY HH:mm:ss')}/>
+                        <AppLabelWithValue label={labelDatePrevue} labelValue={dayjs(datePrevue).format('DD/MM/YYYY HH:mm:ss')}/>
+                        {isDemande && livraisonValue.toLowerCase() === 'livré' && <AppLabelWithValue label={labelDateLivraison} labelValue={dayjs(dateLivraison).format('DD/MM/YYYY HH:mm:ss')}/>}
 
                     </View>}
                 </View>
 
             </View>
-                {/*{label=='facture' && <LottieView style={{height: 150, width: 150}} autoPlay={factureAnimPlay} loop={factureAnimLoop} source={require('../../assets/animations/bill')}/>}*/}
 
         </View>
             <View style={{
@@ -178,16 +156,26 @@ const store = useStore()
 
             </View>}
 
-            <View style={{position: 'absolute',right:10,top: 200, alignItems: 'center'}}>
-                {label == 'commande' && !isHistorique && <TouchableOpacity onPress={moveItemToHistory}>
+            <View style={{position: 'absolute',right:10,top: 220, alignItems: 'center'}}>
+                {label === 'commande' && !isHistorique &&
+                <TouchableOpacity onPress={moveItemToHistory}>
                     <FontAwesome name="history" size={25} color={colors.dark} />
                 </TouchableOpacity>}
                 {orderEspace === 'historique' && <TouchableOpacity>
                     <Entypo name='reply' color={colors.dark} size={25}/>
                 </TouchableOpacity>}
-                <ItemIconButton otherStyle={{marginTop: 20}} iconSize={24} iconName='delete' color={colors.rougeBordeau} onPress={deleteItem}/>
+              {endFacture &&  <ItemIconButton otherStyle={{marginTop: 10}} iconSize={24} iconName='delete' color={colors.rougeBordeau} onPress={deleteItem}/>}
             </View>
-       </>
+            {label == 'facture' && okPayement &&
+                <View style={ {
+                    position: 'absolute',
+                    top: 30,
+                    right: 20
+                }}>
+                   <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={false} source={require('../../assets/animations/done')}/>
+                </View>
+            }
+                </View>
     );
 }
 
