@@ -4,20 +4,19 @@ import AppButton from "./AppButton";
 import colors from "../utilities/colors";
 import AppText from "./AppText";
 import AppLabelLink from "./AppLabelLink";
-import {useStore} from "react-redux";
-import {getRoleAdmin} from "../store/selectors/authSelector";
+import useAuth from "../hooks/useAuth";
 
-function ItemDetails({item, firstOptions, secondOptions, selectedOption, selectedImage,
-                         selectedFirstOption, selectedSecondOption, selectedQty, selectedPrice,
+function ItemDetails({firstOptions, secondOptions, selectedImage,
+                         selectedFirstOption, selectedSecondOption, selectedQty,
                          changeImage, addItemToCart, editItem, deleteItem, addOption, itemImages,
                          itemLibelle, itemFirstPrice, itemSecondPrice, itemStockQte, FirstOptionDispatch, secondOptionDispatch,
                          decrementQte, incrementQte, itemDescription}) {
-    const store = useStore()
+    const {userRoleAdmin} = useAuth()
 
     return (
         <>
             <ScrollView style={{marginTop: 20}}>
-                {getRoleAdmin(store.getState()) &&  <View style={{
+                {userRoleAdmin() &&  <View style={{
                     alignSelf: 'flex-end',
                     marginBottom: 20
                 }}>

@@ -4,7 +4,7 @@ import {AntDesign} from '@expo/vector-icons'
 
 import Color from '../utilities/colors'
 
-function AppIconWithBadge({name, size, color, badgeCount, onPress,children, style, notifStyle}) {
+function AppIconWithBadge({name, size, color, badgeCount,children, style, notifStyle}) {
     return (
         <View style={[styles.mainView, style]}>
             {name && <AntDesign name={name} size={size} color={color}/>}

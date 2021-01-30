@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {useSelector} from 'react-redux'
 import {View, StyleSheet} from 'react-native'
 import {Picker} from '@react-native-community/picker'
 import AppText from "./AppText";

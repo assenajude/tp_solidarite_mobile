@@ -1,19 +1,26 @@
-import React from 'react';
-import {useSelector} from "react-redux";
+import React, {useState} from 'react';
+import {useDispatch, useSelector} from "react-redux";
 import {createStackNavigator} from "@react-navigation/stack";
 import EserviceScreen from "../screens/EserviceScreen";
 import colors from "../utilities/colors";
-import LeftUserCompte from "../components/user/LeftUserCompte";
 import NewServiceScreen from "../screens/NewServiceScreen";
 import CartIconRight from "../components/shoppingCart/CartIconRight";
 import routes from "./routes";
 import AppSearchBar from "../components/AppSearchBar";
 import ServiceDetailScreen from "../screens/ServiceDetailScreen";
+import Avatar from "../components/user/Avatar";
+import {getSearchService} from "../store/slices/serviceSlice";
 
 const ServiceStackNav = createStackNavigator()
 
 function ServiceNavigator({navigation}) {
+    const dispatch = useDispatch()
     const itemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
+    const [search, setSearch] = useState('')
+
+    const handleSearch = () => {
+        dispatch(getSearchService(search))
+    }
 
     return (
         <ServiceStackNav.Navigator screenOptions={{
@@ -23,8 +30,8 @@ function ServiceNavigator({navigation}) {
             headerRight: () => <CartIconRight cartLenght={itemsLenght} getToCartScreen={() => navigation.navigate('AccueilNavigator', {screen: routes.CART})} />
         }}>
             <ServiceStackNav.Screen name='ServiceScreen' component={EserviceScreen} options={{
-                headerTitle: () => <AppSearchBar/>,
-                headerLeft: () => <LeftUserCompte getUserCompteNavigator={() =>navigation.openDrawer()}/>
+                headerTitle: () => <AppSearchBar searchValue={search} changeSearchValue={(value) => setSearch(value)} handleSearch={handleSearch}/>,
+                headerLeft: () => <Avatar otherImageStyle={{width: 40,height: 40}} onPress={() =>navigation.openDrawer()}/>
             }}/>
             <ServiceStackNav.Screen name='NewServiceScreen' component={NewServiceScreen} options={{
                 title: 'Ajout nouveau service',

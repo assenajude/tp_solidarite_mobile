@@ -8,11 +8,12 @@ import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppText from "../components/AppText";
-import {addService} from '../store/slices/serviceSlice'
+import {addService, getServices} from '../store/slices/serviceSlice'
 import { getOrdersByUser} from "../store/slices/orderSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppFormSwitch from "../components/forms/AppFormSwitch";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
+import {postData} from "../api/service";
 
 const serviceValideSchema = Yup.object().shape({
     libelle: Yup.string(),
@@ -47,15 +48,26 @@ function NewServiceScreen({navigation}) {
             isDispo:service.isDispo
         }
         await dispatch(addService(serviceData))
-        const error = store.getState().entities.order.error
-        if(!error) {
-        await dispatch(getOrdersByUser())
-         navigation.goBack()
+        const error = store.getState().entities.service.error
+        if(error !== null) {
+            alert("Impossible de faire l'ajout, une erreur est apparue.")
         } else {
-            Alert.alert('ERROR!', 'Une erreur est apparue, Veillez reessayer plutard', [
-                {text: 'ok', onPress: () => {return;}}
-                ], {cancelable: false} )
+            await dispatch(getServices())
+            navigation.goBack()
         }
+    }
+
+    const handleSave = (service) => {
+        const serviceData = {
+            categoryId: selectedCategorie,
+            libelle: service.libelle,
+            description: service.description,
+            montantMin: service.montantMin,
+            montantMax: service.montantMax,
+            images: service.images,
+            isDispo:service.isDispo
+        }
+       postData(serviceData)
     }
 
     return (

@@ -1,54 +1,46 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {useDispatch, useSelector, useStore} from "react-redux";
-import {View, FlatList, StyleSheet, ActivityIndicator} from "react-native";
+import React from 'react';
+import {useDispatch, useSelector} from "react-redux";
+import {View, FlatList} from "react-native";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import AppCard from "../components/AppCard";
-import {getServices, addService} from '../store/slices/serviceSlice'
+import {getServiceRefreshed} from '../store/slices/serviceSlice'
 import ListFooter from "../components/list/ListFooter";
-import {getRoleAdmin} from "../store/selectors/authSelector";
 import routes from "../navigation/routes";
 import AppButton from "../components/AppButton";
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
 import {getModalDismiss, getProvenanceSet} from "../store/slices/shoppingCartSlice";
 import useAddToCart from "../hooks/useAddToCart";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import useAuth from "../hooks/useAuth";
 
 function EserviceScreen({navigation}) {
-    const store = useStore()
     const dispatch = useDispatch()
+    const {userRoleAdmin} = useAuth()
     const {addItemToCart} = useAddToCart()
     const loading = useSelector(state =>state.entities.service.loading)
+    const refreshLoading = useSelector(state => state.entities.service.refreshLoading)
     const addToCartLoading = useSelector(state => state.entities.shoppingCart.loading)
-    const serviceData = useSelector(state => state.entities.service.list)
+    const serviceData = useSelector(state => state.entities.service.searchList)
+    const serviceError = useSelector(state => state.entities.service.error)
     const showItemModal = useSelector(state => state.entities.shoppingCart.eserviceModal)
     const selectedItem = useSelector(state => state.entities.shoppingCart.newAdded)
 
-    const getServiceData = useCallback(() => {
-        dispatch(getServices())
-    }, [])
 
-    useEffect(() => {
-        getServiceData()
-    }, [])
-
-
-
-    if(!loading && serviceData.length === 0) {
-        return <>
-        <View style={{
+    if (!loading && serviceError !== null) {
+        return <View style={{
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center'
         }}>
-            <AppText>Aucune donnée trouvée..</AppText>
+            <AppText>Une erreur est apparue...Veuillez recharger la page</AppText>
+            <AppButton title='Recharger' onPress={getServiceData}/>
         </View>
-            {getRoleAdmin(store.getState()) && <ListFooter onPress={() => navigation.navigate(routes.NEW_SERVICE)} otherStyle={{alignSelf: 'flex-end', margin: 60}}/>}
-            </>
     }
+
     if (showItemModal) {
         return (
-            <AddToCartModal source={{uri: selectedItem.image}} designation={selectedItem.libelle}
+            <AddToCartModal source={{uri: selectedItem.imagesService[0]}} designation={selectedItem.libelle}
             goToHomeScreen={() => {
                 dispatch(getModalDismiss())
             }}
@@ -62,23 +54,28 @@ function EserviceScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={loading || addToCartLoading}/>
-        <View style={{
-            justifyContent: 'center',
-            alignItems: 'center'
-        }}>
-        <FlatList data={serviceData} keyExtractor={item =>item.id.toString()}
-                  renderItem={({item})=><AppCard itemType={item.Categorie.typeCateg || 'e-service'} image={{uri: item.imagesService[0]}} button2='Utiliser' title={item.libelle}
+
+        {!loading && serviceData.length> 0 && serviceError === null && <FlatList refreshing={refreshLoading} onRefresh={() => dispatch(getServiceRefreshed())}  data={serviceData} keyExtractor={item =>item.id.toString()}
+                  renderItem={({item})=><AppCard notInStock={!item.isDispo} itemType={item.Categorie.typeCateg || 'e-service'} image={{uri: item.imagesService[0]}} button2='Utiliser' title={item.libelle}
                     addToCart={() => {
                         dispatch(getProvenanceSet('eservice'))
                         addItemToCart(item)
                     }} dispo={item.isDispo?'oui':'non'} serviceMin={item.montantMin} serviceMax={item.montantMax} otherImgaeStyle={{height: 190}}
                   onPress={() => navigation.navigate(routes.SERVICE_DETAIL, item)}>
-                      <AppButton textStyle={{fontSize: 10}} title='+ Infos' style={{backgroundColor: colors.rougeBordeau, padding: 5, width: '20%'}}/>
-                  </AppCard>}/>
-                 {getRoleAdmin(store.getState()) && <View style={{position: 'absolute', bottom: 80, right: 20}}>
+                      <AppButton textStyle={{fontSize: 10}} title='+ Infos' style={{backgroundColor: colors.rougeBordeau, padding: 5, width: '20%'}}
+                                 onPress={() =>navigation.navigate(routes.SERVICE_DETAIL, item)}/>
+                  </AppCard>}/>}
+            {!loading && serviceData.length === 0 && serviceError === null && <View style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <AppText>Aucune donnée trouvée..</AppText>
+            </View>}
+                 {userRoleAdmin() && <View style={{position: 'absolute', bottom: 80, right: 20}}>
                       <ListFooter onPress={() => navigation.navigate(routes.NEW_SERVICE)}/>
                   </View>}
-        </View>
+
             </>
     );
 }

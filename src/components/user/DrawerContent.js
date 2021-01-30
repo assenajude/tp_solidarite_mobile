@@ -1,51 +1,68 @@
-import React, {useState, useEffect} from 'react'
-import {useSelector, useStore, useDispatch} from "react-redux";
+import React from 'react'
+import {useSelector, useDispatch} from "react-redux";
 import {DrawerItem, DrawerContentScrollView} from "@react-navigation/drawer";
-import {View,Button, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
-import {AntDesign, FontAwesome, MaterialCommunityIcons, FontAwesome5,Feather, MaterialIcons, EvilIcons, Entypo} from '@expo/vector-icons'
+import {View,Text, StyleSheet, TouchableOpacity} from 'react-native'
+import {Fontisto,AntDesign,MaterialCommunityIcons, FontAwesome5,Feather, MaterialIcons, EvilIcons, Entypo} from '@expo/vector-icons'
 
-import AppAvatar from "../AppAvatar";
 import Color from '../../utilities/colors';
 import routes from '../../navigation/routes'
 import AppButton from "../AppButton";
 import AppIconWithBadge from "../AppIconWithBadge";
 import {getLogout} from '../../store/slices/authSlice'
-import {getRoleAdmin} from "../../store/selectors/authSelector";
-import LeftUserCompte from "./LeftUserCompte";
+import useAuth from "../../hooks/useAuth";
+import Avatar from "./Avatar";
+import AppText from "../AppText";
 
 function DrawerContent(props) {
-    const store = useStore()
     const dispatch = useDispatch()
+    const {initUserDatas} = useAuth()
+    const {userRoleAdmin} = useAuth()
+
     const user = useSelector(state => state.auth.user)
+    const isUser = useSelector(state => {
+        const connetedUser = state.auth.user
+        const isLoggedIn = Object.entries(connetedUser).length > 0?true:false
+        return isLoggedIn
+    })
     const favoriteCompter = useSelector(state => state.entities.userFavorite.favoriteCompter)
-    const isLogin = useSelector(state => state.auth.isLoggedIn)
+    const articleCompter = useSelector(state => state.entities.order.articleRefreshCompter)
+    const serviceCompter = useSelector(state => state.entities.order.serviceRefreshCompter)
+    const locationCompter = useSelector(state => state.entities.order.locationRefreshCompter)
+    const factureCompter = useSelector(state => state.entities.facture.newFactureCompter)
+    const prositionCompter = useSelector(state => state.entities.proposition.newPropositionCompter)
+    const helpCompter = useSelector(state => state.entities.faq.helpCompter)
 
-    const isUser = Object.entries(user).length !== 0
 
+    const handleLogout = () => {
+        dispatch(getLogout())
+        initUserDatas()
+    }
 
-    useEffect(() => {
-
-    }, [])
 
     return (
         <View style={styles.container}>
            <DrawerContentScrollView {...props}>
                <View style={styles.content}>
                    <View>
+
                        <View style={styles.avatar}>
-                       <View style={styles.avatarStyle}>
-                           <LeftUserCompte avatarNotif={false} imageStyle={{width: 80, height: 80}}
-                                           getUserCompteNavigator={() => props.navigation.navigate(routes.COMPTE)}/>
+                       <View style={{top: 20}}>
+                           <Avatar otherImageStyle={{width: 80,height: 80}}/>
                        </View>
                            <View>
-                           <TouchableOpacity onPress={() => props.navigation.navigate(routes.NOTIFICATION)}>
-                           <AppIconWithBadge name='bells'
-                                             color='black' size={24} style={{marginRight: 10}}
-                                             notifStyle={{backgroundColor: Color.rougeBordeau}} badgeCount={3} />
-                           </TouchableOpacity>
+                               <TouchableOpacity onPress={() => props.navigation.navigate(routes.HELP)}>
+                                   <View style={{flexDirection: 'row'}}>
+                                       <AppIconWithBadge notifStyle={{backgroundColor: Color.rougeBordeau}} badgeCount={helpCompter}>
+                                           <View style={{flexDirection: 'row'}}>
+                                               <Entypo name="help-with-circle" size={20} color={Color.bleuFbi}/>
+                                           </View>
+                                       </AppIconWithBadge>
+                                       <AppText style={{color: Color.bleuFbi}}>Aide</AppText>
+                                   </View>
+                               </TouchableOpacity>
                            </View>
                        </View>
-                       <View style={styles.isUsernameStyle}>
+                       <View style={styles.usernameStyle}>
                        {isUser && <TouchableOpacity onPress={() => props.navigation.navigate(routes.COMPTE)}>
                        <View style={styles.usernameContainer}>
                            <Text>{user.username}</Text>
@@ -73,48 +90,79 @@ function DrawerContent(props) {
                        <DrawerItem icon={({size, color}) =>
                            <AppIconWithBadge name='message1' badgeCount={1}
                                              notifStyle={{backgroundColor: Color.rougeBordeau}} size={size} color={color} />}
-                           // <AntDesign name='message1' size={24} color={color} />}
                            label='Messages' onPress={() => {props.navigation.navigate(routes.USER_MESSAGE)}} />
                    </View>
                    <View>
-                       <DrawerItem icon={({size, color}) => <AppIconWithBadge badgeCount={favoriteCompter}
+                       <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge badgeCount={favoriteCompter}
                                    notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
-                                  <MaterialIcons name="favorite-border" size={30} color={color}/>
+                                  <MaterialIcons name="favorite-border" size={size} color={color}/>
                        </AppIconWithBadge> }
                                    label='Favoris' onPress={() => {props.navigation.navigate(routes.USER_FAVORIS)}} />
                    </View>
                    <View>
-                       <DrawerItem icon={({size, color}) => <FontAwesome5 name='money-bill-alt' size={size} color={color}/>}
-                                   label='Vos factures' onPress={() => {props.navigation.navigate(routes.USER_FACTURE)}} />
+                       <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge badgeCount={factureCompter}
+                                             notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
+                               <FontAwesome5 name='money-bill-alt' size={size} color={color}/>
+                           </AppIconWithBadge> }
+                                   label='Mes factures' onPress={() => {props.navigation.navigate(routes.USER_FACTURE)}} />
+
                    </View>
                    <View>
-                       <DrawerItem icon={({size, color}) => <Feather name="command" size={size} color={color} />}
-                                   label='Vos commandes' onPress={() => {props.navigation.navigate(routes.USER_ORDER)}} />
+                       <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge badgeCount={articleCompter}
+                                             notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
+                               <Feather name="command" size={size} color={color}/>
+                           </AppIconWithBadge> }
+                                   label='Mes commandes' onPress={() => {props.navigation.navigate(routes.USER_ORDER)}} />
                    </View>
 
                    <View>
-                       <DrawerItem icon={({size, color}) => <MaterialCommunityIcons name="store" size={size} color={color} />}
-                                   label='Vos locations' onPress={() => {props.navigation.navigate('UserLocation')}} />
+                       <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge badgeCount={locationCompter}
+                                             notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
+                               <MaterialIcons name="store" size={size} color={color}/>
+                           </AppIconWithBadge> }
+                                   label='Mes locations' onPress={() => {props.navigation.navigate('UserLocation')}} />
                    </View>
 
                    <View>
-                       <DrawerItem icon={({size, color}) => <AntDesign name="carryout" size={size} color={color} />}
-                                   label='Vos services' onPress={() => {props.navigation.navigate(routes.USER_SERVICE)}} />
+                       <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge badgeCount={serviceCompter}
+                                             notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}
+                                             name="carryout" size={size} color={color}>
+                           </AppIconWithBadge> }
+                                   label='Mes Services' onPress={() => {props.navigation.navigate(routes.USER_SERVICE)}} />
                    </View>
                    <View>
-                       <DrawerItem icon={({size, color}) => <Entypo name="address" size={size} color={color} />}
-                                   label='Vos adresses' onPress={() => {props.navigation.navigate(routes.USER_ADDRESS)}} />
+                       <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge badgeCount={locationCompter}
+                                             notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
+                               <Entypo name="address" size={size} color={color} />
+                           </AppIconWithBadge> }
+                                   label='Mes adresses' onPress={() => {props.navigation.navigate(routes.USER_ADDRESS)}} />
+                   </View>
+                   <View>
+                       <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge badgeCount={prositionCompter}
+                                             notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
+                               <Fontisto name="suitcase-alt" size={size} color={color} />
+                           </AppIconWithBadge> }
+                                   label='Plans & Propositions' onPress={() => {props.navigation.navigate('AccueilNavigator',{screen: 'PlanPropositionScreen'})}} />
                    </View>
 
 
-                   {getRoleAdmin(store.getState()) && <View>
+                   {userRoleAdmin() && <View>
                        <DrawerItem icon={({size, color}) => <MaterialCommunityIcons name="dots-horizontal" size={size} color={color} />}
                                    label='Gerer' onPress={() => {props.navigation.navigate('OtherMain')}} />
                    </View>}
                </View>
                </View>
            </DrawerContentScrollView>
-            {isLogin && <Button title='Se déconnecter' color={Color.rougeBordeau} onPress={() => dispatch(getLogout())}/>}
+            {isUser &&
+                <AppButton style={{padding: 5, borderRadius: 0}}  iconName='logout' iconColor={Color.blanc} title='Se deconnecter'
+                           textStyle={{marginLeft: 10}} onPress={() => handleLogout()}/>}
         </View>
     );
 }

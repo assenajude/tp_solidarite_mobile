@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {useSelector, useDispatch} from 'react-redux'
-import {View, Text, StyleSheet, ScrollView, FlatList, Button} from 'react-native'
+import {View, StyleSheet, ScrollView, FlatList} from 'react-native'
 import * as Yup from 'yup';
 
 

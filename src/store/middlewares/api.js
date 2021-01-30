@@ -11,36 +11,33 @@ const api = ({dispatch}) => next => async action => {
     try {
         let response;
         if (data) {
+            let formData;
             const dataKeys = Object.keys(data)
-            if (dataKeys.indexOf('images') !== -1) {
-                let formData = new FormData();
-                for (key in data) {
-                    if (key =='images') {
-                        data.images.forEach(image => {
-                       const filename = image.split('/').pop();
-                        formData.append('images', {
-                            name: filename,
-                            type: 'image/jpeg',
-                            uri: image
-                        })
-                        })
+            if(dataKeys.indexOf('images') !== -1) {
+                formData = new FormData();
+                dataKeys.forEach(key => {
+                        if(key === 'images' ) {
+                          data.images.forEach(image => {
+                         formData.append('images', {
+                             name: image.split('/').pop(),
+                             type: 'image/jpeg',
+                             uri: image
+                         })
+                     })
                     }
-                    formData.append(key, data[key])
-                }
-                response = await apiClient.axiosInstance.request({
-                    url,
-                    method,
-                    data:formData,
-                    headers: {'x-access-token':authToken}
+                    else {
+                        formData.append(key, data[key])
+                    }
                 })
             } else {
-                response = await apiClient.axiosInstance.request({
-                    url,
-                    method,
-                    data,
-                    headers: {'x-access-token':authToken}
-                })
-        }
+                formData = data
+            }
+            response = await apiClient.axiosInstance.request({
+                url,
+                method,
+                data:formData,
+                headers: {'x-access-token':authToken}
+            })
 
         } else {
             response = await apiClient.axiosInstance.request({

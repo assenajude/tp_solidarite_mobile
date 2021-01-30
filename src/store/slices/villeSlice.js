@@ -31,8 +31,6 @@ const villeSlice = createSlice({
             state.error = action.payload
         },
         getVilleRelais: (state, action) => {
-            /*const relais = state.list.filter(ville => ville.nom === action.payload);
-            const villeRelais = relais[0].pointRelais;*/
             const selectedVille = state.list.find(ville => ville.nom === action.payload);
             state.selectedVille = selectedVille
             state.villeRelais = selectedVille.PointRelais

@@ -11,7 +11,7 @@ export default useAddToCart = () => {
     const store = useStore()
     const dispatch = useDispatch()
     const addItemToCart = (item) => {
-        const cartTypeWarn = store.getState().entities.shoppingCart.type
+        const cartTypeCmde = store.getState().entities.shoppingCart.type
         const itemKeys = Object.keys(item)
         let typeCmde;
         if(itemKeys.indexOf('typeCmde') !== -1) {
@@ -19,9 +19,10 @@ export default useAddToCart = () => {
         } else {
             typeCmde = item.Categorie.typeCateg
         }
-        if(cartTypeWarn !== '' && cartTypeWarn !== typeCmde) {
-            Alert.alert('Attention', `Une commande de ${cartTypeWarn} est en cours, veillez la finaliser ou l'annuler`, [
-                {text: 'ok', onPress: () => navigation.navigate(routes.CART)}
+        if(cartTypeCmde !== '' && cartTypeCmde !== typeCmde) {
+            Alert.alert('Attention', `Une commande de ${cartTypeCmde} est en cours, veillez la finaliser ou l'annuler`, [
+                {text: 'ok', onPress: () => navigation.navigate(routes.CART)},
+                {text: 'retour', onPress: () => {return;} }
             ], {cancelable: false})
         } else {
             dispatch(getAddItemToCart(item))

@@ -1,15 +1,15 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, StyleSheet, ScrollView} from "react-native";
 import * as Yup from 'yup'
 
 import {useDispatch, useSelector, useStore} from "react-redux";
-import useConvertBuffer from "../hooks/useConvertBuffer";
 import ProfileImagePicker from "../components/user/ProfileImagePicker";
-import {getAvatarChange, getSaveEditInfo, getUserProfileAvatar} from "../store/slices/userProfileSlice";
+import {getSaveEditInfo} from "../store/slices/userProfileSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
+import {getAvatarChange} from "../store/slices/authSlice";
 
 const valideEditInfo = Yup.object().shape({
     username: Yup.string(),
@@ -17,24 +17,21 @@ const valideEditInfo = Yup.object().shape({
     nom: Yup.string(),
     prenom: Yup.string(),
     tel: Yup.string(),
-    adresse: Yup.string()
+    adresse: Yup.string(),
+    profession: Yup.string()
 })
 
 function EditUserInfoScreen({navigation}) {
     const dispatch = useDispatch()
     const store = useStore()
 
-    const avatar = useSelector(state => state.profile.avatar)
     const user = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.profile.loading)
-    const {arrayBufferToBase64} = useConvertBuffer()
     const currentUser = useSelector(state => state.profile.connectedUser)
 
-   // let uriData = 'data:image/jpeg;base64,'+arrayBufferToBase64(avatar?.data);
 
     const [showProfileModal, setShowProfileModal] = useState(false)
-    const [avatarImage, setAvatarImage] = useState()
-    const [newPhoto, setNewPhoto] = useState([avatar])
+    const [newPhoto, setNewPhoto] = useState([user.avatar])
 
 
     const handleChangeAvatar = (imageUrl) => {
@@ -57,7 +54,8 @@ function EditUserInfoScreen({navigation}) {
             nom: info.nom,
             prenom: info.prenom,
             phone: info.phone,
-            adresse: info.adresse
+            adresse: info.adresse,
+            profession: info.profession
         }
         await dispatch(getSaveEditInfo(data))
         const error = store.getState().profile.error
@@ -92,7 +90,8 @@ function EditUserInfoScreen({navigation}) {
                 nom: currentUser.nom,
                 prenom: currentUser.prenom,
                 phone: currentUser.phone,
-                adresse: currentUser.adresse
+                adresse: currentUser.adresse,
+                profession: currentUser.profession
             }} validationSchema={valideEditInfo} onSubmit={handleSaveEditInfo}>
                 <AppFormField title='Nom utilisateur' name='username' />
                 <AppFormField title='E-mail' name='email'/>
@@ -100,6 +99,7 @@ function EditUserInfoScreen({navigation}) {
                 <AppFormField title='Prenom' name='prenom'/>
                 <AppFormField title='Telephone' name='phone'/>
                 <AppFormField title='Adresse' name='adresse'/>
+                <AppFormField title='Profession' name='profession'/>
                 <AppSubmitButton title='Valider' showLoading={isLoading}/>
             </AppForm>
         </View>

@@ -37,7 +37,7 @@ const userFavoriteSlice = createSlice({
                    prixReel: article.prixReel,
                    prixPromo: article.prixPromo,
                    description: article.descripArticle,
-                   type: 'e-commerce'
+                   type: 'article'
                })
             })
 
@@ -49,7 +49,7 @@ const userFavoriteSlice = createSlice({
                     prixReel: location.coutReel,
                     prixPromo: location.coutPromo,
                     description: location.descripLocation,
-                    type: 'e-location'
+                    type: 'location'
                 })
             })
             state.list = [...formatArticleFav,...formatLocationFav]
@@ -59,7 +59,7 @@ const userFavoriteSlice = createSlice({
             let itemIndex;
             const selectedItem = action.payload
             let compter = 0
-            if(selectedItem.Categorie.typeCateg === 'e-commerce') {
+            if(selectedItem.Categorie.typeCateg === 'article') {
                 itemIndex = state.articleFavoris.findIndex(item => item.id === selectedItem.id)
                 if(itemIndex >= 0 ) {
                     state.articleFavoris.splice(itemIndex, 1)

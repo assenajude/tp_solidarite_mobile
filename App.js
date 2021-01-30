@@ -1,41 +1,36 @@
 
-import React, {useState} from "react";
+import React from "react";
 import {Provider} from 'react-redux'
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet} from "react-native";
+import {useNetInfo} from "@react-native-community/netinfo";
 
 import configureStore from "./src/store/configureStore";
-import {autoLogin} from './src/store/slices/authSlice'
 
+import {NavigationContainer} from "@react-navigation/native";
 import UserCompteNavigation from "./src/navigation/UserCompteNavigation";
-import {AppLoading} from "expo";
-import authStorage from './src/store/persistStorage';
+import {SafeAreaProvider} from "react-native-safe-area-context";
+import OfflineNotice from "./src/components/OfflineNotice";
+
 
 export default function App() {
     const store = configureStore();
-
-    const [isReady, setIsReady] = useState(false)
-    const [user, setUser] = useState()
-
-    const restoreUser = async () => {
-            const user = await authStorage.getUser();
-            if (user) setUser(user)
-    }
-    if(!isReady) {
-        return <AppLoading startAsync={restoreUser} onFinish={() => setIsReady(true)} />
-    }
+    const netInfo = useNetInfo()
+    const noInternet = netInfo.type !== "unknown" && netInfo.isInternetReachable === false
 
     return (
-      <Provider store={store}>
-        <UserCompteNavigation/>
-      </Provider>
+          <SafeAreaProvider>
+                    {/*{ noInternet && <OfflineNotice/>}*/}
+             <Provider store={store}>
+                  <NavigationContainer>
+                    <UserCompteNavigation/>
+                 </NavigationContainer>
+               </Provider>
+          </SafeAreaProvider>
         )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1
   },
 });

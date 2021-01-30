@@ -6,7 +6,7 @@ import {Picker} from "@react-native-community/picker";
 
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
-import {saveVille, getAllVilles} from '../store/slices/villeSlice'
+import {saveVille} from '../store/slices/villeSlice'
 import AppText from "../components/AppText";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import ListItem from "../components/list/ListItem";

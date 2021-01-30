@@ -15,7 +15,7 @@ function ProfileImagePicker({showPickerModal,onChangeImage,onChangePhoto,changeP
                                 dismissPickerModal, getPickerModalShown, imageUrl,deleteAvatar
 }) {
 
-    const avatar = useSelector(state => state.profile.avatar)
+    const user = useSelector(state => state.auth.user)
 
     const chooseImage = async() => {
         try {
@@ -97,8 +97,8 @@ function ProfileImagePicker({showPickerModal,onChangeImage,onChangePhoto,changeP
                         justifyContent: 'center',
                         alignItems: "center"
                     }}>
-                        <AppButton title='prendre une photo' style={{width: '50%', margin: 20}} onPress={takePhoto}/>
-                        <AppButton title='Choisir une image' style={{width: '50%', margin: 20}} onPress={chooseImage}/>
+                        <AppLabelLink content='prendre une photo'  handleLink={takePhoto}/>
+                        <AppLabelLink content='Choisir une image'  handleLink={chooseImage}/>
                         <AppLabelLink content='Supprimer la photo' handleLink={deleteAvatar}/>
                     </View>
                     </Animated.View>

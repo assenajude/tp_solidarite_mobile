@@ -3,11 +3,12 @@ import {View, TextInput,TouchableOpacity, StyleSheet} from 'react-native'
 import {EvilIcons} from '@expo/vector-icons'
 import Color from '../utilities/colors'
 
-function AppSearchBar({style, leaveInput, changeSearchValue, searchValue}) {
+function AppSearchBar({style, leaveInput, changeSearchValue, searchValue, handleSearch}) {
     return (
 
         <View style={[styles.searchContainer, style]}>
-            <TextInput style={styles.inputStyle} onBlur={leaveInput} value={searchValue} onChangeText={changeSearchValue} placeholder='chercher ici...'/>
+            <TextInput style={styles.inputStyle} onBlur={leaveInput} value={searchValue} onChangeText={changeSearchValue} placeholder='chercher ici...'
+                       onSubmitEditing={handleSearch}/>
             <TouchableOpacity>
             <EvilIcons name='search' size={24} style={styles.iconStyle}/>
         </TouchableOpacity>

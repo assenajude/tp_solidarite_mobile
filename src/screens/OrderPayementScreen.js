@@ -1,42 +1,49 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {View,ActivityIndicator, StyleSheet, ScrollView} from "react-native";
-import {useSelector, useStore, useDispatch} from "react-redux";
+import React, {useState, useEffect} from 'react';
+import {View,StyleSheet, ScrollView} from "react-native";
+import {useSelector, useDispatch} from "react-redux";
 
 
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
-import {getPayementActive, getSelected, getSelectedPlan, loadPayements} from '../store/slices/payementSlice'
+import {
+    getPayementActive,
+    getPayementDisabled, getPlanDetail,
+    getSelectedPlan
+} from '../store/slices/payementSlice'
 import PayementListItem from "../components/list/PayementListItem";
 import AppButton from "../components/AppButton";
-import {getInteretValue, getTotalWithPayement} from '../store/selectors/orderSelector'
 import routes from '../navigation/routes';
-import {getAdresse} from '../store/slices/userAdresseSlice'
-import {getAllVilles} from '../store/slices/villeSlice'
 import ModeItemCheck from "../components/payement/ModeItemCheck";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {loadPlans} from "../store/slices/planSlice";
+import usePayementPlan from "../hooks/usePayementPlan";
+import usePlaceOrder from "../hooks/usePlaceOrder";
 
 function OrderPayementScreen({navigation}) {
     const dispatch = useDispatch()
-    const store = useStore()
-
+    const {getPayementRate, getTotal} = usePlaceOrder()
+    const {permitCredit, isPlanDisabled} = usePayementPlan()
     const articleAmount = useSelector(state => state.entities.shoppingCart.totalAmount)
     const payements = useSelector(state => state.entities.payement.list)
     const currentOrder = useSelector(state => state.entities.order.currentOrder)
     const payementPlans = useSelector(state => state.entities.payement.payementPlans)
     const loading = useSelector(state => state.entities.payement.loading)
+    const selectedPlan = useSelector(state => state.entities.payement.currentPlan)
     const livraisonLoading = useSelector(state => state.entities.userAdresse.loading)
     const [checkItem, setCheckItem] = useState(false)
+    const typeCmde = useSelector(state => state.entities.shoppingCart.type)
 
-   const getStarted = useCallback(async () => {
-       dispatch(loadPayements())
-       dispatch(getSelected(1))
-       // dispatch(loadPlans())
-   }, [])
+
+
+
 
 
   useEffect(() => {
-      dispatch(getSelected(1))
+      if(typeCmde === 'service') {
+          dispatch(getPayementDisabled(1))
+          dispatch(getPayementActive(2))
+      } else {
+          dispatch(getPayementActive(1))
+      }
   }, [])
 
 
@@ -49,27 +56,28 @@ function OrderPayementScreen({navigation}) {
 
 
     return (
-        <>
         <View style={styles.container}>
             <View style={styles.summary}>
                 <View style={styles.itemLine}>
-                    <AppText style={{fontWeight: 'bold'}} >Montant articles: </AppText>
+                    <AppText style={{fontWeight: 'bold'}} >Montant commande: </AppText>
                     <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{articleAmount} FCFA</AppText>
                 </View>
                 <View style={styles.itemLine}>
-                    <AppText style={{fontWeight: 'bold'}}>Taux d'interet payement: </AppText>
-                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}> {getInteretValue(store.getState())} FCFA</AppText>
+                    <AppText style={{fontWeight: 'bold'}}>Interet payement: </AppText>
+                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}> {getPayementRate()} FCFA</AppText>
                 </View>
                 <View style={styles.itemLine}>
                     <AppText style={{fontWeight: 'bold'}}>Net actuel à payer: </AppText>
-                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{getTotalWithPayement(store.getState())} FCFA</AppText>
+                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{getTotal()} FCFA</AppText>
                 </View>
             </View>
             <View>
                 <View style={styles.headerStyle}>
                 <AppText style={{color: colors.blanc, fontWeight: 'bold', fontSize: 12}}>Dites nous comment vous voulez payer votre commande</AppText>
                 </View>
-                <ScrollView style={{paddingBottom: 20}}>
+            </View>
+            <ScrollView>
+                <View  style={{paddingBottom: 30}}>
                 <View style={styles.modePayement}>
                     <View style={{
                         height: 35,
@@ -81,7 +89,17 @@ function OrderPayementScreen({navigation}) {
                     <View style={{marginLeft: 20}}>
                     <ScrollView horizontal>
                         {payements.map((item, index) => <View key={index.toString()}>
-                            <ModeItemCheck isActive={item.active} modeTitle={item.mode} getModeActive={() => dispatch(getPayementActive(item.id))}/>
+                            <ModeItemCheck isActive={item.active} modeTitle={item.mode} getModeActive={() => {
+                                if(typeCmde === 'service' && item.mode.toLowerCase() === 'cash') {
+                                    alert('Désolé, vous ne pouvez pas choisir ce mode de payement pour cette commande.')
+                                } else {
+                                    if(item.mode.toLowerCase() === 'credit' && !permitCredit()) {
+                                        alert('Impossible de choisir ce mode, un ou plusieurs articles de votre commande ne peuvent pas être vendus à credit')
+                                    } else {
+                                      dispatch(getPayementActive(item.id))
+                                    }
+                                }
+                            }} isPayementDisabled={typeCmde === 'service' && item.mode.toLowerCase() === 'cash'}/>
                         </View>)}
                     </ScrollView>
                     </View>
@@ -101,25 +119,32 @@ function OrderPayementScreen({navigation}) {
                     </View>}
                     <View style={{justifyContent: 'flex-start'}}>
                     {payementPlans.map((plan, index) =>
-                        <PayementListItem libelle={plan.libelle} description={plan.descripPlan} key={index}
+                        <PayementListItem disablePlan={isPlanDisabled(plan)}
+                                          libelle={plan.libelle} description={plan.descripPlan} key={index}
                                           checked={plan.checked} selectItem={() => {
-                            dispatch(getSelectedPlan(plan))
-                            setCheckItem(true)}}/>)}
+                                              if(isPlanDisabled(plan)) {
+                                                  return alert('Vous ne pouvez pas choisir ce plan pour cette commande, veuillez choisir un autre plan SVP')
+                                              }
+                                            dispatch(getSelectedPlan(plan))
+                                            setCheckItem(true)
+                                          }} planDelai={plan.nombreMensualite>0?plan.nombreMensualite+' m':'3 j'}
+                                          showDetail={plan.showPlanDetail} getDetails={() => dispatch(getPlanDetail(plan.id))}
+                                          goToPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: plan})}
+                                          goToDisabledPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: plan})}/>)}
                     </View>
 
                 </View>
-                    <AppButton buttonLoading={livraisonLoading}  disable={true} style={styles.buttonStyle} textStyle={{fontSize: 20}} title='continuer'
+              {Object.keys(selectedPlan).length>0 &&  <AppButton buttonLoading={livraisonLoading} style={styles.buttonStyle} textStyle={{fontSize: 20}} title='continuer'
                                onPress={() => {
-                                   if(currentOrder.type === 'e-location' || currentOrder.type === 'e-service') {
+                                   if(currentOrder.type === 'location' || currentOrder.type === 'service') {
                                        navigation.navigate(routes.ORDER)
                                    } else {
                                        navigation.navigate(routes.ORDER_LIVRAISON)
                                    }
-                               }}/>
+                               }}/>}
+                </View>
             </ScrollView>
         </View>
-        </View>
-       </>
     );
 }
 

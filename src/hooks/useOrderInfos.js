@@ -2,8 +2,7 @@ import {useSelector, useStore} from "react-redux";
 
 let useOrderInfos;
 export default useOrderInfos = () => {
-    const store = useStore()
-    const listOrder = useSelector(state => state.entities.order.list)
+    const listOrder = useSelector(state => state.entities.order.currentUserOrders)
     const listPayement = useSelector(state => state.entities.payement.list)
     const listRelais = useSelector(state => state.entities.pointRelais.list)
 

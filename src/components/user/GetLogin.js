@@ -1,6 +1,5 @@
 import React from 'react';
 import {useNavigation} from '@react-navigation/native'
-import {useSelector} from "react-redux";
 import {View} from "react-native";
 import AppText from "../AppText";
 import AppButton from "../AppButton";

@@ -1,25 +1,26 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React from 'react';
 import {useSelector, useDispatch, useStore} from 'react-redux'
-import {View, Text, StyleSheet, Alert,Modal, FlatList, ScrollView} from 'react-native'
+import {View, Text, StyleSheet, Alert, ScrollView} from 'react-native'
 
 import Color  from '../utilities/colors'
 import FinalOrderItem from "../components/order/FinalOrderItem";
-import {getInteretValue, getTaux, getTotalPartCaution} from '../store/selectors/orderSelector'
 import routes from "../navigation/routes";
-import {getFraisLivraison, getTotalFinal} from '../store/selectors/orderSelector';
 import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
-import authStorage from '../store/persistStorage'
-import {makeOrder, getOrderReset} from '../store/slices/orderSlice'
-import {getCartClear} from '../store/slices/shoppingCartSlice'
-import {getResetPayement} from '../store/slices/payementSlice'
-import {getAdresseReset} from '../store/slices/userAdresseSlice'
+import {makeOrder, getFinalOrderDetails, getOrderReset} from '../store/slices/orderSlice'
+import {getCurrentPlanDetail, getResetPayement} from '../store/slices/payementSlice'
+import {getAdresseReset, getOrderAdresseDetails} from '../store/slices/userAdresseSlice'
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {getSelectedLivraisonVille, getUserVilleReset} from "../store/slices/villeSlice";
+import OrderItemDetails from "../components/order/OrderItemDetails";
+import AppLabelWithValue from "../components/AppLabelWithValue";
+import {getCartClear} from "../store/slices/shoppingCartSlice";
+import {getUserVilleReset} from "../store/slices/villeSlice";
+import usePlaceOrder from "../hooks/usePlaceOrder";
 
 function OrderScreen({navigation}) {
     const store = useStore()
     const dispatch = useDispatch();
+    const {getTotal,getShippingRate, getPayementRate, getTauxPercent} = usePlaceOrder()
 
     const selectedPayemet = useSelector(state => state.entities.payement.selectedPayement)
     const currentPlan = useSelector(state => state.entities.payement.currentPlan);
@@ -30,16 +31,15 @@ function OrderScreen({navigation}) {
     const loading = useSelector(state => state.entities.order.loading)
 
     const saveOrder = async () => {
-        const user = await authStorage.getUser();
         let adresseId;
         if(selectedAdesse) {
             adresseId = selectedAdesse.id
         }
-        let livraisonDate = null
+        let livraisonDate;
         let dateNow = new Date()
         const dateOfNow = dateNow.getDate()
         dateNow.setDate(dateOfNow+3)
-        if(currentOrder.type === 'e-service') {
+        if(currentOrder.type === 'service') {
             livraisonDate = serviceDate
         } else {
             livraisonDate = dateNow.getTime()
@@ -50,9 +50,9 @@ function OrderScreen({navigation}) {
             planId: currentPlan.id,
             items: currentOrder.items,
             itemsLength: currentOrder.itemsLenght,
-            interet: getInteretValue(store.getState()),
-            fraisTransport: getFraisLivraison(store.getState()),
-            montant: getTotalFinal(store.getState()),
+            interet: getPayementRate(),
+            fraisTransport: getShippingRate(),
+            montant: getTotal(),
             dateLivraisonDepart:livraisonDate,
             typeCmde: currentOrder.type
         }
@@ -64,21 +64,14 @@ function OrderScreen({navigation}) {
             ], {cancelable: false})
 
         } else {
-            dispatch(getCartClear())
-            dispatch(getOrderReset())
-            dispatch(getResetPayement())
-            dispatch(getAdresseReset())
-            dispatch(getUserVilleReset())
+                dispatch(getCartClear())
+                dispatch(getOrderReset())
+                dispatch(getAdresseReset())
+                dispatch(getResetPayement())
+                dispatch(getUserVilleReset())
             navigation.navigate(routes.ORDER_SUCCESS)
         }
     }
-
-
-    useEffect(() => {
-    }, [])
-
-
-
 
     if (!currentOrder) {
         return (
@@ -95,26 +88,64 @@ function OrderScreen({navigation}) {
                     <AppText style={{color: Color.blanc}}>Verifiez les details de votre commande puis finaliser</AppText>
                 </View>
             <ScrollView>
-               {currentOrder.type === 'e-location' && <FinalOrderItem  header="Location" label1='Quantité reservée: ' label1Value={currentOrder.itemsLenght}
-                label2='Montant: ' label2Value={currentOrder.amount}
-               label4='Part total caution: ' label4Value={getTotalPartCaution(store.getState()).totalPartCaution}/>}
+               {currentOrder.type === 'location' &&
+               <FinalOrderItem  header="Location" label1={currentOrder.items[0].libelle}
+                                label2='Montant: ' label2Value={currentOrder.amount}
+                                label4='Part total caution: ' detailsInfo={currentOrder.showDetails}
+                                getOrderItemDetails={() => dispatch(getFinalOrderDetails())}>
+                   <OrderItemDetails quantite={currentOrder.items[0].quantite} montant={currentOrder.items[0].montant}
+                                     imageSource={{uri: currentOrder.items[0].image}} libelle={currentOrder.items[0].libelle}/>
+                                     <View>
+                                         <AppLabelWithValue label={`Coût ${currentOrder.items[0].frequence}`} labelValue={currentOrder.items[0].prix} secondLabel='fcfa'/>
+                                         <AppLabelWithValue label='Caution' labelValue={currentOrder.items[0].caution} secondLabel={currentOrder.items[0].frequence.toLowerCase() === 'mensuelle'?'Mois':'Jour(s)'}/>
+                                     </View>
+               </FinalOrderItem>}
 
-                {currentOrder.type === 'e-service' && <FinalOrderItem header="Service" label1={currentOrder.items[0].libelle}
-                label2='Montant: ' label2Value={currentOrder.amount}/>}
+                {currentOrder.type === 'service' &&
+                <FinalOrderItem header="Service" label1={currentOrder.items[0].libelle}
+                                label2='Montant: ' label2Value={currentOrder.amount} detailsInfo={currentOrder.showDetails}
+                                getOrderItemDetails={() => dispatch(getFinalOrderDetails())}>
 
-               {currentOrder.type === 'e-commerce' && <FinalOrderItem header='Commande' label1= "Nombre d'articles: " label1Value={currentOrder.itemsLenght}
-                label2='Montant: ' label2Value={currentOrder.amount}/>}
+                    <View>
+                        <OrderItemDetails imageSource={{uri: currentOrder.items[0].image}} quantite={currentOrder.items[0].quantite}
+                                          montant={currentOrder.items[0].montant} libelle={currentOrder.items[0].libelle}/>
+                    </View>
+                </FinalOrderItem>}
+
+               {currentOrder.type === 'article' &&
+                         <FinalOrderItem header='Commande' label1= "Nombre d'articles: " label1Value={currentOrder.itemsLenght}
+                                          label2='Montant: ' label2Value={currentOrder.amount}
+                                         detailsInfo={currentOrder.showDetails} getOrderItemDetails={() => dispatch(getFinalOrderDetails())
+                                         }>
+                             <View>
+                                {currentOrder.items.map(item => <OrderItemDetails key={item.id.toString()} libelle={item.libelle} imageSource={{uri: item.image}}
+                                                                                  quantite={item.quantite} montant={item.montant}/>)}
+                             </View>
+
+                        </FinalOrderItem>}
 
                 <FinalOrderItem  header='Payement' label1='Mode: ' label1Value={selectedPayemet.mode}
-                label2={`Taux d'interet (${getTaux(store.getState())}%): `} label2Value={getInteretValue(store.getState())} label3='Plan: '
-                                label3Value={currentPlan.libelle} changeLabel3={() => navigation.navigate(routes.ORDER_PAYEMENT)} label4='Description:' label4Value={currentPlan.descripPlan}/>
+                label2={`Taux d'interet (${getTauxPercent()}%): `} label2Value={getPayementRate()} label3='Plan: '
+                                label3Value={currentPlan.libelle} changeLabel3={() => navigation.navigate(routes.ORDER_PAYEMENT)} label4='Description:' label4Value={currentPlan.descripPlan}
+                                 detailsInfo={currentPlan.CurrentPlanDetail} isPayement={true} getOrderItemDetails={() => dispatch(getCurrentPlanDetail())}>
+                    <View>
+                        <AppText>{currentPlan.descripPlan}</AppText>
+                    </View>
+                </FinalOrderItem>
 
-             { currentOrder.type === 'e-commerce' && <FinalOrderItem header='Livraison' label1='Agence de retrait: ' label1Value={selectedAdesseRelais.nom}
-                            label2='Coût: ' label2Value={getFraisLivraison(store.getState())}
-                            label3='Votre contact: ' label3Value={selectedAdesse.nom} changeLabel3={() => navigation.navigate(routes.ORDER_LIVRAISON)} label4='Telephone: ' label4Value={selectedAdesse.tel}/>}
+             { currentOrder.type === 'article' && <FinalOrderItem header='Livraison' label1='Agence de retrait: ' label1Value={selectedAdesseRelais.nom}
+                            label2='Coût: ' label2Value={getShippingRate()}
+                            label3='Votre contact: ' label3Value={selectedAdesse.nom} changeLabel3={() => navigation.navigate(routes.ORDER_LIVRAISON)} label4="Plus d'infos: "
+                             label4Value={selectedAdesse.tel} detailsInfo={selectedAdesse.showDetails} getOrderItemDetails={() => dispatch(getOrderAdresseDetails())}>
+                 <View>
+                     <AppLabelWithValue label='Tel: ' labelValue={selectedAdesse.tel}/>
+                     <AppLabelWithValue label='E-mail: ' labelValue={selectedAdesse.email}/>
+                     <AppLabelWithValue label='Autres adresses: ' labelValue={selectedAdesse.adresse}/>
+                 </View>
+             </FinalOrderItem>}
                 <View style={styles.totalFinal}>
-                    <AppText style={{fontSize: 24, fontWeight: 'bold'}}>Montant total TTC: </AppText>
-                    <AppText style={{color: Color.rougeBordeau, fontSize: 15, fontWeight: 'bold'}}>{getTotalFinal(store.getState())} FCFA</AppText>
+                    <AppText style={{fontSize: 20, fontWeight: 'bold'}}>Montant total TTC: </AppText>
+                    <AppText style={{color: Color.rougeBordeau, fontSize: 20, fontWeight: 'bold'}}>{getTotal()} FCFA</AppText>
                 </View>
                  <AppButton onPress={saveOrder} textStyle={{fontWeight: 'bold', fontSize: 15}} style={styles.finalButton}
                             title='Finaliser votre demande'/>

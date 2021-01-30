@@ -3,12 +3,13 @@ import {createMaterialTopTabNavigator} from "@react-navigation/material-top-tabs
 import UserFactureScreen from "../screens/UserFactureScreen";
 import UserFactureOkScreen from "../screens/UserFactureOkScreen";
 import UserFactureEncoursScreen from "../screens/UserFactureEncoursScreen";
+import {Dimensions} from "react-native";
 
 const UserFactTopNavigator = createMaterialTopTabNavigator()
 
 function UserFactureNavigator(props) {
     return (
-        <UserFactTopNavigator.Navigator>
+        <UserFactTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}}>
             <UserFactTopNavigator.Screen name='UserFactureScreen' component={UserFactureScreen} options={{
                 title: 'Tous'
             }}/>
@@ -16,7 +17,7 @@ function UserFactureNavigator(props) {
                 title: 'En cours'
             }}/>
             <UserFactTopNavigator.Screen name='UserFactureOkScreen' component={UserFactureOkScreen} options={{
-                title: 'Déjà soldées'
+                title: 'soldées'
             }}/>
         </UserFactTopNavigator.Navigator>
     );

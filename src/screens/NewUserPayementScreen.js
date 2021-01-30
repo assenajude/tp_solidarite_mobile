@@ -34,12 +34,6 @@ function NewUserPayementScreen({pickerValue, changePickerValue, ...props}) {
 
 
     const handleSubmit = (payement) => {
-   /*      const payementObject = {
-            planId: selectedPlan,
-             mode: payement.mode,
-             montant: payement.montant
-        };
-        console.log(payementObject);*/
         console.log(payement);
 
     }

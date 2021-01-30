@@ -9,19 +9,19 @@ const orderSlice = createSlice({
     initialState: {
         list: [],
         currentUserOrders: [],
+        listServices: [],
+        listLocations: [],
+        listArticles: [],
         currentOrder: {},
-        demandeCompter: 0,
-        contratCompter: 0,
-        historiqueCompter: 0,
         loading:false,
         orderSuccess: false,
         error: null,
         newAdded: {},
-        userAllData: [],
         servicePayementDate: Date.now(),
+        totalCompter: 0,
         articleRefreshCompter: 0,
         locationRefreshCompter: 0,
-        serviceRefreshCompter: 0
+        serviceRefreshCompter: 0,
 
     },
     reducers: {
@@ -33,33 +33,28 @@ const orderSlice = createSlice({
             state.loading = false
             state.error  = action.payload
         },
-        orderReceived: (state, action) => {
+        allOrderReceived: (state, action) => {
+            state.loading = false
+            state.error = null
+            const data = action.payload
+            state.list = data
+
+        },
+        userOrdersReceived: (state, action) => {
             state.loading = false
             state.error = null
             const orderList = action.payload
-            state.list= orderList
+            state.currentUserOrders = orderList
+            const locationList = orderList.filter(item => item.typeCmde === 'location')
+            const articleList = orderList.filter(item => item.typeCmde === 'article')
+            const serviceList = orderList.filter(item => item.typeCmde === 'service')
+            state.listLocations = locationList
+            state.listArticles = articleList
+            state.listServices = serviceList
+            state.totalCompter = 0
             state.articleRefreshCompter = 0
             state.locationRefreshCompter = 0
             state.serviceRefreshCompter = 0
-        },
-        currentOrders: (state, action) => {
-         state.currentUserOrders = state.list.filter(item => item.typeCmde == action.payload)
-            let compterDemande = 0
-            let compterHistorique = 0
-            let compterContrat = 0
-            state.currentUserOrders.forEach(order => {
-                if (order.historique) {
-                    compterHistorique+=1
-                } else if(order.Contrats.length>=1) {
-                    compterContrat+=1
-                } else {
-                    compterDemande+=1
-                }
-            })
-            state.demandeCompter = compterDemande
-            state.historiqueCompter = compterHistorique
-            state.contratCompter = compterContrat
-
         },
         orderAdded: (state, action) => {
            const justAdded = action.payload
@@ -68,65 +63,84 @@ const orderSlice = createSlice({
             state.error = null
             state.newAdded = justAdded
             state.list.push(justAdded)
-            if(justAdded.typeCmde === 'e-commerce') {
+            if(justAdded.typeCmde === 'article') {
                 state.articleRefreshCompter += 1
-            } else if(justAdded.typeCmde === 'e-location') {
+                state.listArticles.push(justAdded)
+            } else if(justAdded.typeCmde === 'location') {
                 state.locationRefreshCompter += 1
+                state.listLocations.push(justAdded)
             } else {
                 state.serviceRefreshCompter += 1
+                state.listServices.push(justAdded)
             }
+            state.totalCompter++
         },
         resetOrder: (state) => {
             state.currentOrder = {}
             state.servicePayementDate = Date.now()
         },
         showItemDetail: (state, action) => {
-            const selectedItem = state.currentUserOrders.find(item => item.id === action.payload)
-            if(selectedItem.showDetails) {
-                selectedItem.showDetails = false
+            let selectedItem;
+            const currentItem = action.payload
+            if(currentItem.typeCmde === 'article') {
+                selectedItem = state.listArticles.find(item => item.id === currentItem.id)
+            } else if(currentItem.typeCmde === 'location') {
+                selectedItem = state.listLocations.find(item => item.id === currentItem.id)
             } else {
-                selectedItem.showDetails = true
+                selectedItem = state.listServices.find(item => item.id === currentItem.id)
             }
-            const otherOrders = state.currentUserOrders.filter(item => item.id !== selectedItem.id)
-            otherOrders.forEach(item => item.showDetails = false)
+            selectedItem.showDetails = !selectedItem.showDetails
         },
         editStatusSuccess: (state, action) => {
             state.loading = false
-            let compterDemande = 0
-            let compterHistorique = 0
-            let compterContrat = 0
-            const orderIndex = state.currentUserOrders.findIndex(item => item.id === action.payload.id)
-            state.currentUserOrders.splice(orderIndex, 1,action.payload)
-            state.currentUserOrders.forEach(item => {
-                if (item.historique) {
-                    compterHistorique +=1
-                } else if(item.Contrats[0] && !item.historique) {
-                    compterContrat +=1
-                } else {
-                    compterDemande +=1
-                }
-            })
-            state.demandeCompter = compterDemande
-            state.ContratCompter = compterContrat
-            state.historiqueCompter = compterHistorique
+            const newItem = action.payload
+            let oldItem;
+            if(newItem.typeCmde === 'location') {
+                oldItem = state.listLocations.find(item => item.id === newItem.id)
+            } else if(newItem.typeCmde === 'service') {
+                oldItem = state.listServices.find(item => item.id === newItem.id)
+            } else {
+                oldItem = state.listArticles.find(item => item.id === newItem.id)
+            }
+                oldItem.statusLivraison = newItem.statusLivraison
+                oldItem.statusAccord = newItem.statusAccord
+                oldItem.historique = newItem.historique
+                oldItem.Contrats = newItem.Contrats
+                oldItem.Facture = newItem.Facture
+                oldItem.dateLivraisonFinal = newItem.dateLivraisonFinal
+                oldItem.isExpired = newItem.isExpired
         },
-        deleteSuccess: (state)=> {
+        deleteSuccess: (state, action)=> {
           state.loading = false
           state.error = null
-        },
-        deleteItem: (state, action) => {
-            state.loading = false
-            const deletedOrderIndex = state.currentUserOrders.findIndex(item => item.id === action.payload)
-           state.currentUserOrders.splice(deletedOrderIndex,1)
-        },
-        updateContrat: (state, action) => {
-            state.error = null
-            state.loading = false
-            const orderIndex = state.list.findIndex(order => order.id === action.payload.id)
-            if(orderIndex >= 0) {
-                state.list.splice(orderIndex, 1, action.payload)
+            const deletedItem = action.payload
+            let deletedItemIndex
+            if(deletedItem.typeCmde === 'service') {
+                deletedItemIndex = state.listServices.findIndex(item => item.id === deletedItem.id)
+                state.listServices.splice(deletedItemIndex, 1)
+            } else if(deletedItem.typeCmde === 'location') {
+                deletedItemIndex = state.listLocations.findIndex(item => item.id === deletedItem.id)
+                state.listLocations.splice(deletedItemIndex, 1)
+            } else {
+                deletedItemIndex = state.listArticles.findIndex(item => item.id === deletedItem.id)
+                state.listArticles.splice(deletedItemIndex, 1)
             }
-        }
+        },
+        showFinalOrderDetails: (state, action) => {
+            state.currentOrder.showDetails = !state.currentOrder.showDetails
+        },
+     /*   stopTimer: (state, action) => {
+            let selectedOrder;
+            if(action.payload.typeCmde === 'article') {
+                selectedOrder = state.listArticles.find(article => article.id === action.payload.id)
+            } else if(action.payload.typeCmde === 'location') {
+                selectedOrder = state.listLocations.find(location => location.id === action.payload.id)
+            } else {
+                selectedOrder = state.listServices.find(service =>service.id === action.payload.id)
+            }
+            selectedOrder.stopTimer = true
+
+        }*/
     },
     extraReducers: {
         [addToOrder]: (state, action) => {
@@ -144,11 +158,20 @@ const orderSlice = createSlice({
 });
 
 export default orderSlice.reducer;
-const {orderAdded,resetOrder,deleteItem,
+const {orderAdded,resetOrder,
     editStatusSuccess,deleteSuccess,
-    orderReceived,showItemDetail, orderRequested, orderRequestFailed, updateContrat, currentOrders} = orderSlice.actions
+    userOrdersReceived,allOrderReceived,showItemDetail, orderRequested, orderRequestFailed,
+    showFinalOrderDetails, stopTimer} = orderSlice.actions
 
 const url = '/commandes'
+
+export const getAllOrders = () => apiRequest({
+    url,
+    method: 'get',
+    onStart: orderRequested.type,
+    onSuccess: allOrderReceived.type,
+    onError: orderRequestFailed.type
+})
 
 export const makeOrder = (order) => apiRequest({
     url,
@@ -164,13 +187,13 @@ export const getOrdersByUser = () => apiRequest({
     url: url+'/byUser',
     method: 'get',
     onStart: orderRequested.type,
-    onSuccess: orderReceived.type,
+    onSuccess: userOrdersReceived.type,
     onError: orderRequestFailed.type
 })
 
-export const getCurrentOrders = (libelle) => dispatch => {
+/*export const getCurrentOrders = (libelle) => dispatch => {
     dispatch(currentOrders(libelle))
-}
+}*/
 
 
 
@@ -215,16 +238,26 @@ export const getOrderDeleted = (data) => apiRequest({
 })
 
 
-export const getDeleteUpdate = (orderId) => dispatch => {
-    dispatch(deleteItem(orderId))
-}
-
 
 export const getOrderContratUpdate = (data) => apiRequest({
     url: url+'/contrats/update',
     data,
     method: 'patch',
     onStart: orderRequested.type,
-    onSuccess: updateContrat.type,
+    onSuccess: editStatusSuccess.type,
     onError: orderRequestFailed.type
+})
+
+export const getFinalOrderDetails = () => dispatch => {
+    dispatch(showFinalOrderDetails())
+}
+
+export const getTimerStop = (data) => apiRequest({
+    url:url+'/update',
+    data,
+    method: 'patch',
+    onStart: orderRequested.type,
+    onSuccess: editStatusSuccess.type,
+    onError: orderRequestFailed.type
+
 })

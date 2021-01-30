@@ -5,11 +5,11 @@ const locationSlice = createSlice({
     name: 'location',
     initialState: {
         list: [],
+        availableLocation: [],
         loading: true,
         addSuccess: false,
         error: null,
         newAdded: {},
-        availableLocation: [],
         userLocations: []
     },
     reducers: {
@@ -21,6 +21,7 @@ const locationSlice = createSlice({
             state.loading = false
             state.error = null
             state.list = action.payload
+            state.availableLocation = action.payload
         },
         locationRequestFailed: (state, action) => {
             state.loading = false
@@ -31,17 +32,28 @@ const locationSlice = createSlice({
             state.loading = false
             state.addSuccess = true
             state.list.push(action.payload)
+            state.availableLocation.unshift(action.payload)
             state.newAdded = action.payload
         },
-        userLocations: (state, action) => {
-        const userLocation = state.list.filter(location => location.userId === action.payload.id)
-            state.userLocations = userLocation
+        searchLocation: (state, action) => {
+            const searchTerme = action.payload.toLowerCase()
+            const currentList = state.list
+            if(searchTerme.length === 0) {
+                state.availableLocation = currentList
+            } else {
+                const filterList = currentList.filter(location => {
+                    const searchLabel = location.libelleLocation+' '+location.descripLocation
+                    const normalizedLabel = searchLabel.toLowerCase()
+                    if(normalizedLabel.search(searchTerme) !== -1) return true
+                })
+                state.availableLocation = filterList
+            }
         }
 
     }
 });
 
-const {locationAdded, locationReceived, locationRequested, locationRequestFailed} = locationSlice.actions
+const {locationAdded, locationReceived, locationRequested, locationRequestFailed, searchLocation} = locationSlice.actions
 export default locationSlice.reducer
 
 
@@ -63,3 +75,7 @@ export const addLocation = (location) => apiRequest({
     onSuccess: locationAdded.type,
     onError: locationRequestFailed.type
 })
+
+export const getLocationSearch = (value)=> dispatch => {
+    dispatch(searchLocation(value))
+}

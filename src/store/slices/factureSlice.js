@@ -5,11 +5,15 @@ import {apiRequest} from "../actionsCreators/apiActionCreator";
 const factureSlice = createSlice({
     name:'facture',
     initialState: {
+        list: [],
         userFactures: [],
+        encoursList: [],
+        soldeList: [],
         newAdded: {},
         loading: false,
         error: null,
-        orderFacture: {}
+        orderFacture: {},
+        newFactureCompter: 0
     },
     reducers: {
         factureRequested: (state, action) => {
@@ -20,6 +24,7 @@ const factureSlice = createSlice({
         factureAdded: (state, action) => {
             state.loading = false
             state.error = null
+            state.newFactureCompter ++
             state.newAdded = action.payload
             state.userFactures.push(action.payload)
         },
@@ -30,27 +35,26 @@ const factureSlice = createSlice({
         factureReceived: (state, action) => {
             state.loading = false
             state.error = null
+            state.newFactureCompter = 0
             const userFactures = action.payload
             state.userFactures = userFactures
-            let factureRatio = 0
-            state.userFactures.forEach(facture => {
-                factureRatio = facture.solde/facture.montant
-                factureRatio.toFixed(2)
-                facture.ratio = Number(factureRatio)
-            })
+            state.encoursList = userFactures.filter(item => item.montant !== item.solde)
+            state.soldeList = userFactures.filter(item => item.montant === item.solde)
+
+
         },
         userFactures: (state, action) => {
             state.userFactures = action.payload
         },
         showItemTranche: (state, action) => {
             let selectedItem = state.userFactures.find(item => item.id === action.payload)
-            selectedItem.ok = true
-            if(selectedItem.showTranche){
-                selectedItem.showTranche = false
+            selectedItem.showTranche = !selectedItem.showTranche
+            if(selectedItem.montant === selectedItem.solde) {
+                let soldeItem = state.soldeList.find(item => item.id === selectedItem.id)
+                soldeItem.showTranche = !soldeItem.showTranche
             } else {
-                selectedItem.showTranche = true
-                const otherItem = state.userFactures.filter(item => item.id !== action.payload)
-                otherItem.forEach(item => item.showTranche = false)
+                let encoursItem = state.encoursList.find(item => item.id === selectedItem.id)
+                encoursItem.showTranche = !encoursItem.showTranche
             }
         },
         factureUpdated: (state, action) => {
@@ -58,6 +62,14 @@ const factureSlice = createSlice({
             state.loading = false
             const updatedIndex = state.userFactures.findIndex(item => item.id === action.payload.id)
             state.userFactures.splice(updatedIndex, 1, action.payload)
+            if(action.payload.montant === action.payload.solde) {
+                let soldeIndex = state.encoursList.findIndex(item => item.id === action.payload.id)
+                state.encoursList.splice(soldeIndex, 1)
+                state.soldeList.push(action.payload)
+            } else {
+                let encoursIndex = state.encoursList.findIndex(item => item.id === action.payload.id)
+                state.encoursList.splice(encoursIndex, 1, action.payload)
+            }
         }
     }
 })

@@ -1,14 +1,14 @@
 import React from 'react';
+import {Dimensions} from 'react-native'
 import {createMaterialTopTabNavigator} from "@react-navigation/material-top-tabs";
 import UserServiceScreen from "../screens/UserServiceScreen";
-import UserAccordServiceScreen from "../screens/UserAccordServiceScreen";
 import UserServiceContratScreen from "../screens/UserServiceContratScreen";
 import UserServiceHistoryScreen from "../screens/UserServiceHistoryScreen";
 
 const ServiceTopNavigator = createMaterialTopTabNavigator()
 function UserServiceNavigator(props) {
     return (
-        <ServiceTopNavigator.Navigator >
+        <ServiceTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}} initialRouteName='UserServiceScreen'>
             <ServiceTopNavigator.Screen name='UserServiceContratScreen' component={UserServiceContratScreen} options={{
                 title: 'Contrats'
             }}/>

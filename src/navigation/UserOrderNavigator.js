@@ -1,4 +1,5 @@
 import React from 'react';
+import {Dimensions} from 'react-native'
 import {createMaterialTopTabNavigator} from "@react-navigation/material-top-tabs";
 import UserOrderScreen from "../screens/UserOrderScreen";
 import UserOrderContratScreen from "../screens/UserOrderContratScreen";
@@ -9,7 +10,7 @@ const UserCmdeTopNavigator = createMaterialTopTabNavigator()
 
 function UserOrderNavigator(props) {
     return (
-        <UserCmdeTopNavigator.Navigator>
+        <UserCmdeTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}} initialRouteName='UserOrderScreen'>
             <UserCmdeTopNavigator.Screen name='UserOrderContratScreen' component={UserOrderContratScreen} options={{
                 title: 'Contrats'
             }}/>

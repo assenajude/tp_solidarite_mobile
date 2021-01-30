@@ -5,6 +5,7 @@ const mainSlice = createSlice({
     name: 'main',
     initialState: {
         list: [],
+        searchList: [],
         loading: false,
         error: null,
         refresh: false,
@@ -28,9 +29,7 @@ const mainSlice = createSlice({
             state.error = null
             state.homeCounter = 0
             state.list = action.payload
-        },
-        addNewItem:(state, action) => {
-            state.list.push(action.payload)
+            state.searchList = action.payload
         },
         startRefresh: (state, action) => {
             state.refresh = true
@@ -42,6 +41,16 @@ const mainSlice = createSlice({
             state.error = null
             state.loading = false
             state.newOption = action.payload
+        },
+        deleteItemSuccess: (state, action) => {
+            state.loading = false
+            state.error = null
+            const selectedItem = action.payload
+            const newList = state.list.filter(item => item.id !== selectedItem.id)
+            const newSearchList = state.searchList.filter(item => item.id !== selectedItem.id)
+            state.list = newList
+            state.searchList = newSearchList
+
         },
         selectedOptions: (state, action) => {
             const selectedItemOptions = action.payload.ProductOptions
@@ -60,17 +69,34 @@ const mainSlice = createSlice({
             const selectedItem = action.payload.item
             const itemOptions = selectedItem.ProductOptions
             const selectedOption = itemOptions.find(opt => opt.couleur === action.payload.couleur && opt.taille === action.payload.taille)
-            if(selectedItem.Categorie.typeCateg === 'e-location') {
+            if(selectedItem.Categorie.typeCateg === 'location') {
                state.selectedOption = selectedOption.LocationOption
            } else {
             state.selectedOption = selectedOption.ArticleOption
            }
+        },
+        searchProduct: (state,action) => {
+            const searchTerme = action.payload
+            const currentList = state.list
+            if(searchTerme.length === 0) {
+                state.searchList = currentList
+            } else {
+            const filteredList = currentList.filter(product =>  {
+                const designation = product.Categorie.typeCateg === 'article'?product.designArticle:product.libelleLocation
+                const description = product.Categorie.typeCateg === 'article'?product.descripArticle:product.descripLocation
+                const designAndDescrip = designation +' ' + description
+                const expression = searchTerme.toLowerCase()
+                const searchResult = designAndDescrip.toLowerCase().search(expression)
+                if(searchResult !== -1) return true
+            })
+            state.searchList = filteredList
+            }
         }
     }
 })
 
-const {mainReceived, mainRequested, mainRequestFailed, addNewItem, startRefresh, incrementHomeCounter,
-    colorSize, selectedOptions, optionAdded, selectOption} = mainSlice.actions
+const {mainReceived, mainRequested, mainRequestFailed, startRefresh, incrementHomeCounter,
+    colorSize, selectedOptions, optionAdded, selectOption, searchProduct, deleteItemSuccess} = mainSlice.actions
 export default mainSlice.reducer
 
 const url = '/mainDatas'
@@ -97,11 +123,6 @@ export const getHomeCounterIncrement = () => dispatch => {
 }
 
 
-export const addItemToMainList = (item) => dispatch => {
-    dispatch(addNewItem(item))
-}
-
-
 export const addOption = (data) => apiRequest({
     url: '/options',
     data,
@@ -122,3 +143,16 @@ export const getColorSizes = (data) => dispatch => {
 export const getSelectOption = (data) => dispatch => {
     dispatch(selectOption(data))
 }
+
+export const getSearchProduct = (terme) => dispatch => {
+    dispatch(searchProduct(terme))
+}
+
+export const getItemDeleted = (item) => apiRequest({
+    url:url+'/delete',
+    method: 'delete',
+    data: item,
+    onStart: mainRequested.type,
+    onSuccess: deleteItemSuccess.type,
+    onError: mainRequestFailed.type
+})

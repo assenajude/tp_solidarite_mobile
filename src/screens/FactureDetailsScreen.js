@@ -10,11 +10,13 @@ import AppDetailCarousel from "../components/AppDetailCarousel";
 import useManageUserOrder from "../hooks/useManageUserOrder";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import TrancheItem from "../components/TrancheItem";
+import {useSelector} from "react-redux";
 
 function FactureDetailsScreen({route}) {
-    const facture = route.params
     const {getItems, getModePayement} = useOrderInfos()
     const {payFactureTranche} = useManageUserOrder()
+    const listFacture = useSelector(state => state.entities.facture.userFactures)
+    const facture = listFacture.find(item => item.id === route.params.id)
 
     const [factureItems, setFactureItems] = useState(getItems(facture.CommandeId))
 
@@ -30,8 +32,10 @@ function FactureDetailsScreen({route}) {
             }}>
             <View>
                 <AppModePayement modePayement={getModePayement(facture.CommandeId)}/>
-                <AppLottieViewAnim lottieAutoPlay={facture.montant === facture.solde} lottieStyle={{height: 50, width: 50}}
-                                   lottieSource={require('../assets/animations/done')} lottieLoop={false}/>
+              {facture.montant === facture.solde &&  <AppLottieViewAnim lottieAutoPlay={true} lottieStyle={{height: 50, width: 50}}
+                                   lottieSource={require('../assets/animations/done')} lottieLoop={false}/>}
+                {facture.montant !== facture.solde && <AppLottieViewAnim lottieAutoPlay={true} lottieStyle={{height: 50, width: 50}}
+                                   lottieSource={require('../assets/animations/money')} lottieLoop={true}/>}
                 <AppDetailCarousel detailLabel='Facture n°: ' labelValue={facture.numero} carouselItems={factureItems}
                                    typeFacture={facture.typeFacture === 'e-commerce'?'Commande':facture.typeFacture === 'e-location'?'Location':'Service'}/>
             </View>

@@ -10,10 +10,9 @@ function AppFormField({name, title, ...props}) {
 
     return (
         <>
-            <AppInput title={title} value={values[name]} {...props}
+            <AppInput title={title} value={values[name]}
                 onBlur={() => setFieldTouched(name) }
-                onChangeText={handleChange(name)}
-
+                onChangeText={handleChange(name)} {...props}
             />
             <AppErrorMessage error={errors[name]} visible={touched[name]}/>
         </>

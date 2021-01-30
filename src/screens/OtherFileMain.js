@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, Text, ScrollView} from 'react-native'
+import React, {useCallback, useEffect} from 'react';
+import {StyleSheet,ScrollView} from 'react-native'
 import AppButton from "../components/AppButton";
 import routes from '../navigation/routes'
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {loadCategories} from "../store/slices/categorieSlice";
-import {getAllShippingAdress} from '../store/slices/shippingAdresseSlice';
 import {loadRelais} from '../store/slices/pointRelaisSlice'
 import {getRegions} from '../store/slices/regionSlice';
 import {getAllVilles} from '../store/slices/villeSlice'
@@ -24,10 +23,6 @@ function OtherFileMain({navigation}) {
         await dispatch(getAllVilles())
     }, [])
 
-    const getShippingAdresse = useCallback(async () => {
-        await dispatch(getAllShippingAdress())
-    }, [])
-
     const getPointRelais = useCallback(async () => {
         await dispatch(loadRelais())
     }, [])
@@ -42,7 +37,6 @@ const getUserAdresses = useCallback(async () => {
 
     useEffect(() => {
             getCategories();
-        getShippingAdresse();
         getPointRelais()
         getAllRegions()
         getVilles()
@@ -53,12 +47,11 @@ const getUserAdresses = useCallback(async () => {
         <ScrollView>
            <AppButton title='Categorie' style={styles.buttonStyle} onPress={() =>navigation.navigate(routes.CATEGORIE)}/>
            <AppButton title='Payement' style={styles.buttonStyle} onPress={() =>navigation.navigate(routes.PAYEMENT)}/>
-           <AppButton title='Plan' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.PLAN)}/>
+           <AppButton title='Plan' style={styles.buttonStyle} onPress={() => navigation.navigate('AccueilNavigator',{screen: routes.PLAN})}/>
            <AppButton title='Region' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.REGION)}/>
            <AppButton title='Ville' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.VILLE)}/>
             <AppButton title='Point relais' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.POINT_RELAIS)}/>
             <AppButton title='Adresse utilisateur' style={styles.buttonStyle} onPress={() => navigation.navigate(routes.USER_ADDRESS)}/>
-            <AppButton title='Couleur et Taille' style={styles.buttonStyle} onPress={() => navigation.navigate('ColorAndSizeScreen')}/>
 
         </ScrollView>
 

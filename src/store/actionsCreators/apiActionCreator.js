@@ -1,4 +1,4 @@
-import {createAction, createAsyncThunk} from '@reduxjs/toolkit';
+import {createAction} from '@reduxjs/toolkit';
 
 
 export const apiRequest = createAction('api/request')

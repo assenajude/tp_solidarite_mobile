@@ -6,7 +6,8 @@ const relaisSlice = createSlice({
     initialState: {
         list: [],
         loading: false,
-        selectedRelais: {}
+        selectedRelais: {},
+        error: null
     },
     reducers: {
         relaisRequested: (state, action) => {
@@ -18,6 +19,7 @@ const relaisSlice = createSlice({
         },
         relaisRequestFailded: (state, action) => {
             state.loading = false
+            state.error = action.payload
         },
         relaisAdded: (state, action) => {
             state.loading = false
@@ -60,6 +62,3 @@ export const addRelais = (relais) => dispatch => {
 
 }
 
-export const getSelectedRelais = (nom) => dispatch => {
-    dispatch(selectedRelais(nom))
-}

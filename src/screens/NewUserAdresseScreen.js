@@ -1,8 +1,7 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {View, ScrollView, StyleSheet,Text,  FlatList, TouchableOpacity, TouchableHighlight, Alert} from 'react-native'
+import React, {useState, useEffect} from 'react';
+import {useDispatch, useSelector, useStore} from "react-redux";
+import {View, ScrollView, StyleSheet,TouchableHighlight, Alert} from 'react-native'
 import * as Yup from 'yup'
-import decode from 'jwt-decode'
 
 
 import AppText from "../components/AppText";
@@ -12,10 +11,14 @@ import AppInput from "../components/AppInput";
 import color from '../utilities/colors'
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import {selectedVilleRelais} from "../store/slices/villeSlice";
-import {getSelectedRelais} from "../store/slices/pointRelaisSlice";
-import {getAdresse, saveAdresse} from '../store/slices/userAdresseSlice';
-import authStorage from '../store/persistStorage'
-import routes from "../navigation/routes";
+import {
+    getCurrentAdresseReset,
+    getCurrentAdresseSelected,
+    getUpdateAdresse,
+    saveAdresse
+} from '../store/slices/userAdresseSlice';
+import AppErrorMessage from "../components/forms/AppErrorMessage";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 
 const adressValidSchema = Yup.object().shape({
@@ -25,28 +28,26 @@ const adressValidSchema = Yup.object().shape({
     adresse: Yup.string()
 })
 
-function NewUserAdresseScreen({navigation}) {
+function NewUserAdresseScreen({navigation, route}) {
     const dispatch = useDispatch()
-
+    const store = useStore()
+    const [mode, setMode] = useState(route.params.mode)
+    const currentAdresse = useSelector(state => state.entities.userAdresse.currentAdresse)
+    const listRelais = useSelector(state => state.entities.pointRelais.list)
+    const [editRelais, setEditRelais] = useState(Object.keys(currentAdresse).length>0?listRelais.find(item => item.id === currentAdresse.PointRelaiId):{})
+    const user = useSelector(state => state.auth.user)
     const villes = useSelector(state => state.entities.ville.list)
     const pointRelais = useSelector(state => state.entities.ville.villeRelais);
     const [showVille, setShowVille] = useState(false)
-    const [selectedVille, setSelectedVille] = useState('');
-    const [selectedRelais, setSelectedRelais] = useState('');
+    const [selectedVille, setSelectedVille] = useState(Object.keys(editRelais).length>0?editRelais.Ville.nom:'');
+    const [selectedRelais, setSelectedRelais] = useState(Object.keys(editRelais).length>0?editRelais.nom:'');
     const [showRelais, setShowRelais] = useState(false);
     const [newRelais, setNewRelais] = useState({})
+    const error = useSelector(state => state.entities.userAdresse.error)
+    const isLoading = useSelector(state => state.entities.userAdresse.loading)
+    const [errorMessage, setErrorMessage] = useState('')
 
 
-    const getUser = async () => {
-        const user = await authStorage.getUser();
-        if (!user) {
-            Alert.alert('Info', 'veillez vous connecter pour ajouter vos addresses', [
-                {text: 'annuler', onPress: () => navigation.goBack()},
-                {text: 'ok', onPress: () => navigation.navigate(routes.LOGIN)}
-            ], {cancelable: false})
-        }
-        return user;
-    }
 
     const [tabVilles, setTabVilles] = useState(() => {
         const newTabVille = []
@@ -61,7 +62,7 @@ function NewUserAdresseScreen({navigation}) {
     const filteredRelais = (val) => pointRelais.filter((relais) => relais.nom.includes(val))
 
     const handleSaveAdress = async (userAdresse) => {
-        const user = await authStorage.getUser()
+        if(mode === "addNew") {
         const adressData = {
             idUser: user.id,
             relaisId: newRelais.id,
@@ -70,16 +71,33 @@ function NewUserAdresseScreen({navigation}) {
             email: userAdresse.email,
             adresse: userAdresse.adresse
         }
-        dispatch(saveAdresse(adressData))
+        await dispatch(saveAdresse(adressData))
+        } else {
+            const currentRelais = listRelais.find(item => item.nom === selectedRelais)
+            const data = {...userAdresse, id:currentAdresse.id, relaisId: currentRelais.id}
+            await dispatch(getUpdateAdresse(data))
+        }
+        const error = store.getState().entities.userAdresse.error
+        if(error !== null) {
+            if(mode === 'addNew') {
+                setErrorMessage("Impossible d'ajouter l'adresse, veuillez reessayer plutard")
+            } else setErrorMessage('Impossible de modifier votre adresse, Veuillez reessayer plutard')
+            return;
+        }
+        navigation.goBack()
     }
 
     useEffect(() => {
-        getUser()
         filteredVilles(selectedVille);
         filteredRelais(selectedRelais)
-    }, [setSelectedVille, setSelectedRelais, pointRelais, setNewRelais])
+        return () => {
+            dispatch(getCurrentAdresseReset())
+        }
+    }, [])
 
     return (
+        <>
+            <AppActivityIndicator visible={isLoading}/>
         <ScrollView>
         <View>
             <View>
@@ -97,6 +115,10 @@ function NewUserAdresseScreen({navigation}) {
                 </View>
                    {showVille && <View>
                        <ScrollView style={styles.villeList}>
+                           <View style={{
+                               height: 100,
+                               width: 200
+                           }}>
                        {filteredVilles(selectedVille).map((ville, index) =>
                            <TouchableHighlight underlayColor={color.or} key={index} onPress={() => {
                            setSelectedVille(ville)
@@ -110,6 +132,7 @@ function NewUserAdresseScreen({navigation}) {
                            </View>
                            </TouchableHighlight>
                        )}
+                           </View>
                        </ScrollView>
                     </View>}
                 </View>
@@ -126,32 +149,36 @@ function NewUserAdresseScreen({navigation}) {
                     </View>
                     <View>
                   { showRelais && <ScrollView style={styles.relaisList}>
-
+                                <View style={{
+                                    height: 100,
+                                    width: 200
+                                }}>
                           {filteredRelais(selectedRelais).map((item, index) =>
                               <TouchableHighlight key={index} underlayColor={color.or} onPress={() => {
                                   setSelectedRelais(item.nom);
                                   setShowRelais(false);
                                   setNewRelais(item)
-                                  console.log(newRelais);
                               }}>
                               <AppText >{item.nom}</AppText>
                               </TouchableHighlight>
                           )}
+                                </View>
                   </ScrollView>}
                     </View>
                 </View>
             </View>
             <View style={styles.infoPerso}>
                 <AppText style={{backgroundColor: color.rougeBordeau, color: color.blanc}}>Infos perso</AppText>
+                <AppErrorMessage error={errorMessage} visible={error}/>
                     <AppForm initialValues={{
-                        nom: '',
-                        tel: '',
-                        email: '',
-                        adresse: ''
+                        nom: currentAdresse.nom,
+                        tel: currentAdresse.tel,
+                        email: currentAdresse.email,
+                        adresse: currentAdresse.adresse
                     }} validationSchema={adressValidSchema} onSubmit={handleSaveAdress}>
                         <AppFormField title='Nom' name='nom'/>
                         <AppFormField title='Phone' name='tel'/>
-                        <AppFormField title='E-mail' name='email'/>
+                        <AppFormField title='E-mail' name='email' keyboardType='email-address'/>
                         <AppFormField title='Autres Adresse' name='adresse'/>
                         <AppSubmitButton title='Ajouter'/>
                     </AppForm>
@@ -160,6 +187,7 @@ function NewUserAdresseScreen({navigation}) {
 
         </View>
         </ScrollView>
+            </>
 
     );
 }

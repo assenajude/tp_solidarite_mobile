@@ -22,7 +22,7 @@ function NewCategorieScreen({navigation}) {
     const dispatch = useDispatch();
     const [addFailed, setAddFailed] = useState(false)
     const loading = useSelector(state => state.entities.categorie.loading)
-    const [selectedType, setSelectedType] = useState('e-commerce')
+    const [selectedType, setSelectedType] = useState('article')
 
     const AddNewCategorie = async (categorie) => {
         const categorieData = {
@@ -44,9 +44,9 @@ function NewCategorieScreen({navigation}) {
             }}>
                 <AppText style={{fontSize: 18, marginRight: 20}}>Type:</AppText>
                 <Picker mode='dropdown' style={{height: 50, width: 160}} selectedValue={selectedType} onValueChange={(value) => setSelectedType(value)}>
-                    <Picker.Item value='e-commerce' label='e-commerce'/>
-                    <Picker.Item value='e-location' label='e-location'/>
-                    <Picker.Item value='e-service' label='e-service'/>
+                    <Picker.Item value='article' label='e-commerce'/>
+                    <Picker.Item value='location' label='e-location'/>
+                    <Picker.Item value='service' label='e-service'/>
                 </Picker>
             </View>
             <AppForm initialValues={{

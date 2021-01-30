@@ -5,6 +5,7 @@ const articleSlice = createSlice({
     name: 'article',
     initialState: {
         availableArticles: [],
+        searchList: [],
         loading: false,
         error: null,
         creditArticles: [],
@@ -16,6 +17,7 @@ const articleSlice = createSlice({
         },
         articlesReceived: (state, action) => {
             state.availableArticles = action.payload
+            state.searchList = action.payload
             state.loading = false
             state.error = null
         },
@@ -26,6 +28,7 @@ const articleSlice = createSlice({
         },
         articleAdded: (state, action) => {
             state.availableArticles.push(action.payload)
+            state.searchList.unshift(action.payload)
             state.loading = false
             state.articleAddedSuccess = true
         },
@@ -37,13 +40,28 @@ const articleSlice = createSlice({
             const articleList = state.availableArticles.splice(editIndex, 1, action.payload)
                 state.availableArticles = articleList
             }
+        },
+        searchArticle: (state, action) => {
+            const searchTerme = action.payload
+            const currentList = state.availableArticles
+            if(searchTerme.length === 0) {
+                state.searchList = currentList
+            } else {
+                const filteredList = currentList.filter(article => {
+                    const searchString = article.designArticle + ' '+ article.descripArticle
+                    const normalizeString = searchString.toLowerCase()
+                    const normalizeTerme = searchTerme.toLowerCase()
+                    if(normalizeString.search(normalizeTerme) !== -1) return true
+                })
+                state.searchList = filteredList
+            }
         }
     }
 });
 
 export default articleSlice.reducer;
 const {articlesReceived, articlesRequested, articlesRequestFailed,
-    articleAdded, articleEditSuccess} = articleSlice.actions
+    articleAdded, articleEditSuccess, searchArticle} = articleSlice.actions
 
 const url = '/articles'
 export const loadArticles = () => apiRequest({
@@ -75,3 +93,8 @@ export const saveEditedArticle = (data) => apiRequest({
     onSuccess: articleEditSuccess.type,
     onError: articlesRequestFailed.type
 })
+
+
+export const getSearchArticle = (value) => dispatch => {
+    dispatch(searchArticle(value))
+}

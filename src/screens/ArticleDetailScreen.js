@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import {ScrollView, View,StyleSheet, Image, TouchableWithoutFeedback} from "react-native";
 import AppButton from "../components/AppButton";
-import {getRoleAdmin} from "../store/selectors/authSelector";
-import {useDispatch, useSelector, useStore} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import colors from "../utilities/colors";
 import AppText from "../components/AppText";
 import AppLabelLink from "../components/AppLabelLink";
@@ -12,12 +11,19 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
 import {getModalDismiss, getProvenanceSet} from "../store/slices/shoppingCartSlice";
 import routes from "../navigation/routes";
+import useAuth from "../hooks/useAuth";
 
 function ArticleDetailScreen({route, navigation}) {
-    const store = useStore()
     const dispatch = useDispatch()
     const {addItemToCart} = useAddToCart()
-    const item = route.params
+    const {userRoleAdmin} = useAuth()
+
+
+    const item = useSelector(state => {
+        const listArticles = state.entities.article.availableArticles
+        const currentArticle = listArticles.find(article => article.id === route.params.id)
+        return currentArticle
+    })
 
     const colorOptions = useSelector(state => state.entities.main.selectedItemOptions)
     const optionSizes = useSelector(state => state.entities.main.selectedColorSizes)
@@ -36,24 +42,17 @@ function ArticleDetailScreen({route, navigation}) {
     }
 
     const handleAddToCart = () => {
-        const itemData = {
-            id: item.id,
-            designation: item.designArticle,
-            imagesArticle: item.imagesArticle,
-            prix: selectedPrice || item.prixPromo,
-            couleur: selectedColor,
-            taille: selectedSize,
-            quantite: selectedQty,
-            montant: +selectedPrice * selectedQty || item.prixPromo,
-            typeCmde: item.Categorie.typeCateg,
-
+        const isOptionSelected = selectedColor !=='' && selectedSize !==''
+        if(!isOptionSelected) {
+            return alert('Veuillez choisir une option SVP.')
         }
+     const itemData = {...item, prix: selectedOption.prix, couleur: selectedColor, taille: selectedSize,quantite: selectedQty}
         dispatch(getProvenanceSet('commerceDetail'))
         addItemToCart(itemData)
     }
 
     if(showModal) {
-        return <AddToCartModal itemModalVisible={showModal} source={{uri: addedItem.image}} designation={addedItem.libelle}
+        return <AddToCartModal itemModalVisible={showModal} source={{uri: addedItem.imagesArticle[0]}} designation={addedItem.designArticle}
                                goToHomeScreen={() => dispatch(getModalDismiss())}
                                goToShoppingCart={() => {
                                    dispatch(getModalDismiss())
@@ -65,7 +64,7 @@ function ArticleDetailScreen({route, navigation}) {
         <>
             <AppActivityIndicator visible={isLoading}/>
         <ScrollView style={{marginTop: 20}}>
-           {getRoleAdmin(store.getState()) &&  <View style={{
+           {userRoleAdmin() &&  <View style={{
                 alignSelf: 'flex-end',
                 marginBottom: 20
             }}>
@@ -195,6 +194,9 @@ function ArticleDetailScreen({route, navigation}) {
 
         </ScrollView>
 
+           {item.qteStock === 0 && <View style={styles.rupture}>
+                <AppText style={{color: colors.rougeBordeau}}>Rupture de stock</AppText>
+            </View>}
         </>
     );
 }
@@ -210,6 +212,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    rupture: {
+        position: 'absolute',
+        alignItems: "center",
+        justifyContent: 'center',
+        backgroundColor: colors.blanc,
+        opacity: 0.5,
+        width: '100%',
+        height: '100%'
     }
 })
 export default ArticleDetailScreen;

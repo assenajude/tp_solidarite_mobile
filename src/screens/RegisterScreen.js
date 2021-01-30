@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {View, ActivityIndicator,ScrollView, StyleSheet, Image, Text, KeyboardAvoidingView} from 'react-native';
+import {ScrollView, StyleSheet, Image} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient'
 import * as yup from 'yup'
 
@@ -10,10 +10,15 @@ import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppForm from "../components/forms/AppForm";
 import AppErrorMessage from "../components/forms/AppErrorMessage";
-import {register, signin} from '../store/slices/authSlice'
+import {getLoginReset, getUserProfileAvatar, register, signin} from '../store/slices/authSlice'
 import routes from "../navigation/routes";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {Alert} from "react-native-web";
+import {getOrdersByUser} from "../store/slices/orderSlice";
+import {getFacturesByUser} from "../store/slices/factureSlice";
+import {getConnectedUserData} from "../store/slices/userProfileSlice";
+import {getUserFavoris} from "../store/slices/userFavoriteSlice";
+import {getAdresse} from "../store/slices/userAdresseSlice";
+import {getCartItems} from "../store/slices/shoppingCartSlice";
 
 const registerValidationSchema = yup.object().shape({
     username: yup.string().min(2,'Le pseudo doit contenir au moins 2 caractère').required('Veillez choisir un nom utilisateur'),
@@ -30,12 +35,22 @@ const registerValidationSchema = yup.object().shape({
 
 function RegisterScreen({navigation}) {
     const store = useStore()
-    const error = useSelector(state => state.auth.error)
     const loading = useSelector(state => state.auth.loading)
-    const [registerFailed, setRegisterFailed] = useState(false);
+    const [registerFailed, setRegisterFailed] = useState(false)
+    const [loginError, setLogginError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
 
     const dispatch = useDispatch();
 
+    const getUserData = () => {
+        dispatch(getOrdersByUser())
+        dispatch(getFacturesByUser())
+        dispatch(getUserProfileAvatar())
+        dispatch(getConnectedUserData())
+        dispatch(getUserFavoris())
+        dispatch(getAdresse())
+        dispatch(getCartItems())
+    }
 
     const handleSubmit = async(user) => {
         const userData = {
@@ -45,33 +60,39 @@ function RegisterScreen({navigation}) {
         }
             await dispatch(register(userData));
             const error = store.getState().auth.error
-            if(error === null) {
-                await dispatch(signin(user))
-                const newError = store.getState().auth.error
-                if(newError === null) {
-                    navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
+            if(error !== null) {
+                setRegisterFailed(true)
+                setErrorMessage("Désolé, nous n'avons pas pu créer votre compte, veuillez réessayer plutard.")
+                return;
+            } else {
+               await dispatch(signin(user))
+                const loginError = store.getState().auth.error
+                if(loginError !== null) {
+                    setLogginError(true)
+                    setErrorMessage("Votre compte a été créé mais nous n'avons pas pu vous connecter")
+                    return;
                 } else {
-                    Alert.alert('ERREUR', 'Vous avez creer votre compte avec succès mais nous ne pouvons pas vous connecter maintenant', [
-                        {text: 'ok', onPress: () => {return;}}
-                    ])
+                    getUserData()
                 }
             }
-
-
+       navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
     }
 
 
     useEffect(() => {
+        return () => {
+            dispatch(getLoginReset())
+        }
     }, [])
 
     return (
         <>
             <AppActivityIndicator visible={loading}/>
         <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
-            <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/logo_solidarite.png')} />
+            <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/icon.png')} />
             <ScrollView style={{marginBottom: 20}}>
             <AppText lineNumber={1} style={styles.headerStyle}>Inscription</AppText>
-                <AppErrorMessage visible={registerFailed} error="erreur lors de l'enregistrement"/>
+                <AppErrorMessage visible={registerFailed || loginError} error={errorMessage}/>
                 <AppForm initialValues={{
                     username: '',
                     email: '',
@@ -81,13 +102,13 @@ function RegisterScreen({navigation}) {
                    onSubmit={handleSubmit}
                   validationSchema={registerValidationSchema}
                 >
-                    <AppFormField title='Username' name='username'/>
+                    <AppFormField title='Username' name='username' autoCapitalize='none'/>
 
-                    <AppFormField title='E-mail' name='email' keyboardType='email-address'/>
+                    <AppFormField title='E-mail' name='email' keyboardType='email-address' autoCapitalize='none'/>
 
-                    <AppFormField title='password' name='password' secureTextEntry />
+                    <AppFormField title='password' name='password' secureTextEntry autoCapitalize='none' />
 
-                    <AppFormField title='password-confirmation' name='confirmation' secureTextEntry/>
+                    <AppFormField title='password-confirmation' name='confirmation' secureTextEntry autoCapitalize='none'/>
 
                     <AppSubmitButton title='Inscrivez-vous' showLoading={loading}/>
                 </AppForm>

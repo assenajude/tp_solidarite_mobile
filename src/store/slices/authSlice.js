@@ -1,5 +1,4 @@
 import {createSlice} from '@reduxjs/toolkit'
-import {authApiRequest} from '../actionsCreators/authApiActionCreator'
 import decode from 'jwt-decode'
 import authStorage from '../persistStorage'
 import {apiRequest} from "../actionsCreators/apiActionCreator";
@@ -10,13 +9,14 @@ const authSlice = createSlice({
         user: {},
         loading: false,
         isLoggedIn: false,
-        error: null
+        error: null,
+        success: false
     },
     reducers:{
         authRequested: (state, action) => {
-            state.isLoggedIn = false;
             state.loading = true;
             state.error = null
+            state.isLoggedIn = false
         },
         authSuccess: (state, action) => {
            const newUser = decode(action.payload.accessToken)
@@ -30,9 +30,9 @@ const authSlice = createSlice({
             state.loading = false;
         },
         registerSucccess: (state, action) => {
-            state.user = action.payload;
             state.loading = false;
-            state.isLoggedIn = true
+            state.succcess = true
+            state.error = null
         },
         authFailed: (state, action) => {
             state.loading = false;
@@ -45,12 +45,27 @@ const authSlice = createSlice({
                 state.loading = false
                 state.error = null
         },
+        changeAvatar: (state, action) => {
+            state.user.avatar = action.payload.avatar
+            state.loading = false
+            state.error = null
+        },
+        profileAvatar: (state, action) =>{
+            state.user.avatar = action.payload.avatar
+            state.loading= false
+            state.error = null
+        },
+        resetLogin: (state) => {
+            state.loading = false
+            state.error = null
+        }
 
     }
 })
 
 export default authSlice.reducer
-const {authFailed, authRequested, authSuccess, autoLogin, logout} = authSlice.actions
+const {authFailed, authRequested, authSuccess, autoLogin, logout, changeAvatar, profileAvatar,
+    registerSucccess, resetLogin} = authSlice.actions
 
 
  //action creators
@@ -69,17 +84,14 @@ export const signin = (user) => apiRequest({
     onError: authFailed.type
 })
 
-export const register = (user) => async dispatch=> {
-        const result = await dispatch(authApiRequest({
-            url: signupUrl,
-            method: 'post',
-            data: user,
-        }));
-        if (result.status === 201) {
-            dispatch(signin(user))
-        } else dispatch(authFailed(result))
-
-}
+export const register = (user) => apiRequest({
+    url: signupUrl,
+    method: 'post',
+    data: user,
+    onStart: authRequested.type,
+    onSuccess: registerSucccess.type,
+    onError: authFailed.type
+})
 
 export const getAutoLogin = (user) => dispatch => {
     dispatch(autoLogin(user))
@@ -89,6 +101,26 @@ export const getLogout = () => dispatch => {
     dispatch(logout())
     authStorage.removeToken()
 }
+const avatarUrl = '/users/me'
+export const getAvatarChange = (image) => apiRequest({
+    url:avatarUrl+'/avatar',
+    data: image,
+    method: 'patch',
+    onStart: authRequested.type,
+    onSuccess: changeAvatar.type,
+    onError: authFailed.type
+})
+
+export const getUserProfileAvatar = () => apiRequest({
+    url: avatarUrl+'/avatar',
+    method: 'get',
+    onStart: authRequested.type,
+    onSuccess: profileAvatar.type,
+    onError: authFailed.type
+
+})
 
 
-
+export const getLoginReset = () => dispatch => {
+    dispatch(resetLogin())
+}

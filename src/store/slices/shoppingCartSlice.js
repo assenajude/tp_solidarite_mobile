@@ -1,5 +1,4 @@
 import {createSlice} from '@reduxjs/toolkit'
-import {addToCart, changeItemQuantity} from '../actionsCreators/shoppingCartActionCreator'
 import {apiRequest} from "../actionsCreators/apiActionCreator";
 
 const shoppingCartSlice = createSlice({
@@ -10,6 +9,7 @@ const shoppingCartSlice = createSlice({
         totalAmount: 0,
         itemsLenght: 0,
         type: '',
+        cartMode: '',
         addToCartSuccess: false,
         newAdded: {},
         loading: false,
@@ -38,7 +38,31 @@ const shoppingCartSlice = createSlice({
           state.error = null
           state.addToCartSuccess = true
           state.newAdded = action.payload
-         switch (state.provenance) {
+            const newAddedItem = action.payload
+            const currentItem = newAddedItem.CartItem
+            const itemId = newAddedItem.id
+            if(state.items[itemId]) {
+                state.items[itemId].CartItem.quantite++
+                state.items[itemId].CartItem.montant += newAddedItem.prixPromo;
+                state.itemsLenght++
+                state.totalAmount+=newAddedItem.prixPromo
+            } else {
+                   let montantTotal = 0
+                    state.items[itemId] = newAddedItem;
+                if(currentItem.itemType === 'location') {
+                    montantTotal = currentItem.prix * newAddedItem.nombreCaution || currentItem.prix * 4
+                } else  {
+                    montantTotal = currentItem.montant
+                }
+
+                state.totalAmount += montantTotal
+                state.itemsLenght +=currentItem.quantite;
+                state.type = currentItem.itemType
+                state.cartMode = newAddedItem.aide?'credit':'cash'
+            }
+
+            state.loading = false
+            switch (state.provenance) {
              case "ecommerce":
                  state.ecommerceModal = true
                  break;
@@ -57,23 +81,7 @@ const shoppingCartSlice = createSlice({
              default:
                  state.showModal = true
          }
-          state.loading = false
-            const newProduit = action.payload
-            if(state.items[newProduit.id]) {
-                state.items[newProduit.id].quantite++
-                state.items[newProduit.id].montant += newProduit.prix;
-                state.itemsLenght ++
-                state.totalAmount+=newProduit.prix
-            } else {
-                state.items[newProduit.id] = newProduit;
-                state.itemsLenght +=newProduit.quantite;
-                state.type = state.items[newProduit.id].type || state.items[newProduit.id].typeCmde
-                if (newProduit.type === 'e-location') {
-                    state.totalAmount+=newProduit.caution * newProduit.prix
-                } else {
-                    state.totalAmount += newProduit.prix * newProduit.quantite
-                }
-            }
+
         },
         clearCart: (state, action)=> {
             state.items = {}
@@ -93,72 +101,92 @@ const shoppingCartSlice = createSlice({
             state.provenance = ''
         },
         updateItem: (state, action) => {
+            state.loading = false
             let selectedItem = state.items[action.payload.id]
-            selectedItem.prix = action.payload.montant
-            selectedItem.montant = action.payload.montant
+            selectedItem.CartItem
+                .prix = action.payload.montant
+            selectedItem.CartItem
+                .montant = action.payload.montant
+            state.items[action.payload.id] = selectedItem
+            state.itemsLenght = 1
             state.totalAmount = action.payload.montant
         },
         deleteCartItem: (state, action) => {
-            let selectedItem = state.items[action.payload.id]
-            if (selectedItem.quantite === 1) {
-                delete state.items[selectedItem.id]
-                state.itemsLenght--
-                if(state.type == 'e-service') {
-                    state.totalAmount = 0
-                }else if(state.type == 'e-location') {
-                    state.totalAmount -= selectedItem.prix*selectedItem.caution
-                } else {
-                state.totalAmount -= selectedItem.prix
-                }
+            state.loading = false
+            state.error = null
+            const itemId = action.payload.id
+            let selectedItem = state.items[itemId]
+            if(state.type === 'article' && selectedItem.CartItem.quantite > 1) {
+                    selectedItem.CartItem.quantite--
+                    selectedItem.CartItem.montant-= selectedItem.prixPromo
+                    state.items[selectedItem.id] = selectedItem
+                    state.itemsLenght--
+                    state.totalAmount -= selectedItem.prixPromo
+            } else {
+                delete state.items[itemId]
+                state.itemsLenght = 0
+                state.totalAmount = 0
+                state.type = ''
             }
-             else {
-            selectedItem.quantite--
-            selectedItem.montant-= selectedItem.prix
-            state.items[selectedItem.id] = selectedItem
-                state.itemsLenght--
-                state.totalAmount -= selectedItem.prix
-            }
-             if(state.itemsLenght === 0) {
-                 state.type = ''
-             }
         },
         cartItemsReceived: (state, action) => {
             state.loading = false
             state.error = null
             const currentItems = action.payload
             state.cartItems = currentItems
-            let cartLength = 0
-            let cartAmount = 0
-            currentItems.forEach(item => {
-                state.items[item.id] = item.CartItem
-                cartLength += item.CartItem.quantite
-                cartAmount += item.CartItem.montant
-            })
-            state.itemsLenght = cartLength
-            state.totalAmount = cartAmount
-        }
-    },
-    extraReducers: {
-        [addToCart]: (state, action) => {},
-        [changeItemQuantity]: (state, action) => {
-            const itemId = action.payload.id;
-            const itemQuantite = action.payload.quantite
-            const lastItem = state.items[itemId];
-            const lastQuantity = lastItem.quantite;
-            const lastMontant = lastItem.montant;
-            state.items[itemId].quantite = itemQuantite;
-            state.items[itemId].montant = itemQuantite * lastItem.prix;
-            state.itemsLenght -= lastQuantity;
-            state.totalAmount -= lastMontant;
-            state.itemsLenght += state.items[itemId].quantite;
-            state.totalAmount += state.items[itemId].montant
+            if(currentItems.length >0 ) {
+                let cartLength = 0
+                let cartAmount = 0
+                currentItems.forEach(item => {
+                    state.items[item.id] = item
+                    cartLength += item.CartItem.quantite
+                    if(item.CartItem.itemType ==='location') {
+                    cartAmount += item.CartItem.prix * item.nombreCaution
+                    } else {
+                        cartAmount+= item.CartItem.montant
+
+                    }
+                })
+                state.totalAmount = cartAmount
+                state.itemsLenght = cartLength
+                state.type = currentItems[0].CartItem.itemType
+            } else {
+                state.items = {}
+                state.cartItems = []
+                state.totalAmount = 0
+                state.itemsLenght = 0
+                state.type = ''
+                state.newAdded = {}
+
+            }
+        },
+        incrementItemQty: (state, action) => {
+          state.loading = false
+            state.error = null
+            let selectedItem = state.items[action.payload.id]
+          selectedItem.CartItem.quantite++
+          selectedItem.CartItem.montant+=action.payload.prix
+          state.items[action.payload.id] = selectedItem
+          state.itemsLenght++
+          state.totalAmount+=action.payload.prix
+        },
+        decrementItemQty: (state, action) => {
+            state.loading = false
+            state.error = null
+            let selectedItem = state.items[action.payload.id]
+            selectedItem.CartItem.quantite--
+            selectedItem.CartItem.montant -= action.payload.prix
+            state.items[action.payload.id] = selectedItem
+            state.itemsLenght--
+            state.totalAmount-= action.payload.prix
         }
     }
 });
 
 export default shoppingCartSlice.reducer;
 const {clearCart, dismissItemModal, updateItem, deleteCartItem,cartItemsReceived,
-       itemAddedToCart, shoppingCartRequested, shoppingCartRequestFailed, setProvenance} = shoppingCartSlice.actions
+       itemAddedToCart, shoppingCartRequested, shoppingCartRequestFailed,
+       setProvenance, incrementItemQty, decrementItemQty} = shoppingCartSlice.actions
 //action creators
 
 const url = '/shoppingCarts'
@@ -208,3 +236,21 @@ export const getCartItemDelete = (data) => apiRequest({
 export const getProvenanceSet = (label) => dispatch => {
     dispatch(setProvenance(label))
 }
+
+export const getItemQtyIncrement = (item) => apiRequest({
+    url:url+'/incrementQuantity',
+    method: 'patch',
+    data: item,
+    onStart: shoppingCartRequested.type,
+    onSuccess: incrementItemQty.type,
+    onError: shoppingCartRequestFailed.type
+})
+
+export const getItemQtyDecrement = (item) => apiRequest({
+    url:url+'/decrementQuantity',
+    method: 'patch',
+    data: item,
+    onStart: shoppingCartRequested.type,
+    onSuccess: decrementItemQty.type,
+    onError: shoppingCartRequestFailed.type
+})

@@ -1,24 +1,23 @@
-import React, {useEffect} from 'react';
-import {View,ScrollView, Image} from "react-native";
+import React from 'react';
+import {View,ScrollView, Image, StyleSheet} from "react-native";
 import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
-import {getRoleAdmin} from "../store/selectors/authSelector";
 import colors from "../utilities/colors";
-import {color} from "react-native-reanimated";
-import {useDispatch, useStore} from "react-redux";
+import { useSelector} from "react-redux";
+import useAuth from "../hooks/useAuth";
 
-function ServiceDetailScreen({route, navigation}) {
-    const store = useStore()
-    const dispatch = useDispatch()
-
-    const service = route.params
-
-    useEffect(() => {
-    }, [])
+function ServiceDetailScreen({route}) {
+    const {userRoleAdmin} = useAuth()
+    const service = useSelector(state => {
+        const list = state.entities.service.list
+        const currentService = list.find(item => item.id === route.params.id)
+        return currentService
+    })
 
     return (
+        <>
         <ScrollView>
-               {getRoleAdmin(store.getState()) && <View style={{alignSelf: 'flex-end', margin: 20}}>
+               {userRoleAdmin() && <View style={{alignSelf: 'flex-end', margin: 20}}>
                     <AppButton title='edit' iconColor={colors.blanc} iconSize={15} iconName='edit'/>
                     <AppButton style={{marginTop: 10, marginBottom: 10}} title='add option' iconSize={15} iconColor={colors.blanc} iconName='plus'/>
                     <AppButton title='delete' iconColor={colors.blanc} iconSize={15} iconName='delete'/>
@@ -55,7 +54,21 @@ function ServiceDetailScreen({route, navigation}) {
                     </View>
                 </View>
         </ScrollView>
+           {service.isDispo === false && <View style={styles.notDispo}>
+                <AppText style={{color: colors.rougeBordeau}}>Ce service n'est plus disponible</AppText>
+            </View>}
+            </>
     );
 }
+
+const styles = StyleSheet.create({
+    notDispo: {
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 0.5,
+        backgroundColor: colors.blanc
+    }
+})
 
 export default ServiceDetailScreen;

@@ -1,6 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {apiRequest} from "../actionsCreators/apiActionCreator";
-import {saveTranche} from '../actionsCreators/trancheActionCreator'
 
 const trancheSlice = createSlice({
     name: 'tranche',
@@ -38,17 +37,6 @@ const trancheSlice = createSlice({
             let tranche = state.list.find(tranche => tranche.id === action.payload.id)
             tranche.solde = action.payload.montant
             tranche.payed = true
-        }
-    },
-    extraReducers: {
-        [saveTranche]:(state, action) => {
-            state.loading = false
-            state.error = null
-            // console.log(action.payload.tranches);
-              for(key in action.payload) {
-                  state.list.push(action.payload[key])
-              }
-              state.newAdded = action.payload
         }
     }
 })

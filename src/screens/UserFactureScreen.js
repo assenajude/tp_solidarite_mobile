@@ -1,7 +1,6 @@
 import React, {useCallback,useEffect} from 'react';
 import {View,FlatList} from "react-native";
 import {useSelector, useDispatch} from "react-redux";
-import dayjs from 'dayjs'
 
 import {
     getTrancheShown,
@@ -18,28 +17,23 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 function UserFactureScreen({navigation}) {
     const dispatch = useDispatch()
     const {payFactureTranche} = useManageUserOrder()
-    const {getModePayement} = useOrderInfos()
+    const {getModePayement, getItems} = useOrderInfos()
     const user = useSelector(state => state.auth.user)
     const userFactures = useSelector(state => state.entities.facture.userFactures)
-    const listOrder = useSelector(state => state.entities.order.list)
     const isLoading = useSelector(state => state.entities.facture.loading)
+    const newCompter = useSelector(state => state.entities.facture.newFactureCompter)
 
     const getUserFactures = useCallback(async () => {
-        await dispatch(getFacturesByUser())
+        if(newCompter>0) await dispatch(getFacturesByUser())
+
     }, [])
 
-    const getItemsOfFacture = (orderId) => {
-        const selectedOrder = listOrder.find(item => item.id === orderId)
-        if(selectedOrder) return selectedOrder.CartItems
-        return null
-    }
 
 
 
 
     useEffect(() => {
         getUserFactures()
-        // dispatch(getFacturesByUser())
     }, [])
 
 
@@ -49,16 +43,13 @@ function UserFactureScreen({navigation}) {
                <AppActivityIndicator visible={isLoading}/>
            <FlatList data={userFactures} keyExtractor={item => item.id.toString()}
                     renderItem={({item}) =>
-                        <FactureListItem numero={item.numero} header='F'
-                                         orderItems={getItemsOfFacture(item.CommandeId)}
-                                         trancheButtonTitle2='payer' showProgress={item.ratio < 1}
+                        <FactureListItem numero={item.numero}
+                                         orderItems={getItems(item.CommandeId)} showProgress={item.ratio < 1}
                                          okPayement={item.montant === item.solde} progress={Number(item.ratio)}
                                          showTranches={item.showTranche}  getDetails={() => dispatch(getTrancheShown(item.id))} montant={item.montant}
                                          dateEmission={item.dateEmission} dateEcheance={item.dateFin}
-                                         tranches={item.Tranches} label='facture' labelDateCmde='Debut payement' labelDateLivraison='Fin Payement'
-                                         payTranche={(tranche)=> payFactureTranche(tranche)}
-                                          linkTitle='consulter la cmde'
-                                         getLink={() => navigation.navigate(routes.ORDER_DETAILS, item)}
+                                         tranches={item.Tranches} payTranche={(tranche)=> payFactureTranche(tranche)}
+                                         getLink={() => navigation.navigate(routes.ORDER_DETAILS, item.Commande)}
                                          modePayement={getModePayement(item.CommandeId)}
                                          solde={item.solde} endFacture={item.montant === item.solde}
                                         goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}/>

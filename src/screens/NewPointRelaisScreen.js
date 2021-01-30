@@ -1,7 +1,5 @@
-
-
 import React, {useState, useEffect} from 'react';
-import {useSelector, useDispatch} from "react-redux";
+import {useSelector, useDispatch, useStore} from "react-redux";
 import {View, StyleSheet, Alert, ScrollView} from 'react-native'
 import {Picker} from '@react-native-community/picker'
 import * as Yup from 'yup'
@@ -23,8 +21,9 @@ const relaisValideSchema = Yup.object().shape({
 })
 
 
-function NewPointRelaisScreen(props) {
+function NewPointRelaisScreen({navigation}) {
     const dispatch = useDispatch()
+    const store = useStore()
 
 const regions = useSelector(state => state.entities.region.list);
 const selectedVilles = useSelector(state => state.entities.region.regionVilles);
@@ -39,14 +38,12 @@ const [selectedVille, setSelectedVille] = useState(1)
             adresse: relais.adresse,
             email: relais.email
         }
-
-                try {
-                    await dispatch(addRelais(relaisData))
-                } catch (e) {
-                    Alert.alert('Error', `Impossible d'ajouter le point relais, essayez encore..`, [
-                        {text: 'ok', onPress: () => {return;}}
-                    ])
-                }
+        await dispatch(addRelais(relaisData))
+        const error = store.getState().entities.pointRelais.error
+        if(error !== null) {
+            return alert('Erreur...Impossible dajouter le point relais')
+        }
+         navigation.goBack()
     }
 
     useEffect(() => {

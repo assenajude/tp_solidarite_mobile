@@ -14,10 +14,10 @@ function TabNavigation(props) {
     const Tab = createBottomTabNavigator();
 
     const homeCounter = useSelector(state => state.entities.main.homeCounter)
+    const serviceCompter = useSelector(state => state.entities.service.serviceRefresh)
 
 
     return (
-
         <Tab.Navigator tabBarOptions={{
             activeTintColor: colors.blanc,
             activeBackgroundColor: colors.rougeBordeau
@@ -39,13 +39,14 @@ function TabNavigation(props) {
                             <MaterialCommunityIcons name="warehouse" size={size} color={color} />,
                         title:'e-location'}}/>
 
-        <Tab.Screen name="E-service"  component={ServiceNavigator}
-                    options={{tabBarIcon: ({size, color}) =>
-                            <FontAwesome5 name="hands-helping" size={size} color={color} />,
-                    title: 'e-service'}}/>
+
+            <Tab.Screen name="E-service" component={ServiceNavigator}
+                        options={{tabBarIcon: ({size, color}) => <AppIconWithBadge notifStyle={{backgroundColor: colors.bleuFbi}} badgeCount={serviceCompter} >
+                                <FontAwesome5 name="hands-helping" size={size} color={color} />
+                            </AppIconWithBadge>,
+                            title: 'e-service'}}/>
 
     </Tab.Navigator>
-
 );
 }
 

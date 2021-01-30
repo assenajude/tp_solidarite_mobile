@@ -8,16 +8,19 @@ import AppButton from "../AppButton";
 import CartItemQuantite from "./CartItemQuantite";
 
 
-function CartItem({source, designation,icon=false, activeDecrement,deleteItem,
+function CartItem({source, designation,icon=false, activeDecrement,deleteItem,caution,frequence,
                       price, min, max, montantMin,montantMax,  montant, activeIncrement,showItemDetails,
-                      quantite, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement}) {
+                      quantite, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement,
+                  disabledDecrement, disabledIncrement, notInStock, itemType}) {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.itemContainer}>
                 <View style={styles.imageContainer}>
                     <TouchableOpacity onPress={showCartItem}>
                     <Image style={styles.imageStyle} source={source}/>
-                    <AppText>{designation}</AppText>
+                    <View style={{width: 100}}>
+                    <AppText lineNumber={1}>{designation}</AppText>
+                    </View>
                     </TouchableOpacity>
                     <View style={styles.buttonContainer}>
                         <AppButton onPress={showItemDetails} style={{backgroundColor: Color.lightGrey}} iconName='search1' iconSize={20} iconColor='black'/>
@@ -26,7 +29,7 @@ function CartItem({source, designation,icon=false, activeDecrement,deleteItem,
                 </View>
                 <View style={styles.secondContainer}>
                {price && <AppText style={{marginLeft: 40, marginRight: 10}}>{itemPrice}</AppText>}
-                    {quantite && <CartItemQuantite minusActive={activeDecrement} plusActive={activeIncrement} quantite={itemQuantite} decrementQuantite={quantityDecrement} incrementQuantite={quantityIncrement} style={{marginRight: 15, marginLeft: 15}}/>}
+                    {quantite && <CartItemQuantite disabledDecrement={disabledDecrement} disabledIncrement={disabledIncrement} minusActive={activeDecrement} plusActive={activeIncrement} quantite={itemQuantite} decrementQuantite={quantityDecrement} incrementQuantite={quantityIncrement} style={{marginRight: 15, marginLeft: 15}}/>}
                 {montant && <AppText>{itemAmount}</AppText>}
 
                     {min && <AppText>{montantMin}</AppText>}
@@ -35,6 +38,19 @@ function CartItem({source, designation,icon=false, activeDecrement,deleteItem,
 
                 </View>
             </View>
+            {itemType === 'location' && <View style={{
+                flexDirection: 'row',
+                justifyContent: 'center'
+            }}>
+                <AppText style={{fontWeight: 'bold'}}>Caution: </AppText>
+                <AppText style={{fontWeight: 'bold', color: Color.rougeBordeau}}>{caution} {frequence.toLowerCase() === 'mensuelle'?'Mois':'Jours'}</AppText>
+            </View>}
+            {notInStock && <View style={styles.notInStock}>
+                <AppText style={{color: Color.rougeBordeau}}>Rupture de stock</AppText>
+            </View>}
+            {notInStock && <View style={styles.deleteNotInStock}>
+                <AppButton iconColor={Color.blanc} iconName='delete' title='supprimer' iconSize={24}/>
+            </View>}
         </View>
     );
 
@@ -45,7 +61,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         borderColor: Color.leger,
-        borderWidth: 2
+        borderWidth: 2,
+        padding: 10
     },
     itemContainer: {
         flexDirection: 'row',
@@ -53,9 +70,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         padding: 10
     },
-    imageContainer: {
 
-    },
     secondContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -69,6 +84,19 @@ const styles = StyleSheet.create({
         height: 80,
         width: 80
     },
+    notInStock: {
+        position: 'absolute',
+        zIndex: 1,
+        opacity: 0.8,
+        backgroundColor: Color.blanc,
+        width:'100%',
+        height: '100%'
+    },
+    deleteNotInStock: {
+        position: 'absolute',
+        alignSelf: 'center',
+        zIndex: 2,
+    }
 
 })
 

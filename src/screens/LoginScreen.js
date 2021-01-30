@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {View, Alert,ScrollView, StyleSheet, Image, Keyboard, TouchableWithoutFeedback, Platform} from 'react-native';
+import {ScrollView, StyleSheet, Image, View} from 'react-native';
 import * as yup from 'yup'
 import {LinearGradient} from 'expo-linear-gradient'
 
@@ -10,19 +10,17 @@ import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppForm from "../components/forms/AppForm";
 import AppText from "../components/AppText";
-import User from "../models/user";
 import AppErrorMessage from "../components/forms/AppErrorMessage";
-import {signin, autoLogin} from '../store/slices/authSlice'
-import authStorage from '../store/persistStorage'
+import {signin, getUserProfileAvatar, getLoginReset} from '../store/slices/authSlice'
 import routes from '../navigation/routes'
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getOrdersByUser} from "../store/slices/orderSlice";
 import {getFacturesByUser} from "../store/slices/factureSlice";
-import {getTranches} from "../store/slices/trancheSlice";
-import {getUserProfileAvatar} from "../store/slices/userProfileSlice";
 import {getAdresse} from "../store/slices/userAdresseSlice";
-import {getAllVilles} from "../store/slices/villeSlice";
 import {getUserFavoris} from "../store/slices/userFavoriteSlice";
+import {getConnectedUserData} from "../store/slices/userProfileSlice";
+import AppLabelLink from "../components/AppLabelLink";
+import {getCartItems} from "../store/slices/shoppingCartSlice";
 
 const loginValidationSchema = yup.object().shape({
     username: yup.string().required("Veillez saisir un nom d'utilisateur"),
@@ -30,63 +28,62 @@ const loginValidationSchema = yup.object().shape({
 })
 
 function LoginScreen({navigation}) {
-    const loginUser = new User({
-        email: '',
-        password: ''
-    });
 
-    const [loginFailed, setLoginFailed] = useState(false);
     const isLoading = useSelector(state => state.auth.loading)
-    const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
-    const token = useSelector(state => state.auth.token);
+    const error = useSelector(state => state.auth.error)
 
 
     const dispatch = useDispatch();
     const store = useStore()
 
 
-    const getNewUser = (state) => {
-        return state.auth.user
-    }
-
     const handleLogin = async (user) => {
         await dispatch(signin(user))
         const error = store.getState().auth.error
-        if(error !== null) {
-            Alert.alert('Erreur', 'Impossible de vous connecter maintenant. Veuillez reessayer plutard', [
-                {text: 'ok', onPress: () => {return}}
-            ])
-        }
+        if(error !== null) return;
         dispatch(getOrdersByUser())
         dispatch(getFacturesByUser())
-        dispatch(getTranches())
         dispatch(getUserProfileAvatar())
+        dispatch(getConnectedUserData())
         dispatch(getUserFavoris())
         dispatch(getAdresse())
-        dispatch(getAllVilles())
+        dispatch(getCartItems())
         navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
     }
+
+    useEffect(() => {
+        return () => {
+            dispatch(getLoginReset())
+        }
+    }, [])
 
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
              <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
-                 <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/logo_solidarite.png')} />
+                 <Image resizeMode='contain' style={styles.logoStyle} source={require('../assets/icon.png')} />
                  <ScrollView>
                 <AppText style={styles.headerStyle}>Connection</AppText>
-                    <AppErrorMessage visible={loginFailed} error='erreur lors de la connection'/>
+                    <AppErrorMessage visible={error !== null} error="Le nom d'utilisateur ou le mot de passe n'est pas correct"/>
                     <AppForm initialValues={{username: '', password: ''}}
                             onSubmit={handleLogin}
                             validationSchema={loginValidationSchema}
                     >
                         <AppFormField title='Username' name='username'
-                                      iconName='user'/>
+                                      iconName='user' autoCapitalize='none'/>
                         <AppFormField title='Password' secureTextEntry iconName='lock'
-                                      name='password'
+                                      name='password' autoCapitalize='none'
                         />
                         <AppSubmitButton  title='Connectez-vous'/>
-
                     </AppForm>
+                     <View style={{
+                         flexDirection: 'row',
+                         marginTop: 20
+                     }}>
+                         <AppText style={{color: Color.bleuFbi}}>Vous n'avez pas de compte?</AppText>
+                         <AppLabelLink content='créez un' otherTextStyle={{color: Color.or}}
+                                       handleLink={() => navigation.navigate('AccueilNavigator', {screen: routes.REGISTER})}/>
+                     </View>
             </ScrollView>
              </LinearGradient>
             </>

@@ -1,28 +1,18 @@
-import React, {useEffect, useCallback} from 'react';
-import {useSelector, useDispatch} from "react-redux";
+import React from 'react';
+import {useSelector} from "react-redux";
 
 
-
-import {getFactures} from '../store/slices/factureSlice'
-import { getOrdersByUser} from '../store/slices/orderSlice'
 import routes from "../navigation/routes";
 import OrderSuccess from "../components/order/OrderSuccess";
 
 function OrderSuccessScreen({navigation}) {
-    const dispatch = useDispatch()
     const newOrder = useSelector(state => state.entities.order.newAdded)
 
-    const getnewOrders = useCallback(async () => {
-        await dispatch(getOrdersByUser())
-        await dispatch(getFactures())
-    }, [dispatch])
-
-    useEffect(()=> {
-        getnewOrders()
-    }, [])
 
 
-    if(newOrder.typeCmde === 'e-location') {
+
+
+    if(newOrder.typeCmde === 'location') {
         return(
             <OrderSuccess message='Vous devez consulter son status dans vos locations'
                          labelNumNewOrder='CMD Location N°: ' newOrderNum={newOrder.numero}
@@ -31,7 +21,7 @@ function OrderSuccessScreen({navigation}) {
         )
     }
 
-    if(newOrder.typeCmde === 'e-service') {
+    if(newOrder.typeCmde === 'service') {
         return (
             <OrderSuccess message='Vous devez consulter son status dans vos services'
                          labelNumNewOrder='CMD Service N°:' newOrderNum={newOrder.numero}

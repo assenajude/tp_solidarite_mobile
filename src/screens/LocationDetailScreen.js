@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import {Image, ScrollView, StyleSheet, TouchableWithoutFeedback, View} from "react-native";
 import AppText from "../components/AppText";
-import {getRoleAdmin} from "../store/selectors/authSelector";
-import {useDispatch, useSelector, useStore} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {getColorSizes, getSelectOption} from "../store/slices/mainSlice";
 import useAddToCart from "../hooks/useAddToCart";
 import AppButton from "../components/AppButton";
@@ -12,12 +11,18 @@ import AddToCartModal from "../components/shoppingCart/AddToCartModal";
 import {getModalDismiss, getProvenanceSet} from "../store/slices/shoppingCartSlice";
 import routes from "../navigation/routes";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import useAuth from "../hooks/useAuth";
 
 function LocationDetailScreen({route, navigation}) {
-    const store = useStore()
     const dispatch = useDispatch()
     const {addItemToCart} = useAddToCart()
-    const item = route.params
+    const {userRoleAdmin} = useAuth()
+
+    const item = useSelector(state => {
+        const listLocation = state.entities.location.list
+        const selectedLocation = listLocation.find(item => item.id === route.params.id)
+        return selectedLocation
+    })
 
     const showItemModal = useSelector(state => state.entities.shoppingCart.locationDetailModal)
     const addedItem = useSelector(state => state.entities.shoppingCart.newAdded)
@@ -36,27 +41,18 @@ function LocationDetailScreen({route, navigation}) {
     }
 
     const handleAddToCart = () => {
-
-        const itemData = {
-            id: item.id,
-            libelleLocation: item.libelleLocation,
-            imagesLocation: item.imagesLocation,
-            prix: selectedPrice || item.coutPromo,
-            couleur: selectedColor,
-            taille: selectedSize,
-            quantite: selectedQty,
-            nombreCaution: item.nombreCaution,
-            montant: +locSelectedOption.prix * item.nombreCaution,
-            typeCmde: 'e-location',
-
+        const isLocationSelected = selectedColor !== '' && selectedSize !== ''
+        if(!isLocationSelected) {
+            return alert('Vous devez choisir une option pour valider.')
         }
+    const itemData = {...item, couleur: selectedColor, prix: locSelectedOption.prix, taille: selectedSize, quantite: selectedQty}
         dispatch(getProvenanceSet('locationDetail'))
         addItemToCart(itemData)
     }
 
 
     if(showItemModal) {
-        return <AddToCartModal itemModalVisible={showItemModal} source={{uri: addedItem.image}} designation={addedItem.libelle}
+        return <AddToCartModal itemModalVisible={showItemModal} source={{uri: addedItem.imagesLocation[0]}} designation={addedItem.libelleLocation}
                                goToHomeScreen={() => dispatch(getModalDismiss())}
                                goToShoppingCart={() => {
                                    dispatch(getModalDismiss())
@@ -66,7 +62,7 @@ function LocationDetailScreen({route, navigation}) {
         <>
             <AppActivityIndicator visible={isLoading}/>
             <ScrollView style={{marginTop: 20}}>
-                {getRoleAdmin(store.getState()) &&  <View style={{
+                {userRoleAdmin() &&  <View style={{
                     alignSelf: 'flex-end',
                     marginBottom: 20
                 }}>
@@ -200,9 +196,11 @@ function LocationDetailScreen({route, navigation}) {
                         <AppText>{item.descripLocation}</AppText>
                     </View>
                 </View>
-
             </ScrollView>
 
+            {item.qteDispo === 0 && <View style={styles.rupture}>
+                <AppText style={{color: colors.rougeBordeau}}>Rupture de stock</AppText>
+            </View>}
         </>
     );
 }
@@ -218,6 +216,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    rupture: {
+        position:'absolute',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 0.5,
+        backgroundColor: colors.blanc
     }
 })
 

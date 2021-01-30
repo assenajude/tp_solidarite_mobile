@@ -1,13 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {apiRequest, apiRequestSuccess, apiRequestFailed} from '../actionsCreators/apiActionCreator'
-
-//thunk
-
-/*export const getCategories =  createAsyncThunk('categorie/getAllCategories', async () => {
-    const response = await categorieService.getAllCategories();
-    return response.data
-
-});*/
+import {apiRequest} from '../actionsCreators/apiActionCreator'
 
 
 const categorieSlice = createSlice({

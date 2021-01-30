@@ -1,46 +1,30 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {useSelector, useDispatch} from 'react-redux'
-import {View, Text,FlatList, StyleSheet} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {useSelector, useDispatch, useStore} from 'react-redux'
+import {View, FlatList, StyleSheet} from 'react-native';
 
 import ListFooter from "../components/list/ListFooter";
 import routes from '../navigation/routes'
 import PlanListItem from "../components/plan/PlanListItem";
-import ItemSeparator from "../components/list/ItemSeparator";
-import {loadPlans} from "../store/slices/planSlice";
 import AppText from "../components/AppText";
 import {Picker} from "@react-native-community/picker";
-import {getSelected, changePlan} from '../store/slices/payementSlice'
+import {getSelected} from '../store/slices/payementSlice'
+import useAuth from "../hooks/useAuth";
 
 function PlanScreen({navigation}) {
 
     const dispatch = useDispatch();
+    const {userRoleAdmin} = useAuth()
 
-    const plans = useSelector(state => state.entities.plan.list);
-    const selectedPayment = useSelector(state => state.entities.payement.selectedPayement);
     const payements = useSelector(state => state.entities.payement.list);
     const plansOfPayement = useSelector(state => state.entities.payement.payementPlans)
-    const [refreshList, setRefreshList] = useState(false)
-    const [currentPayement, setCurrentPayement] = useState(selectedPayment.id);
-    const currentPlan = useSelector(state => state.entities.payement.currentPlan);
-    const [planChecked, setPlanChecked] = useState(false)
-
-    const loadPlan = useCallback(async () => {
-        await dispatch(loadPlans());
-    }, [dispatch]);
-
-  const getPlansPayement = () => {
-        return selectedPayment.plans
-  }
-
-  const planSelected = (idPlan) => {
-      console.log(idPlan)
-  }
+    const [currentPayement, setCurrentPayement] = useState(1);
 
     useEffect(() => {
-    }, [dispatch, selectedPayment, currentPayement, plansOfPayement])
+        dispatch(getSelected(1))
+    }, [])
 
     return (
-        <View style={styles.container}>
+        <>
             <View style={styles.payementStyle}>
                 <AppText style={{fontWeight: 'bold'}}>Mode Payement: </AppText>
                 <Picker style={{height: 50, width: 120}} mode='dropdown' selectedValue={currentPayement} onValueChange={(value) => {
@@ -51,20 +35,19 @@ function PlanScreen({navigation}) {
                 </Picker>
             </View>
 
-        <View >
-            <FlatList ItemSeparatorComponent={ItemSeparator} data={plansOfPayement} keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => <PlanListItem prop1={item.id} prop2={item.libelle}
-                                                  prop3={item.descripPlan} onPress={() => {
-                                                      dispatch(changePlan(item))
-                                                  }}
-                                                  showIcon={item.showIcon}/>}
+
+            <FlatList data={plansOfPayement} keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => <PlanListItem planImage={{uri: item.imagesPlan[0]}} imageDispo={item.imagesPlan.length>0}
+                                                  label={item.libelle} description={item.descripPlan}
+                                                  getPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: item})}
+                                                  onPress={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: item})}/>}
             />
             {plansOfPayement.length === 0 && <View style={styles.emptyPlans}><AppText>Aucun plan trouvé</AppText></View>}
-        </View>
-            <View style={styles.addButton}>
-                <ListFooter onPress={() =>navigation.navigate(routes.NEW_PLAN)}/>
-            </View>
-       </View>
+
+            {userRoleAdmin() && <View style={styles.addButton}>
+                <ListFooter onPress={() =>navigation.navigate('AccueilNavigator',{screen: routes.NEW_PLAN})}/>
+            </View>}
+       </>
 );
 }
 
@@ -79,7 +62,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         alignSelf: 'flex-end',
-        bottom: 80,
+        bottom: 60,
         right: 50
     },
     emptyPlans: {
@@ -88,7 +71,8 @@ const styles = StyleSheet.create({
       alignItems: 'center'
     },
     payementStyle: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        top: 20
     }
 
 })

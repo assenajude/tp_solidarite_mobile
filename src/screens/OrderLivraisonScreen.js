@@ -1,32 +1,25 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {useSelector, useDispatch, useStore} from "react-redux";
-import {View, ActivityIndicator, StyleSheet, ScrollView, Alert} from "react-native";
+import React from 'react';
+import {useSelector, useDispatch} from "react-redux";
+import {View, StyleSheet, ScrollView} from "react-native";
 
-import {getTotalFinal, getTotalWithPayement, getFraisLivraison} from '../store/selectors/orderSelector'
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import routes from "../navigation/routes";
 import PayementListItem from "../components/list/PayementListItem";
-import {getAllVilles, getSelectedLivraisonVille} from '../store/slices/villeSlice'
-import {getSelectedAdress, getAdresse} from '../store/slices/userAdresseSlice'
+import { getSelectedLivraisonVille} from '../store/slices/villeSlice'
+import {getSelectedAdress, getAdLivraisonDetail} from '../store/slices/userAdresseSlice'
 import AppButton from "../components/AppButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppLabelWithValue from "../components/AppLabelWithValue";
+import usePlaceOrder from "../hooks/usePlaceOrder";
 
 function OrderLivraisonScreen({navigation}) {
-    const store = useStore();
     const dispatch = useDispatch()
+    const {getShippingRate, getTotal} = usePlaceOrder()
     const loading = useSelector(state => state.entities.userAdresse.loading)
     const adresseByUser = useSelector(state => state.entities.userAdresse.list);
-
-
-    const getUserAdresses = useCallback(async () => {
-        dispatch(getAdresse())
-        dispatch(getAllVilles())
-    }, [])
-
-
-    useEffect(() => {
-    }, [])
+    const currentSelected = useSelector(state => state.entities.userAdresse.selectedAdresse)
+    const isAdresseNotEmpty = Object.keys(currentSelected).length>0
 
 
     if (loading) {
@@ -53,27 +46,28 @@ function OrderLivraisonScreen({navigation}) {
                     <AppText style={{
                         fontWeight: 'bold',
                         color: colors.rougeBordeau
-                    }}>{getTotalWithPayement(store.getState())} FCFA</AppText>
+                    }}>{getTotal()-getShippingRate()} FCFA</AppText>
                 </View>
                 <View style={styles.itemLine}>
                     <AppText style={{fontWeight: 'bold'}}>Frais de livraison: </AppText>
                     <AppText style={{
                         fontWeight: 'bold',
                         color: colors.rougeBordeau
-                    }}>{getFraisLivraison(store.getState())} FCFA</AppText>
+                    }}>{getShippingRate()} FCFA</AppText>
                 </View>
                 <View style={styles.itemLine}>
                     <AppText style={{fontWeight: 'bold'}}>Net actuel à payer: </AppText>
                     <AppText style={{
                         fontWeight: 'bold',
                         color: colors.rougeBordeau
-                    }}>{getTotalFinal(store.getState())} FCFA</AppText>
+                    }}>{getTotal()} FCFA</AppText>
                 </View>
             </View>
             <View>
                 <View style={styles.adressHeader}>
                     <AppText style={{color: colors.blanc}}>Choisissez votre adresse de livraison</AppText>
                 </View>
+            </View>
                 <ScrollView>
                     <View style={{
                         marginLeft: 20
@@ -87,12 +81,21 @@ function OrderLivraisonScreen({navigation}) {
                                                                               dispatch(getSelectedLivraisonVille(item.PointRelai.VilleId))
                                                                               dispatch(getSelectedAdress(item.id))
                                                                           }
-                                                                          } checked={item.selected}/>)}
+                                                                          } checked={item.selected} showDelai={false} showDetail={item.showLivraisonDetail}
+                                                                          getDetails={() => dispatch(getAdLivraisonDetail(item.id))} isAdLivraison={true}
+                                                                          showDetailButton={false}>
+                                                                            <AppLabelWithValue label='Tel: ' labelValue={item.tel}/>
+                                                                            <AppLabelWithValue label='E-mail: ' labelValue={item.email}/>
+                                                                            <AppLabelWithValue label='Autres adresses: ' labelValue={item.adresse}/>
+
+                                                                            </PayementListItem>
+                                                                          )}
+                        {isAdresseNotEmpty && <AppButton style={styles.buttonStyle} title='continuer' onPress={() => {navigation.navigate(routes.ORDER)}}/>}
                     </View>
+
                 </ScrollView>
-                <AppButton title='continuer' style={styles.buttonStyle}
-                           onPress={() => {navigation.navigate(routes.ORDER)}}/>
-            </View>
+
+
         </View>
     );
 }
@@ -119,7 +122,8 @@ const styles = StyleSheet.create({
         height: 40,
         width: '50%',
         alignSelf: 'center',
-        top: 50
+        marginTop: 30,
+        marginBottom: 30
     },
     emptyStyle: {
         flex: 1,

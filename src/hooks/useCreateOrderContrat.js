@@ -1,18 +1,19 @@
 import {useStore, useDispatch} from "react-redux";
 import {Alert} from 'react-native'
-import {getOrderPayementMode} from "../store/selectors/payementSelector";
 import {addFacture} from "../store/slices/factureSlice";
 import {addTranche} from "../store/slices/trancheSlice";
 import {createOrderContrat} from "../store/slices/orderSlice";
+import useOrderInfos from "./useOrderInfos";
 
 let useCreateOrderContrat;
 export default useCreateOrderContrat = () => {
+    const {getModePayement} = useOrderInfos()
     const store = useStore()
     const dispatch = useDispatch()
     
     const createContrat = async (order) => {
         const orderPlan = order.Plan
-        const modePayement = getOrderPayementMode(store.getState())[order.id].payementMode
+        const modePayement = getModePayement(order.id)
         let dateFin = new Date()
         const moisDateFin = dateFin.getMonth() + orderPlan.nombreMensualite
         const jourDateFin = dateFin.getDate()

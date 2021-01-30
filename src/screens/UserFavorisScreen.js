@@ -6,17 +6,45 @@ import colors from "../utilities/colors";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {getToggleFavorite, getUserFavoris} from "../store/slices/userFavoriteSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppButton from "../components/AppButton";
+import routes from "../navigation/routes";
 
-function UserFavorisScreen(props) {
+function UserFavorisScreen({navigation}) {
     const dispatch = useDispatch()
 
-    const useFavorites = useSelector(state => state.entities.userFavorite.list)
+    const useFavorites = useSelector(state => {
+        const formatedFav = []
+        const articleFav = state.entities.userFavorite.articleFavoris
+        const locationFav = state.entities.userFavorite.locationFavoris
+        const allFav = [...articleFav, ...locationFav]
+        allFav.forEach(fav => {
+            const favImage =  fav.imagesArticle?fav.imagesArticle[0] : fav.imagesLocation[0]
+            formatedFav.push({
+                id: fav.id,
+                libelle: fav.designArticle || fav.libelleLocation,
+                image: favImage,
+                prix: fav.prixPromo || fav.coutPromo,
+                prixReel: fav.prixReel || fav.coutReel,
+                type: fav.articles_favoris?'article':'location'
+            })
+        })
+        return formatedFav
+    })
     const favCompter = useSelector(state => state.entities.userFavorite.favoriteCompter)
     const loading = useSelector(state => state.entities.userFavorite.loading)
 
 
     const removefromFavorite = (item) => {
         dispatch(getToggleFavorite(item))
+    }
+
+    const handleOrderFav = (fav) => {
+        if(fav.type === 'article') {
+            navigation.navigate('AccueilNavigator', {screen: routes.ARTICLE_DETAIL, params: {...fav, designArticle: fav.libelle}})
+        } else {
+            navigation.navigate('AccueilNavigator', {screen: routes.LOCATION_DETAIL, params: {...fav, libelleLocation: fav.libelle}})
+        }
+
     }
 
     useEffect(() => {
@@ -60,13 +88,14 @@ function UserFavorisScreen(props) {
                          flexDirection: 'row'
                      }}>
                          <AppText style={{fontWeight: 'bold'}}>Prix: </AppText>
-                         <AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}> {item.prixPromo}</AppText>
+                         <AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}> {item.prix}</AppText>
                          <AppText> / </AppText>
                          <AppText style={{
                              textDecorationLine: 'line-through'
                          }}>{item.prixReel}</AppText>
                          <AppText> fcfa </AppText>
                      </View>
+                     <AppButton style={{alignSelf: 'flex-end', margin: 10}} title='commander' onPress={() => handleOrderFav(item)}/>
                  </View>
                  }/>
     );

@@ -1,15 +1,13 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {createSelector} from 'reselect';
 
 import {apiRequest} from '../actionsCreators/apiActionCreator'
-import {getSelectedPayement} from '../actionsCreators/payementActionCreator'
-import plan from "../../models/plan";
 
 const payementSlice = createSlice({
     name: 'payement',
     initialState: {
         list: [],
         loading: false,
+        error: null,
         payementId: 1,
         selectedPayement: {},
         payementPlans: [],
@@ -23,12 +21,10 @@ const payementSlice = createSlice({
         getPayements: (state, action) => {
             state.loading = false
             state.list = action.payload
-          /*  if(state.list && state.list.length >= 0) {
-               state.list[0].active = true
-            }*/
         },
         payementRequestFailed: (state, action) => {
             state.loading = false
+            state.error = action.payload
         },
         payementAdded: (state, action) => {
             state.list.push(action.payload)
@@ -37,43 +33,50 @@ const payementSlice = createSlice({
             let selected = state.list.find(payement => payement.id === action.payload);
            if(selected) {
             selected.active = true
-            state.payementPlans = selected.Plans
+                const plans = selected.Plans
+               if(plans.length>0) {
+               plans.sort((a, b) => {
+                   if(b.nombreMensualite < a.nombreMensualite ) return 1
+                   if (b.nombreMensualite > a.nombreMensualite) return -1
+                   return 0;
+               })
+               }
+            state.payementPlans = plans
             state.payementId = action.payload
             state.currentPlan = {}
            }
-        },
-        changeCurrentPlan: (state, action) => {
-            state.currentPlan = action.payload;
-            const planPayement = state.payementPlans.find(plan => plan.id === action.payload.id);
-            if (planPayement.showIcon) {
-                planPayement.showIcon = false;
-            } else {
-                planPayement.showIcon = true
-            }
-            const otherPlans = state.payementPlans.filter(plan => plan.id !== action.payload.id);
-            otherPlans.forEach(plan => {
-                plan.showIcon = false
-            })
+           const otherPayments = state.list.filter(payement => payement.id !== action.payload)
+            otherPayments.forEach(item => item.active = false)
         },
         selectPlan: (state, action) => {
             let selectedPlan = state.payementPlans.find(plan => plan.id === action.payload.id);
-            if (selectedPlan.checked) {
-                selectedPlan.checked = false
-            } else selectedPlan.checked = true
+            selectedPlan.checked = !selectedPlan.checked
+            state.currentPlan = selectedPlan.checked?selectedPlan:{}
             const otherPlans = state.payementPlans.filter(plan => plan.id !== selectedPlan.id);
             otherPlans.forEach(plan => {
                 plan.checked = false
             })
-            state.currentPlan = state.payementPlans.find(plan => plan.checked === true)
         },
         activePayement: (state, action) => {
-          const selectedPayement = state.list.find(item => item.id === action.payload)
-            if(selectedPayement) {
+          let selectedPayement = state.list.find(item => item.id === action.payload)
+            state.selectedPayement = selectedPayement
+            state.currentPlan = {}
             selectedPayement.active = true
-            state.payementPlans = selectedPayement.Plans
+            const plansOfPayement = selectedPayement.Plans
+            plansOfPayement.sort((a, b) => {
+                if(b.nombreMensualite < a.nombreMensualite ) return 1
+                if (b.nombreMensualite > a.nombreMensualite) return -1
+                return 0;
+            })
+            state.payementPlans = plansOfPayement
             const otherPayements = state.list.filter(item => item.id !== action.payload)
             otherPayements.forEach(item => item.active = false)
-            }
+
+        },
+        disablePayement: (state, action)=> {
+          let selectedPayement = state.list.find(item => item.id === action.payload)
+            selectedPayement.isDisabled = true
+
         },
         resetPayement: (state) => {
 
@@ -81,17 +84,16 @@ const payementSlice = createSlice({
             const otherPayements = state.list.filter(item => item.id !== state.list[0].id)
             otherPayements.forEach(item => item.active = false)
              state.payementPlans.forEach(item => item.checked = false)
-
-        }
-    },
-    extraReducers: {
-        [getSelectedPayement]: (state, action) => {
-            const selectedId = action.payload
-            state.selectedPayement = state.list.filter(payement => payement.id === selectedId);
-            const selected = state.selectedPayement
-            state.payementId = selectedId
-            if(selected.Plans)state.payementPlans.push(selected.Plans)
-
+            state.currentPlan = {}
+        },
+        showPlanDetail: (state, action) => {
+            let selectedPlan = state.payementPlans.find(plan => plan.id === action.payload)
+            selectedPlan.showPlanDetail = !selectedPlan.showPlanDetail
+            const otherPlans = state.payementPlans.filter(plan =>  plan.id !== action.payload)
+            otherPlans.forEach(plan => plan.showPlanDetail = false)
+        },
+        showCurrentPlanDetail: (state) => {
+            state.currentPlan.CurrentPlanDetail = !state.currentPlan.CurrentPlanDetail
         }
     }
 });
@@ -100,7 +102,8 @@ export default payementSlice.reducer;
 
  const {getPayements, resetPayement, payementAdded,
      payementRequested, payementRequestFailed, selectedPayement,
-     changeCurrentPlan, selectPlan, activePayement} = payementSlice.actions;
+      selectPlan, activePayement, disablePayement,
+     showPlanDetail, showCurrentPlanDetail} = payementSlice.actions;
 
 
 // actions creators
@@ -127,9 +130,6 @@ export const getSelected = (id) => dispatch => {
     dispatch(selectedPayement(id))
 }
 
-export const changePlan = (plan) => dispatch => {
-    dispatch(changeCurrentPlan(plan))
-}
 
 export const getSelectedPlan = (plan) => dispatch => {
     dispatch(selectPlan(plan))
@@ -142,4 +142,16 @@ export const getResetPayement = () => dispatch => {
 
 export const getPayementActive = (payementId) => dispatch => {
     dispatch(activePayement(payementId))
+}
+
+export const getPayementDisabled = (payementId) => dispatch => {
+    dispatch(disablePayement(payementId))
+}
+
+export const getPlanDetail = (planId) => dispatch => {
+    dispatch(showPlanDetail(planId))
+}
+
+export const getCurrentPlanDetail = () => dispatch => {
+    dispatch(showCurrentPlanDetail())
 }

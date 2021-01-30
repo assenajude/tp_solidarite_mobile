@@ -1,15 +1,14 @@
 import React from 'react';
-import {useStore} from "react-redux";
 import {TextInput, TouchableOpacity, View} from "react-native";
 import AppText from "../AppText";
-import {getRoleAdmin} from "../../store/selectors/authSelector";
 import {AntDesign} from "@expo/vector-icons";
 import colors from "../../utilities/colors";
+import useAuth from "../../hooks/useAuth";
 
 function EditItemStatus({labelStatus, editStatus, statusValue,
                             saveEditing,undoEditing,statusValueStyle,permitEdit=true,
                             editingStatusValue,changeEditingStatusValue, getStatusEditing}) {
-    const store = useStore()
+    const {userRoleAdmin} = useAuth()
     return (
         <View style={{
             flexDirection: 'row',
@@ -31,7 +30,7 @@ function EditItemStatus({labelStatus, editStatus, statusValue,
             </View>
           {permitEdit &&  <TouchableOpacity onPress={getStatusEditing}>
 
-                {getRoleAdmin(store.getState()) && !editStatus && <View>
+                {userRoleAdmin() && !editStatus && <View>
                     <AntDesign name='edit' size={24} color='green'/>
                 </View>}
             </TouchableOpacity>}

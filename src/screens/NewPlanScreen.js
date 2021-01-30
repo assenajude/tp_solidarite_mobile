@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator} from 'react-native'
 import * as Yup from 'yup'
-import {useDispatch, useSelector, shallowEqual} from 'react-redux';
+import {useDispatch, useSelector, shallowEqual, useStore} from 'react-redux';
 import {createSelector} from 'reselect'
 import {Picker} from '@react-native-community/picker'
 
@@ -10,38 +10,27 @@ import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import {addPlan} from '../store/slices/planSlice'
 import {loadPayements} from "../store/slices/payementSlice";
+import FormImageListPicker from "../components/forms/FormImageListPicker";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 
 const planValideSchema = Yup.object().shape({
     libelle: Yup.string(),
     description: Yup.string(),
     mensualite: Yup.number(),
-    compensation: Yup.number()
+    compensation: Yup.number(),
+    images: Yup.array()
 })
 
 function NewPlanScreen({navigation, route}) {
 
     const dispatch = useDispatch();
+    const store = useStore()
+
     const listPayements = useSelector(state => state.entities.payement.list)
+    const isLoading = useSelector(state => state.entities.plan.loadingPlan)
 
     const [payementId, setPayementId]  = useState(1);
-    const [allPayements, setAllPayements] = useState([]);
-    const loadPayement = useCallback(async () => {
-        await dispatch(loadPayements());
-    }, [dispatch]);
-
-
-
-
-
-
-        useEffect(() => {
-            loadPayement()
-            setAllPayements(listPayements)
-
-        }, [dispatch, loadPayement])
-
-
 
 
     const addNewPlan = async (plan) => {
@@ -50,13 +39,19 @@ function NewPlanScreen({navigation, route}) {
             libelle: plan.libelle,
             description: plan.description,
             mensualite: plan.mensualite,
-            compensation: plan.compensation
+            compensation: plan.compensation,
+            images: plan.images
         }
             await dispatch(addPlan(planData));
-            navigation.goBack();
+        const error = store.getState().entities.plan.error
+        if(error !== null) {
+            return alert('Impossible dajouter le plan, une erreur est apparue.')
+        }
+        navigation.goBack();
     };
             return (
                 <View style={styles.container}>
+                    <AppActivityIndicator visible={isLoading}/>
                     <ScrollView>
                         <View style={styles.listContainer}>
                             <Text style={{fontWeight: 'bold', marginRight: 15}}>Payement: </Text>
@@ -72,8 +67,10 @@ function NewPlanScreen({navigation, route}) {
                             libelle: '',
                             description: '',
                             mensualite: '',
-                            compensation: ''
+                            compensation: '',
+                            images: []
                         }} validationSchema={planValideSchema} onSubmit={addNewPlan}>
+                            <FormImageListPicker name='images'/>
                             <AppFormField title='Libelle' name='libelle'/>
                             <AppFormField title='Description' name='description'/>
                             <AppFormField title='Nombre de mensualité' name='mensualite'/>
