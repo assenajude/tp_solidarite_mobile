@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, ScrollView} from "react-native";
+import {View, StyleSheet, ScrollView, Alert} from "react-native";
 import * as Yup from 'yup'
 
 import {useDispatch, useSelector, useStore} from "react-redux";
@@ -27,6 +27,7 @@ function EditUserInfoScreen({navigation}) {
 
     const user = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.profile.loading)
+    const loading = useSelector(state => state.auth.loading)
     const currentUser = useSelector(state => state.profile.connectedUser)
 
 
@@ -44,6 +45,14 @@ function EditUserInfoScreen({navigation}) {
 
     const handleSaveAvatarUpdate = async () => {
         await dispatch(getAvatarChange({images: newPhoto}))
+        const error = store.getState().auth.error
+        if(error !== null) {
+            alert('Impossible de changer votre photo de profil')
+        } else {
+            Alert.alert('Info', 'vous avez changé votre photo de profil avec succès', [
+                {text:'ok', onPress:() => {navigation.goBack()}}
+            ])
+        }
     }
 
     const handleSaveEditInfo = async (info) => {
@@ -67,31 +76,40 @@ function EditUserInfoScreen({navigation}) {
 
     }
 
-    const handleDeleteAvatar = () => {
-        dispatch(getAvatarChange({images: []}))
+    const handleDeleteAvatar = async () => {
+        await dispatch(getAvatarChange({images: newPhoto, deleting: true}))
+        const error = store.getState().auth.error
+        if(error !== null) {
+            alert('Impossible de supprimer votre photo de profil')
+        }else {
+            Alert.alert('Alert', 'vous avez supprimé votre photo de profil avec succès', [
+                {text:'ok', onPress:() => {
+                    setNewPhoto([])
+                        navigation.goBack()
+                    }}
+            ])
+        }
     }
 
     return (
         <>
-            <AppActivityIndicator visible={isLoading}/>
+            <AppActivityIndicator visible={isLoading || loading}/>
         <ScrollView>
         <View style={styles.container}>
-            <View style={{
-                flexDirection: 'row'
-            }}>
+
                 <ProfileImagePicker showPickerModal={showProfileModal} dismissPickerModal={() => setShowProfileModal(false)}
                                    getPickerModalShown={() => setShowProfileModal(true)}
                                    imageUrl={{uri: newPhoto[0]}} onChangeImage={handleChangeAvatar} onChangePhoto={handleChangePhoto}
                                     changeProfileAvatar={handleSaveAvatarUpdate} deleteAvatar={handleDeleteAvatar}/>
-            </View>
+
             <AppForm initialValues={{
-                username: currentUser.username,
-                email: currentUser.email,
-                nom: currentUser.nom,
-                prenom: currentUser.prenom,
-                phone: currentUser.phone,
-                adresse: currentUser.adresse,
-                profession: currentUser.profession
+                username: currentUser.username || '',
+                email: currentUser.email || '',
+                nom: currentUser.nom || '',
+                prenom: currentUser.prenom || '',
+                phone: currentUser.phone || '',
+                adresse: currentUser.adresse || '',
+                profession: currentUser.profession || ''
             }} validationSchema={valideEditInfo} onSubmit={handleSaveEditInfo}>
                 <AppFormField title='Nom utilisateur' name='username' />
                 <AppFormField title='E-mail' name='email'/>

@@ -43,6 +43,8 @@ import HelpScreen from "../screens/HelpScreen";
 import FaqScreen from "../screens/FaqScreen";
 import QuestionScreen from "../screens/QuestionScreen";
 import ResponseScreen from "../screens/ResponseScreen";
+import ServiceDetailScreen from "../screens/ServiceDetailScreen";
+import ServiceNavigator from "./ServiceNavigator";
 
 
 
@@ -51,6 +53,7 @@ const ArticleStackNavigator = createStackNavigator();
 const AccueilNavigator = () => {
 const navigation = useNavigation()
     const dispatch = useDispatch()
+    const user = useSelector(state => state.auth.user)
     const cartItemLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
 
     const [seachValue, setSearchValue] = useState('')
@@ -71,7 +74,7 @@ const navigation = useNavigation()
                options={({navigation}) => ({
                    headerTitleAlign: 'center',
                    headerLeft: () =>
-                       <Avatar otherImageStyle={{width:40,height:40}} otherImageContainerStyle={{width:40,height:40}}
+                       <Avatar userAvatar={{uri:user.avatar}} otherImageStyle={{width:40,height:40}} otherImageContainerStyle={{width:40,height:40}}
                                onPress={() =>navigation.openDrawer()}/>,
                    headerTitle: () => <AppSearchBar searchValue={seachValue} changeSearchValue={(val) => setSearchValue(val)}
                                                     handleSearch={handleSearch}/>,
@@ -163,6 +166,9 @@ const navigation = useNavigation()
             <ArticleStackNavigator.Screen name='ResponseScreen' component={ResponseScreen} options={{
                 title: 'Ajouter une reponse'
             }}/>
+            <ArticleStackNavigator.Screen name='ServiceDetailScreen' component={ServiceDetailScreen} options={({route}) => ({
+                title: 'Detail '+route.params.libelle
+            })}/>
 
 
         </ArticleStackNavigator.Navigator>

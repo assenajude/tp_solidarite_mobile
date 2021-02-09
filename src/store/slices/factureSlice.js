@@ -43,9 +43,6 @@ const factureSlice = createSlice({
 
 
         },
-        userFactures: (state, action) => {
-            state.userFactures = action.payload
-        },
         showItemTranche: (state, action) => {
             let selectedItem = state.userFactures.find(item => item.id === action.payload)
             selectedItem.showTranche = !selectedItem.showTranche
@@ -70,12 +67,24 @@ const factureSlice = createSlice({
                 let encoursIndex = state.encoursList.findIndex(item => item.id === action.payload.id)
                 state.encoursList.splice(encoursIndex, 1, action.payload)
             }
+        },
+        resetConnectedFactures: (state) => {
+            state.list =  []
+            state.userFactures =  []
+            state.encoursList =  []
+            state.soldeList =  []
+            state.newAdded =  {}
+            state.loading =  false
+            state.error =  null
+            state.orderFacture =  {}
+            state.newFactureCompter =  0
         }
     }
 })
 
 export default factureSlice.reducer
-const {factureAdded, factureReceived, factureRequested, factureUpdated, factureRequestFailed, showItemTranche} = factureSlice.actions
+const {factureAdded, factureReceived, factureRequested, factureUpdated,
+    factureRequestFailed, showItemTranche, resetConnectedFactures} = factureSlice.actions
 
 
 //action creators
@@ -89,17 +98,6 @@ export const addFacture = (facture) => apiRequest({
         onSuccess: factureAdded.type,
         onError: factureRequestFailed.type
     })
-
-
-
-export const getFactures = () => apiRequest({
-    url,
-    method: 'get',
-    onStart: factureRequested.type,
-    onSuccess: factureReceived.type,
-    onError: factureRequestFailed.type
-
-})
 
 export const getTrancheShown = (factureId) => dispatch =>{
     dispatch(showItemTranche(factureId))
@@ -124,3 +122,7 @@ export const getFacturesByUser = () => apiRequest({
     onSuccess:factureReceived.type,
     onError: factureRequestFailed.type
 })
+
+export const getConnectedFacturesReset = () => dispatch => {
+    dispatch(resetConnectedFactures())
+}

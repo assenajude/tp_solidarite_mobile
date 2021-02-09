@@ -31,10 +31,10 @@ function PropositionItem({isPropositionImage, propositionImage,label,
                 {!propositionNotReady && <AppButton style={{alignSelf: 'flex-end', padding: 5}} title='commander' onPress={getPropositionOrder}/>}
             </View>
             {propositionNotReady && <View style={styles.notReady}>
-                <AppText style={{color: colors.rougeBordeau, fontWeight: "bold"}}>En cours de traitement...</AppText>
             </View>}
 
             {propositionNotReady && <View style={styles.notReadyEdit}>
+                <AppText style={{color: colors.rougeBordeau, fontWeight: "bold"}}>En cours de traitement...</AppText>
                 {userRoleAdmin() && <AppButton title='Editer' onPress={editProposition}/>}
             </View>}
 

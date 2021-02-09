@@ -14,13 +14,15 @@ import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import {useSelector} from "react-redux";
 import Avatar from "../components/user/Avatar";
-import routes from "../navigation/routes";
 
 function OrderDetailsScreen({route, navigation}) {
 
+    const user = useSelector(state => state.auth.user)
     const commande = useSelector(state => {
         const userListOrder = state.entities.order.currentUserOrders
-        const selectedOrder = userListOrder.find(order => order.id === route.params.id)
+        const selectedOrder = userListOrder.find(order => {
+            if(order.id === route.params.id || order.numero === route.params.numero) return true
+        })
         return selectedOrder
     })
 
@@ -46,7 +48,7 @@ function OrderDetailsScreen({route, navigation}) {
     }
 
     useEffect(() => {
-          if(commande.typeCmde === 'e-commerce') {
+          if(commande.typeCmde === 'article') {
               setOrderRelais(getPointRelais(commande.id))
           }
     }, [])
@@ -65,7 +67,7 @@ function OrderDetailsScreen({route, navigation}) {
 
                     </View>
                     <View style={styles.contentStyle}>
-                        <Avatar showUsername={true} onPress={() => navigation.navigate('AccueilNavigator', {screen: 'CompteScreen'})}/>
+                        <Avatar userAvatar={{uri: user.avatar}} showUsername={true} onPress={() => navigation.navigate('AccueilNavigator', {screen: 'CompteScreen'})}/>
                        <View style={{marginLeft: 50}}>
                            <AppLabelWithValue label='Total montant: ' labelValue={commande.montant} secondLabel='fcfa'/>
                            <AppLabelWithValue label='Total payé: ' labelValue={commande.Facture?commande.Facture.solde:0} secondLabel='fcfa'/>

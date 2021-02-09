@@ -21,6 +21,7 @@ import userOrderSlice from './slices/userOrderSlice'
 import userFavoriteSlice from './slices/userFavoriteSlice'
 import propositionSlice from './slices/propositionSlice'
 import faqSlice from './slices/faqSlice'
+import messageSlice from './slices/messageSlice'
 
 export default combineReducers({
     payement: payementSlice,
@@ -43,6 +44,7 @@ export default combineReducers({
     userOrder: userOrderSlice,
     userFavorite: userFavoriteSlice,
     proposition: propositionSlice,
-    faq: faqSlice
+    faq: faqSlice,
+    message: messageSlice
 
 })

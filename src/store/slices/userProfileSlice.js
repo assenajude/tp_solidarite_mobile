@@ -8,7 +8,7 @@ const profilSlice = createSlice({
         loading: false,
         error: null,
         avatar: null,
-        notifCompter: 1
+        notifCompter: 0
 
     },
     reducers: {
@@ -25,19 +25,24 @@ const profilSlice = createSlice({
             state.error = null
             state.connectedUser = action.payload
         },
-
-
         saveInfoEdit: (state, action) => {
             state.loading = false
             state.error = null
             state.connectedUser = action.payload
+        },
+        resetConnectedUser: (state) => {
+            state.connectedUser = {}
+            state.loading = false
+            state.error = null
+            state.avatar = null
+            state.notifCompter = 0
         }
     }
 })
 
 export default profilSlice.reducer
 const {connectedUserData, profileRequested,
-    profileRequestFailed, saveInfoEdit} = profilSlice.actions
+    profileRequestFailed, saveInfoEdit, resetConnectedUser} = profilSlice.actions
 
 
 const url = '/users/me'
@@ -63,3 +68,7 @@ export const getSaveEditInfo = (data) => apiRequest({
     onSuccess: saveInfoEdit.type,
     onError: profileRequestFailed.type
 })
+
+export const getConnectedUserReset = () => dispatch => {
+    dispatch(resetConnectedUser())
+}

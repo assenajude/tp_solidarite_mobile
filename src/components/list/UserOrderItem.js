@@ -12,12 +12,11 @@ import FactureItemLabel from "./FactureItemLabel";
 import AppButton from "../AppButton";
 import ItemIconButton from "./ItemIconButton";
 import {MaterialIcons, Entypo} from '@expo/vector-icons'
-import AppTimer from "../AppTimer";
 
 function UserOrderItem({
                            numero,header,showDetail,orderItems, datePrevue, contrats,contratStatus,isDemande,isContrat,isHistorique,contratStatusStyle,
                            deleteItem,changeLivraisonValue,livraisonValue,goToItemDetails,
-                           fraisLivraison,tauxInteret,statusAccordValue,isExpired,currentOrder,
+                           fraisLivraison,tauxInteret,statusAccordValue,isExpired,expireIn,
                            changeAccordEditValue,leaveItemToContract,moveItemToHistory, getLink,modePayement,
                            getDetails,montant,dateCmde, dateLivraison, typeCmde,
                            loopItemWatch, playItemWatch,solde,endFacture=true,showDeleteIcon=true,
@@ -28,7 +27,7 @@ function UserOrderItem({
         <>
             <View style={styles.mainContainer}>
                {isDemande && statusAccordValue.toLowerCase() === 'accepté' && <View>
-                   {isExpired?<AppText style={{color:colors.rougeBordeau, fontWeight: 'bold'}}>0j 00h00m 00s</AppText>:<AppTimer currentOrder={currentOrder}/>}
+                   {isExpired?<AppText style={{color:colors.rougeBordeau, fontWeight: 'bold'}}>0j 00h00m 00s</AppText>:<AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}>{expireIn}</AppText>}
                </View>}
                 <AppModePayement modePayement={modePayement}/>
                 <View style={{flexDirection: 'row',
@@ -140,7 +139,7 @@ const styles = StyleSheet.create({
     expired: {
         position: 'absolute',
         backgroundColor: colors.blanc,
-        opacity: 0.5,
+        opacity: 0.8,
         height: '100%',
         width: '100%',
         justifyContent: 'center',

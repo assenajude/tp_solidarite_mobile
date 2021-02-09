@@ -29,8 +29,8 @@ function OrderPayementScreen({navigation}) {
     const loading = useSelector(state => state.entities.payement.loading)
     const selectedPlan = useSelector(state => state.entities.payement.currentPlan)
     const livraisonLoading = useSelector(state => state.entities.userAdresse.loading)
-    const [checkItem, setCheckItem] = useState(false)
     const typeCmde = useSelector(state => state.entities.shoppingCart.type)
+    // const [checkItem, setCheckItem] = useState()
 
 
 
@@ -38,12 +38,7 @@ function OrderPayementScreen({navigation}) {
 
 
   useEffect(() => {
-      if(typeCmde === 'service') {
-          dispatch(getPayementDisabled(1))
-          dispatch(getPayementActive(2))
-      } else {
-          dispatch(getPayementActive(1))
-      }
+
   }, [])
 
 
@@ -126,7 +121,7 @@ function OrderPayementScreen({navigation}) {
                                                   return alert('Vous ne pouvez pas choisir ce plan pour cette commande, veuillez choisir un autre plan SVP')
                                               }
                                             dispatch(getSelectedPlan(plan))
-                                            setCheckItem(true)
+                                            // setCheckItem(true)
                                           }} planDelai={plan.nombreMensualite>0?plan.nombreMensualite+' m':'3 j'}
                                           showDetail={plan.showPlanDetail} getDetails={() => dispatch(getPlanDetail(plan.id))}
                                           goToPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: plan})}

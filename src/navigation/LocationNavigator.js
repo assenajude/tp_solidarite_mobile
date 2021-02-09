@@ -15,6 +15,7 @@ const LocationStackNav = createStackNavigator()
 
 function LocationNavigator({navigation}) {
     const dispatch = useDispatch()
+    const user = useSelector(state => state.auth.user)
     const cartItemLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
     const [searchValue, setSearchValue] = useState('')
 
@@ -29,7 +30,7 @@ function LocationNavigator({navigation}) {
             headerTitleAlign: 'center',
         }}>
             <LocationStackNav.Screen name='LocationScreen' component={ElocationScreen} options={{
-                headerLeft: () => <Avatar otherImageStyle={{height: 40,width: 40}} onPress={() =>navigation.openDrawer()}/>,
+                headerLeft: () => <Avatar userAvatar={{uri: user.avatar}} otherImageStyle={{height: 40,width: 40}} onPress={() =>navigation.openDrawer()}/>,
                 headerTitle: () => <AppSearchBar searchValue={searchValue} changeSearchValue={(val) => setSearchValue(val)} handleSearch={handleLocationSearch}/>,
                 headerRight: () => <CartIconRight cartLenght={cartItemLenght} getToCartScreen={() =>navigation.navigate('AccueilNavigator', {screen: routes.CART})}/>
             }}/>

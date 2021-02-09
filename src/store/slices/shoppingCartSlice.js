@@ -116,10 +116,15 @@ const shoppingCartSlice = createSlice({
             state.error = null
             const itemId = action.payload.id
             let selectedItem = state.items[itemId]
-            if(state.type === 'article' && selectedItem.CartItem.quantite > 1) {
+            if(state.type === 'article') {
+                if(selectedItem.CartItem.quantite > 1) {
                     selectedItem.CartItem.quantite--
                     selectedItem.CartItem.montant-= selectedItem.prixPromo
                     state.items[selectedItem.id] = selectedItem
+                } else {
+                    delete state.items[itemId]
+                    state.type = ''
+                }
                     state.itemsLenght--
                     state.totalAmount -= selectedItem.prixPromo
             } else {

@@ -15,8 +15,7 @@ import AppText from "../AppText";
 
 function DrawerContent(props) {
     const dispatch = useDispatch()
-    const {initUserDatas} = useAuth()
-    const {userRoleAdmin} = useAuth()
+    const {userRoleAdmin,resetConnectedUserData} = useAuth()
 
     const user = useSelector(state => state.auth.user)
     const isUser = useSelector(state => {
@@ -31,11 +30,12 @@ function DrawerContent(props) {
     const factureCompter = useSelector(state => state.entities.facture.newFactureCompter)
     const prositionCompter = useSelector(state => state.entities.proposition.newPropositionCompter)
     const helpCompter = useSelector(state => state.entities.faq.helpCompter)
+    const msgCompter = useSelector(state => state.entities.message.newMsgCompter)
 
 
     const handleLogout = () => {
         dispatch(getLogout())
-        initUserDatas()
+        resetConnectedUserData()
     }
 
 
@@ -47,7 +47,7 @@ function DrawerContent(props) {
 
                        <View style={styles.avatar}>
                        <View style={{top: 20}}>
-                           <Avatar otherImageStyle={{width: 80,height: 80}}/>
+                           <Avatar userAvatar={{uri:user.avatar}} otherImageStyle={{width: 80,height: 80}}/>
                        </View>
                            <View>
                                <TouchableOpacity onPress={() => props.navigation.navigate(routes.HELP)}>
@@ -88,7 +88,7 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge name='message1' badgeCount={1}
+                           <AppIconWithBadge name='message1' badgeCount={msgCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau}} size={size} color={color} />}
                            label='Messages' onPress={() => {props.navigation.navigate(routes.USER_MESSAGE)}} />
                    </View>
@@ -137,7 +137,7 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge badgeCount={locationCompter}
+                           <AppIconWithBadge
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                <Entypo name="address" size={size} color={color} />
                            </AppIconWithBadge> }

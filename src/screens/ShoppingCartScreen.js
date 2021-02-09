@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react';
+
+import React, {useState} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
 import {View, FlatList, StyleSheet, ScrollView} from 'react-native'
 import CartListFooter from "../components/shoppingCart/CartListFooter";
@@ -20,6 +21,7 @@ import {
     setItemServiceMontant
 } from "../store/slices/shoppingCartSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getPayementActive, getPayementDisabled} from "../store/slices/payementSlice";
 
 function ShoppingCartScreen({navigation}) {
     const dispatch = useDispatch();
@@ -129,12 +131,21 @@ function ShoppingCartScreen({navigation}) {
         return false
     }
 
-    useEffect(() => {
-    }, [])
+    const handleGetOrder = () => {
+        dispatch(addToOrder(items, itemsLenght, totalAmount, cartType))
+        if(cartType === 'service') {
+            dispatch(getPayementDisabled(1))
+            dispatch(getPayementActive(2))
+        } else {
+            dispatch(getPayementActive(1))
+        }
+        navigation.navigate(routes.ORDER_PAYEMENT)
+
+    }
 
     if (items.length === 0) {
         return <View style={styles.emptyListStyle}>
-            <AppText>Votre panier est vide, vous pouvez y ajouter des articles.</AppText>
+            <AppText>Votre panier est vide.</AppText>
         </View>
     }
 
@@ -144,7 +155,9 @@ function ShoppingCartScreen({navigation}) {
                 <AppActivityIndicator visible={isLoading}/>
             <ScrollView>
                 <CartListHeader min={true} max={true}/>
-               <CartItem showItemDetails={() => navigation.navigate(routes.SERVICE_DETAIL, items[0])} deleteItem={() => handleDeleteItem(items[0])} designation={items[0].libelle} source={{uri: items[0].image}}
+               <CartItem showItemDetails={() => {
+                   navigation.navigate('ServiceDetailScreen', items[0])
+               }} deleteItem={() => handleDeleteItem(items[0])} designation={items[0].libelle} source={{uri: items[0].image}}
                min={true} max={true} montantMin={items[0].montantMin} montantMax={items[0].montantMax} icon={true}/>
                 <View style={{
                     flexDirection: 'row',
@@ -175,10 +188,7 @@ function ShoppingCartScreen({navigation}) {
                         <AppText style={{fontSize: 18, fontWeight: 'bold'}}>{dayjs(selectedDate).format('DD/MM/YYYY HH:mm:ss')}</AppText>
                     </View>
                 </View>
-               <CartListFooter readyToGo={itemsLenght>=1 && totalAmount>0} getOrder={() => {
-                   dispatch(addToOrder(items, itemsLenght, totalAmount,cartType, selectedDate.getTime()))
-                   navigation.navigate(routes.ORDER_PAYEMENT)
-               }} totalAmount={totalAmount}/>
+               <CartListFooter readyToGo={itemsLenght>=1 && totalAmount>0} getOrder={handleGetOrder} totalAmount={totalAmount}/>
             </ScrollView>
                 </>
         )
@@ -190,7 +200,9 @@ function ShoppingCartScreen({navigation}) {
        <FlatList ListHeaderComponent={() => <CartListHeader prix={true} quantite={true} montant={true}/>}
                  data={items} keyExtractor={(item) => item.id.toString()}
                  renderItem={({item}) =>
-                     <CartItem itemType={cartType} caution={item.caution} frequence={item.frequence} notInStock={getQuantiteInStock(item) === 0} deleteItem={() => handleDeleteItem(item)} quantite={true} montant={true} price={true}  designation={item.libelle} itemQuantite={item.quantite}
+                     <CartItem showItemDetails={() => {
+                         item.typeCmde === 'article'?navigation.navigate(routes.ARTICLE_DETAIL, item):navigation.navigate(routes.LOCATION_DETAIL, item)
+                     }} itemType={cartType} caution={item.caution} frequence={item.frequence} notInStock={getQuantiteInStock(item) === 0} deleteItem={() => handleDeleteItem(item)} quantite={true} montant={true} price={true}  designation={item.libelle} itemQuantite={item.quantite}
                                quantityDecrement={() => {dispatch(getItemQtyDecrement(item))}}
                                quantityIncrement={() => {dispatch(getItemQtyIncrement(item))}}
                                source={{uri: item.image}} itemBtnFirst='Détail'
@@ -199,10 +211,7 @@ function ShoppingCartScreen({navigation}) {
                               activeDecrement={cartType == 'article'} disabledDecrement={item.quantite === 1}
                                activeIncrement={cartType == 'article'} disabledIncrement={item.quantite === getQuantiteInStock(item)}/>}
                  ListFooterComponent={() =>
-                     <CartListFooter totalAmount={totalAmount} getOrder={() =>{
-                     const shoppingType = store.getState().entities.shoppingCart.type
-                     dispatch(addToOrder(items, itemsLenght, totalAmount, shoppingType))
-                     navigation.navigate(routes.ORDER_PAYEMENT)}} readyToGo={itemsLenght>=1 && totalAmount>0 && checkIfCartIsNotOutOfStock()}/>}
+                     <CartListFooter totalAmount={totalAmount} getOrder={handleGetOrder} readyToGo={itemsLenght>=1 && totalAmount>0 && checkIfCartIsNotOutOfStock()}/>}
               />
 
         </View>

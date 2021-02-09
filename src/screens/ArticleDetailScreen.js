@@ -21,7 +21,7 @@ function ArticleDetailScreen({route, navigation}) {
 
     const item = useSelector(state => {
         const listArticles = state.entities.article.availableArticles
-        const currentArticle = listArticles.find(article => article.id === route.params.id)
+        const currentArticle = listArticles.find(article => article.id === Number(route.params.id))
         return currentArticle
     })
 
@@ -43,13 +43,14 @@ function ArticleDetailScreen({route, navigation}) {
 
     const handleAddToCart = () => {
         const isOptionSelected = selectedColor !=='' && selectedSize !==''
-        if(!isOptionSelected) {
+        if(item.ProductOptions.length>0 && !isOptionSelected) {
             return alert('Veuillez choisir une option SVP.')
         }
      const itemData = {...item, prix: selectedOption.prix, couleur: selectedColor, taille: selectedSize,quantite: selectedQty}
         dispatch(getProvenanceSet('commerceDetail'))
         addItemToCart(itemData)
     }
+
 
     if(showModal) {
         return <AddToCartModal itemModalVisible={showModal} source={{uri: addedItem.imagesArticle[0]}} designation={addedItem.designArticle}

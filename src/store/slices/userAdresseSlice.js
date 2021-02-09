@@ -80,6 +80,15 @@ const userAdresseSlice = createSlice({
             state.error = null
             const newList = state.list.filter(adresse => adresse.id !== action.payload.id)
             state.list = newList
+        },
+        resetConnectedAdresses: (state) => {
+            state.list = []
+            state.loading = false
+            state.error = null
+            state.userAdresses = []
+            state.selectedAdresse = {}
+            state.adresseRelais = {}
+            state.currentAdresse = {}
         }
     }
 
@@ -89,7 +98,7 @@ export default userAdresseSlice.reducer;
 
 const {userAdresseAdded, resetAdresse, userAdresseFailed, userAdresseReceived, userAdresseRequested,
     selectAdress, showAdressesDetail, showOrderAdresseDetails, currentAdresseSelected, resetCurrentAdress,
-    userAdresseUpdated, userAdresseDeleted} = userAdresseSlice.actions
+    userAdresseUpdated, userAdresseDeleted, resetConnectedAdresses} = userAdresseSlice.actions
 
 
 const url = '/userAdresses'
@@ -155,3 +164,7 @@ export const getAdresseDeleted = (adresse) =>apiRequest({
     onError: userAdresseFailed.type
 
 })
+
+export const getConnectedAdressesReset = () => dispatch => {
+    dispatch(resetConnectedAdresses())
+}

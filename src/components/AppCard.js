@@ -19,7 +19,7 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, isFavorite
             padding: 10
         }}>
         <TouchableHighlight onPress={onPress}>
-        <View  style={[styles.mainContainer, {height: itemType==='service'?330:370}]}>
+        <View  style={[styles.mainContainer, {height: itemType==='service'?330:360}]}>
             {itemType !== 'service' &&  <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between'
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: Color.blanc,
         overflow: 'hidden',
-        width: 350,
+        width: 320,
     },
     buttonContainerStyle: {
       flexDirection:'row',

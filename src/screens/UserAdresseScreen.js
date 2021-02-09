@@ -1,5 +1,5 @@
 import React, { useEffect} from 'react';
-import {View,StyleSheet, FlatList, Alert} from 'react-native'
+import {View,StyleSheet, FlatList, Alert, ToastAndroid} from 'react-native'
 import {useSelector, useDispatch} from "react-redux";
 
 import ListFooter from "../components/list/ListFooter";
@@ -9,6 +9,7 @@ import AppButton from "../components/AppButton";
 import UserAdresseItem from "../components/userAdresse/UserAdresseItem";
 import {getAdresseDeleted, getCurrentAdresseSelected} from "../store/slices/userAdresseSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import ListItemActions from "../components/list/ListItemActions";
 
 function UserAdresseScreen({navigation}) {
     const dispatch = useDispatch()
@@ -17,6 +18,7 @@ function UserAdresseScreen({navigation}) {
     const user = useSelector(state => state.auth.user)
     const listVille = useSelector(state => state.entities.ville.list)
     const isLoading = useSelector(state => state.entities.userAdresse.loading)
+    const error = useSelector(state => state.entities.userAdresse.error)
 
     const isUser = Object.keys(user).length>0
 
@@ -27,9 +29,16 @@ function UserAdresseScreen({navigation}) {
     }
 
     const handleDeleteAdresse =  (adresse) => {
-        Alert.alert('Alert!', 'Voulez-vous supprimer definitivement cette adresse?', [{text: 'oui', onPress: () => dispatch(getAdresseDeleted(adresse))},
+        Alert.alert('Alert!', 'Voulez-vous supprimer definitivement cette adresse?', [{text: 'oui', onPress: async () => {
+              await dispatch(getAdresseDeleted(adresse))
+                if(error !== null){
+                    ToastAndroid.showWithGravity("Impossible de supprimer l'adresse.", ToastAndroid.LONG, ToastAndroid.TOP)
+                } else {
+                    ToastAndroid.showWithGravity("Adresse supprimer avec succès.",ToastAndroid.LONG, ToastAndroid.TOP)
+                }
+            }},
             {text: 'non', onPress: () => {return;}}
-            ], {cancelable: false})
+            ])
     }
 
     useEffect(() => {
@@ -45,7 +54,8 @@ function UserAdresseScreen({navigation}) {
                                                                    dispatch(getCurrentAdresseSelected(item))
                                                                    navigation.navigate('AccueilNavigator', {screen: routes.NEW_USER_ADDRESS, params: {mode: 'edit'}})
                                                                }}
-                                                               getAdresseDelete={() => handleDeleteAdresse(item)}/>
+                                                               getAdresseDelete={() => handleDeleteAdresse(item)}
+                                                               renderAdresseRightActions={() =><ListItemActions onPress={() => handleDeleteAdresse(item)}/>}/>
                       }/>}
             {isUser && userAdresses.length === 0 && <View style={styles.container}>
                 <AppText>vous n'avez pas encore ajouté d'adresses.</AppText>

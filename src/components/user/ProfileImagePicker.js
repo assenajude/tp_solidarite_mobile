@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View, TouchableOpacity, ScrollView, StyleSheet, Animated, Image} from "react-native";
 import {Modal} from "react-native";
 import { Entypo, AntDesign} from '@expo/vector-icons';
@@ -55,13 +55,14 @@ function ProfileImagePicker({showPickerModal,onChangeImage,onChangePhoto,changeP
     }
 
 
+
     return (
         <>
             <ScrollView>
             <View style={{
                 flexDirection: 'row'
             }}>
-                {imageUrl && <Image source={imageUrl} style={{height: 60, width: 60, margin: 20}}/>}
+                {imageUrl && imageUrl.uri !== null && <Image source={imageUrl} style={{height: 60, width: 60, margin: 20}}/>}
             <TouchableOpacity onPress={getPickerModalShown}>
                 <View style={{
                     width: 60,

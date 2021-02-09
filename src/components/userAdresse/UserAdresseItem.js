@@ -4,10 +4,13 @@ import AppText from "../AppText";
 import colors from "../../utilities/colors";
 import AppLabelWithValue from "../AppLabelWithValue";
 import { AntDesign } from '@expo/vector-icons';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+
 
 function UserAdresseItem({adresseName, villeName, telephone, otherAdresse,
-                             email, getAdresseEdit, getAdresseDelete}) {
+                             email, getAdresseEdit,renderAdresseRightActions}) {
     return (
+        <Swipeable renderRightActions={renderAdresseRightActions} >
         <View style={styles.container}>
             <View style={styles.welcome}>
                 <AppText style={{
@@ -20,28 +23,27 @@ function UserAdresseItem({adresseName, villeName, telephone, otherAdresse,
                 <AppText>à</AppText>
                 <AppText style={{fontWeight: 'bold'}}>{villeName}</AppText>
             </View>
-            <View>
+            <View style={{
+                padding: 10
+            }}>
                 <AppText style={{
                     color: colors.or,
                     fontWeight: 'bold',
                     fontSize: 15
                 }}>{adresseName}</AppText>
-                <AppLabelWithValue label='Tel: ' labelValue={telephone}/>
-                <AppLabelWithValue label='E-mail: ' labelValue={email}/>
-                <AppLabelWithValue label='Adresses: ' labelValue={otherAdresse}/>
+                <AppLabelWithValue  labelValue={telephone}/>
+                <AppLabelWithValue labelValue={email}/>
+                <AppLabelWithValue labelValue={otherAdresse}/>
             </View>
             <View style={styles.editButton}>
                 <TouchableOpacity onPress={getAdresseEdit}>
                     <AntDesign name="edit" size={20} color="black" />
                 </TouchableOpacity>
-                <View style={{marginTop: 10}}>
-                <TouchableOpacity onPress={getAdresseDelete}>
-                    <AntDesign name="delete" size={20} color={colors.rougeBordeau} />
-                </TouchableOpacity>
-                </View>
             </View>
 
         </View>
+        </Swipeable>
+
     );
 
 }

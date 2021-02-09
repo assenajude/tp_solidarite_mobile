@@ -20,7 +20,7 @@ function LocationDetailScreen({route, navigation}) {
 
     const item = useSelector(state => {
         const listLocation = state.entities.location.list
-        const selectedLocation = listLocation.find(item => item.id === route.params.id)
+        const selectedLocation = listLocation.find(item => item.id === Number(route.params.id))
         return selectedLocation
     })
 
@@ -42,7 +42,7 @@ function LocationDetailScreen({route, navigation}) {
 
     const handleAddToCart = () => {
         const isLocationSelected = selectedColor !== '' && selectedSize !== ''
-        if(!isLocationSelected) {
+        if(item.ProductOptions.length>0 && !isLocationSelected) {
             return alert('Vous devez choisir une option pour valider.')
         }
     const itemData = {...item, couleur: selectedColor, prix: locSelectedOption.prix, taille: selectedSize, quantite: selectedQty}

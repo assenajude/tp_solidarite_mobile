@@ -34,14 +34,14 @@ const payementSlice = createSlice({
            if(selected) {
             selected.active = true
                 const plans = selected.Plans
-               if(plans.length>0) {
+               if( plans && plans.length>0) {
                plans.sort((a, b) => {
                    if(b.nombreMensualite < a.nombreMensualite ) return 1
                    if (b.nombreMensualite > a.nombreMensualite) return -1
                    return 0;
                })
+                state.payementPlans = plans
                }
-            state.payementPlans = plans
             state.payementId = action.payload
             state.currentPlan = {}
            }

@@ -15,6 +15,7 @@ const ServiceStackNav = createStackNavigator()
 
 function ServiceNavigator({navigation}) {
     const dispatch = useDispatch()
+    const user = useSelector(state => state.auth.user)
     const itemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
     const [search, setSearch] = useState('')
 
@@ -31,15 +32,15 @@ function ServiceNavigator({navigation}) {
         }}>
             <ServiceStackNav.Screen name='ServiceScreen' component={EserviceScreen} options={{
                 headerTitle: () => <AppSearchBar searchValue={search} changeSearchValue={(value) => setSearch(value)} handleSearch={handleSearch}/>,
-                headerLeft: () => <Avatar otherImageStyle={{width: 40,height: 40}} onPress={() =>navigation.openDrawer()}/>
+                headerLeft: () => <Avatar userAvatar={{uri: user.avatar}} otherImageStyle={{width: 40,height: 40}} onPress={() =>navigation.openDrawer()}/>
             }}/>
             <ServiceStackNav.Screen name='NewServiceScreen' component={NewServiceScreen} options={{
                 title: 'Ajout nouveau service',
             }}/>
-            <ServiceStackNav.Screen name='ServiceDetailScreen' component={ServiceDetailScreen} options={({route}) => ({
+           {/* <ServiceStackNav.Screen name='ServiceDetailScreen' component={ServiceDetailScreen} options={({route}) => ({
                 title: 'Detail '+route.params.libelle
             })}/>
-
+*/}
         </ServiceStackNav.Navigator>
     );
 }

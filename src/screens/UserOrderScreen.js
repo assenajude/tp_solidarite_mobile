@@ -57,13 +57,15 @@ function UserOrderScreen({navigation}) {
             renderItem={({item}) =>
            <UserOrderItem header='A' numero={item.numero} isDemande={true} montant={item.montant} orderItems={item.CartItems}
                           modePayement={getModePayement(item.id)} statusAccordValue={item.statusAccord} accordInitData={initData.accordData}
-                          changeAccordEditValue={(value) => {saveAccordEdit({orderId: item.id, statusAccord: value})}}
+                          changeAccordEditValue={(value) => {
+                              saveAccordEdit({orderId: item.id, statusAccord: value})
+                          }}
                           accordStyle={{color: item.statusAccord.toLowerCase() === 'accepté'?colors.vert:item.statusAccord.toLowerCase() === 'refusé'?'red':'grey', fontWeight: 'bold'}}
                           goToItemDetails={() =>navigation.navigate('AccueilNavigator', {screen: routes.ORDER_DETAILS, params: item})}
                           getDetails={() => dispatch(getItemDetail(item))} fraisLivraison={item.fraisTransport} tauxInteret={item.interet}
                           dateCmde={item.dateCmde} showDetail={item.showDetails} datePrevue={item.dateLivraisonDepart} dateLivraison={item.dateLivraisonFinal}
                           moveItemToHistory={() =>{moveOrderToHistory(item.id)}} leaveItemToContract={() => {createOrderContrat(item)}}
-                          deleteItem={() => deleteOrder(item)} isExpired={item.isExpired} currentOrder={item}/>
+                          deleteItem={() => deleteOrder(item)} isExpired={item.isExpired} expireIn={item.expireIn}/>
        }/>}
             {localDemandeList.length === 0 && !isLoading && error === null && <View style={{
                 flex: 1, justifyContent: 'center', alignItems: 'center',

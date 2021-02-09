@@ -7,7 +7,6 @@ import {apiRequest} from '../actionsCreators/apiActionCreator'
 const orderSlice = createSlice({
     name: 'order',
     initialState: {
-        list: [],
         currentUserOrders: [],
         listServices: [],
         listLocations: [],
@@ -33,13 +32,6 @@ const orderSlice = createSlice({
             state.loading = false
             state.error  = action.payload
         },
-        allOrderReceived: (state, action) => {
-            state.loading = false
-            state.error = null
-            const data = action.payload
-            state.list = data
-
-        },
         userOrdersReceived: (state, action) => {
             state.loading = false
             state.error = null
@@ -62,7 +54,6 @@ const orderSlice = createSlice({
             state.orderSuccess = true
             state.error = null
             state.newAdded = justAdded
-            state.list.push(justAdded)
             if(justAdded.typeCmde === 'article') {
                 state.articleRefreshCompter += 1
                 state.listArticles.push(justAdded)
@@ -109,6 +100,8 @@ const orderSlice = createSlice({
                 oldItem.Facture = newItem.Facture
                 oldItem.dateLivraisonFinal = newItem.dateLivraisonFinal
                 oldItem.isExpired = newItem.isExpired
+                oldItem.expireIn = newItem.expireIn
+
         },
         deleteSuccess: (state, action)=> {
           state.loading = false
@@ -129,18 +122,22 @@ const orderSlice = createSlice({
         showFinalOrderDetails: (state, action) => {
             state.currentOrder.showDetails = !state.currentOrder.showDetails
         },
-     /*   stopTimer: (state, action) => {
-            let selectedOrder;
-            if(action.payload.typeCmde === 'article') {
-                selectedOrder = state.listArticles.find(article => article.id === action.payload.id)
-            } else if(action.payload.typeCmde === 'location') {
-                selectedOrder = state.listLocations.find(location => location.id === action.payload.id)
-            } else {
-                selectedOrder = state.listServices.find(service =>service.id === action.payload.id)
-            }
-            selectedOrder.stopTimer = true
-
-        }*/
+        resetConnectedOrders: (state) => {
+            state.currentUserOrders =  []
+            state.listServices =  []
+            state.listLocations =  []
+            state.listArticles =  []
+            state.currentOrder =  {}
+            state.loading = false
+            state.orderSuccess =  false
+            state.error =  null
+            state.newAdded =  {}
+            state.servicePayementDate =  Date.now()
+            state.totalCompter =  0
+            state.articleRefreshCompter =  0
+            state.locationRefreshCompter =  0
+            state.serviceRefreshCompter =  0
+        }
     },
     extraReducers: {
         [addToOrder]: (state, action) => {
@@ -151,7 +148,6 @@ const orderSlice = createSlice({
                 type: action.payload.type,
                 date: action.serviceDate
             }
-            state.list.push(order);
             state.currentOrder = order
         }
     }
@@ -160,18 +156,11 @@ const orderSlice = createSlice({
 export default orderSlice.reducer;
 const {orderAdded,resetOrder,
     editStatusSuccess,deleteSuccess,
-    userOrdersReceived,allOrderReceived,showItemDetail, orderRequested, orderRequestFailed,
-    showFinalOrderDetails, stopTimer} = orderSlice.actions
+    userOrdersReceived,showItemDetail, orderRequested, orderRequestFailed,
+    showFinalOrderDetails, resetConnectedOrders} = orderSlice.actions
 
 const url = '/commandes'
 
-export const getAllOrders = () => apiRequest({
-    url,
-    method: 'get',
-    onStart: orderRequested.type,
-    onSuccess: allOrderReceived.type,
-    onError: orderRequestFailed.type
-})
 
 export const makeOrder = (order) => apiRequest({
     url,
@@ -191,17 +180,10 @@ export const getOrdersByUser = () => apiRequest({
     onError: orderRequestFailed.type
 })
 
-/*export const getCurrentOrders = (libelle) => dispatch => {
-    dispatch(currentOrders(libelle))
-}*/
-
-
 
 export const getOrderReset = () => dispatch => {
     dispatch(resetOrder())
 }
-
-
 
 export const getItemDetail = (orderId) => dispatch => {
     dispatch(showItemDetail(orderId))
@@ -261,3 +243,7 @@ export const getTimerStop = (data) => apiRequest({
     onError: orderRequestFailed.type
 
 })
+
+export const getConnectedOrdersReset = () => dispatch => {
+    dispatch(resetConnectedOrders())
+}

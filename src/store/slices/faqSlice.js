@@ -52,13 +52,19 @@ const faqSlice = createSlice({
             let selectedQuestion = state.questions.find(question => question.id === action.payload.id)
             selectedQuestion.libelle = action.payload.libelle
             selectedQuestion.isValid = action.payload.isValid
+        },
+        questionDeleted: (state, action) => {
+            state.loading = false
+            state.error = null
+            const newQuestions = state.questions.filter(quest => quest.id !== action.payload.id)
+            state.questions = newQuestions
         }
     }
 })
 
 export default faqSlice.reducer
 const {faqResquested, askQuestionSuccess, faqRequestFailed, questionReceived,
-    showQuestionResponse, addResponse, editQuestionSuccess} = faqSlice.actions
+    showQuestionResponse, addResponse, editQuestionSuccess, questionDeleted} = faqSlice.actions
 
 const url = 'faq'
 
@@ -98,5 +104,14 @@ export const getQuestionEdit = (data) => apiRequest({
     method: 'patch',
     onStart: faqResquested.type,
     onSuccess: editQuestionSuccess.type,
+    onError: faqRequestFailed.type
+})
+
+export const getQuestionDelete = (question) => apiRequest({
+    url:url+'/delete',
+    method: 'delete',
+    data:question,
+    onStart: faqResquested.type,
+    onSuccess: questionDeleted.type,
     onError: faqRequestFailed.type
 })

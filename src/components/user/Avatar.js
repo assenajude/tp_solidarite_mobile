@@ -7,10 +7,18 @@ import AppText from "../AppText";
 
 
 function Avatar({showUsername, otherImageStyle,otherImageContainerStyle,
-                    onPress,notifStyle}) {
+                    onPress,notifStyle, userAvatar}) {
 
     const user = useSelector(state => state.auth.user)
-    const compterTotal = useSelector(state => state.entities.order.totalCompter)
+    const compterTotal = useSelector(state => {
+        const orderCompter = state.entities.order.totalCompter
+        const messageCompter = state.entities.message.newMsgCompter
+        const favoriteCompter = state.entities.userFavorite.favoriteCompter
+        const faqCompter = state.entities.faq.helpCompter
+        const factureCompter = state.entities.facture.newFactureCompter
+        const propCompter = state.entities.proposition.newFactureCompter
+        return orderCompter+messageCompter+factureCompter+favoriteCompter+faqCompter+propCompter
+    })
     const isUserConnected = Object.keys(user).length>0
     const showUserIcon = isUserConnected === false || user.avatar === null
 
@@ -19,7 +27,7 @@ function Avatar({showUsername, otherImageStyle,otherImageContainerStyle,
         <View>
             <TouchableOpacity onPress={onPress}>
             <View style={[styles.avatarContainer, otherImageContainerStyle]}>
-            {isUserConnected && user.avatar !== null && <Image resizeMode='center' source={{uri: user.avatar}} resizeMode='contain' style={[styles.imageStyle, otherImageStyle]}/>}
+            {isUserConnected && user.avatar !== null && <Image source={userAvatar} resizeMode='contain' style={[styles.imageStyle, otherImageStyle]}/>}
                 {showUserIcon && <View>
                 <AntDesign name='user' size={30} color={colors.dark}/>
                 </View>}
@@ -37,7 +45,7 @@ const styles = StyleSheet.create({
     imageStyle: {
         height: 50,
         width: 50,
-        borderRadius:100
+        borderRadius:250
     },
     avatarContainer: {
         alignItems: 'center',

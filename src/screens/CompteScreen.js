@@ -11,6 +11,7 @@ import Avatar from "../components/user/Avatar";
 
 function CompteScreen({navigation}) {
     const dispatch = useDispatch()
+    const user = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.profile.loading)
     const currentUser = useSelector(state => state.profile.connectedUser)
 
@@ -37,7 +38,7 @@ function CompteScreen({navigation}) {
 
            }}>
                <View style={{marginRight: 50, top: 20}}>
-                   <Avatar showUsername={true} otherImageStyle={{width: 80,height: 80}}/>
+                   <Avatar userAvatar={{uri: user.avatar}}  showUsername={true} otherImageStyle={{width: 80,height: 80}}/>
                </View>
                <View>
                    <AppButton style={{margin: 20}} onPress={() => navigation.navigate('EditUserInfoScreen')} title='Edit profile' iconSize={24} iconColor={colors.blanc}
@@ -62,6 +63,8 @@ function CompteScreen({navigation}) {
                     <AppLabelWithValue label="Telephone: " labelValue={currentUser.phone}/>
                     <AppLabelWithValue label="E-mail: " labelValue={currentUser.email}/>
                     <AppLabelWithValue label="Adresse: " labelValue={currentUser.adresse}/>
+                    <AppLabelWithValue label="Profession: " labelValue={currentUser.profession}/>
+
                 </View>
             </View>
         </View>

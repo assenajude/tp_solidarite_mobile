@@ -86,12 +86,21 @@ const userFavoriteSlice = createSlice({
                 state.list.splice(itemInListIndex, 1)
             }
            state.loading = false
+        },
+        resetConnectedFavorites: (state) => {
+            state.list = []
+            state.articleFavoris = []
+            state.locationFavoris = []
+            state.error = null
+            state.loading = false
+            state.favoriteCompter = 0
         }
     }
 })
 
 export default userFavoriteSlice.reducer
-const {toggleFavorrite, favoriteReceived, favoriteRequested, favoriteRequestedFailed} = userFavoriteSlice.actions
+const {toggleFavorrite, favoriteReceived, favoriteRequested,
+    favoriteRequestedFailed, resetConnectedFavorites} = userFavoriteSlice.actions
 
 
 const url = '/users/me/favoris'
@@ -113,3 +122,6 @@ export const getToggleFavorite = (item) => apiRequest({
     onError: favoriteRequestedFailed.type
 })
 
+export const getConnectedFavoritesReset = () => dispatch => {
+    dispatch(resetConnectedFavorites())
+}

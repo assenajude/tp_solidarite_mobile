@@ -14,6 +14,7 @@ const CommerceStackNav = createStackNavigator()
 
 function CommerceNavigator({navigation}) {
     const dispatch = useDispatch()
+    const user = useSelector(state => state.auth.user)
     const cartItemsLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
     const [searchValue, setSearchValue] = useState('')
 
@@ -31,7 +32,7 @@ function CommerceNavigator({navigation}) {
             <CommerceStackNav.Screen name='CommerceScreen' component={EcommerceScreen} options={{
                 headerTitle: () => <AppSearchBar searchValue={searchValue} changeSearchValue={(val) => setSearchValue(val)}
                                                  handleSearch={handleCommerceSearch} />,
-                headerLeft: () => <Avatar otherImageStyle={{height: 40, width: 40}} onPress={() =>navigation.openDrawer()}/>
+                headerLeft: () => <Avatar userAvatar={{uri: user.avatar}} otherImageStyle={{height: 40, width: 40}} onPress={() =>navigation.openDrawer()}/>
             }}/>
             <CommerceStackNav.Screen name='NewArticleScreen' component={NewArticleScreen} options={{
                 title: 'Ajout nouvel article'

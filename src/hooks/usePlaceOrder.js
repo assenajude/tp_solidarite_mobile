@@ -3,9 +3,7 @@ import {useSelector} from "react-redux";
 let usePlaceOrder;
 export default usePlaceOrder = () => {
     const currentAmount = useSelector(state => state.entities.order.currentOrder.amount)
-    const currentPayement = useSelector(state => state.entities.payement.selectedPayement)
     const currentPlan = useSelector(state => state.entities.payement.currentPlan)
-    const currentAdresse = useSelector(state => state.entities.userAdresse.selectedAdresse)
     const selectedVille = useSelector(state => state.entities.ville.userVille)
 
     const getPayementRate = () => {

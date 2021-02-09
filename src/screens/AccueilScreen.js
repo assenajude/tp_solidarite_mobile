@@ -27,11 +27,14 @@ import {loadRelais} from "../store/slices/pointRelaisSlice";
 import {getAllPropositions} from "../store/slices/propositionSlice";
 import {getServices} from "../store/slices/serviceSlice";
 import useItemReductionPercent from "../hooks/useItemReductionPercent";
+import OfflineNotice from "../components/OfflineNotice";
+import useAuth from "../hooks/useAuth";
 
 function AccueilScreen({navigation}) {
     const dispatch = useDispatch();
     const {getReductionPercent} = useItemReductionPercent()
     const {addItemToCart} = useAddToCart()
+    const {initUserDatas} = useAuth()
 
     const user = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.entities.main.loading)
@@ -61,12 +64,7 @@ function AccueilScreen({navigation}) {
 
     useEffect(() => {
         if (Object.keys(user).length>0) {
-            dispatch(getOrdersByUser())
-            dispatch(getFacturesByUser())
-            dispatch(getConnectedUserData())
-            dispatch(getUserFavoris())
-            dispatch(getAdresse())
-            dispatch(getCartItems())
+            initUserDatas()
         }
         getStarted()
     }, []);
@@ -118,6 +116,7 @@ function AccueilScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading || cartLoading}/>
+
                 <FlatList onRefresh={() => dispatch(getRefreshing())} refreshing={refresh} data={mainDatas}
                 keyExtractor={(item, index) => index.toString()}
                           renderItem={({item}) => {

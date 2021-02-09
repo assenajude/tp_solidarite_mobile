@@ -1,9 +1,6 @@
 import {Alert, ToastAndroid} from 'react-native'
 import {useDispatch,  useStore} from "react-redux";
-import  Constants from 'expo-constants'
-
 import {
-    getDeleteUpdate,
     getOrderContratUpdate,
     getOrderDeleted,
     getTimerStop,
@@ -12,6 +9,8 @@ import {
 import useCreateOrderContrat from "./useCreateOrderContrat";
 import {getTranchePayed} from "../store/slices/trancheSlice";
 import {getFactureUpdated} from "../store/slices/factureSlice";
+import {getMsgCompterIncremented} from "../store/slices/messageSlice";
+import dayjs from "dayjs";
 
 let useManageUserOder;
 export default useManageUserOder = () => {
@@ -19,17 +18,26 @@ export default useManageUserOder = () => {
     const store = useStore()
     const { createContrat} = useCreateOrderContrat()
 
+    const secsToTime = (secs) => {
+        let d = secs / 8.64e4 | 0;
+        let H = (secs % 8.64e4) / 3.6e3 | 0;
+        let m = (secs % 3.6e3)  / 60 | 0;
+        let s = secs % 60;
+        let z = n=> (n < 10? '0' : '') + n;
+        return `${d}j ${z(H)}h${z(m)}m ${z(s)}s`
+
+    }
+
     const saveAccordEdit = (data) => {
         dispatch(saveStatusEditing(data))
+        dispatch(getMsgCompterIncremented())
     };
 
     const saveLivraisonEdit = (data) => {
         dispatch(saveStatusEditing(data))
+        dispatch(getMsgCompterIncremented())
     };
 
-    const stopTimer= (data) => {
-        dispatch(getTimerStop(data))
-    }
 
     const createOrderContrat = (order) => {
         Alert.alert('Info...', 'Voulez-vous passer en contrat pour cette commande?', [
@@ -92,7 +100,6 @@ export default useManageUserOder = () => {
                 solde: tranche.montant
             }
             await dispatch(getFactureUpdated(factureData))
-            // dispatch(getPayedStatusChanged(tranche))
             const list = store.getState().entities.facture.userFactures
             const justUpdated = list.find(fact => fact.id === tranche.FactureId)
             if(justUpdated.montant === justUpdated.solde) {
@@ -103,7 +110,28 @@ export default useManageUserOder = () => {
                 }))
             }
         }
+        dispatch(getMsgCompterIncremented())
     }
 
-return {saveAccordEdit, saveLivraisonEdit, createOrderContrat, moveOrderToHistory, deleteOrder, payFactureTranche, stopTimer}
+    const getOrderExpirationState = () => {
+        const currentOrders = store.getState().entities.order.currentUserOrders
+        const selectedOrders = currentOrders.filter(order => order.isExpired === false)
+        console.log(selectedOrders);
+        if(selectedOrders.length === 0)return;
+        selectedOrders.forEach(selected => {
+        const date = dayjs(selected.updatedAt).get('day')
+        const lastTime = dayjs(selected.updatedAt).set('day', date + 3)
+            const now = dayjs()
+            const diffTime = lastTime.diff(now, 'second')
+            if(diffTime <= 0) {
+                dispatch(getTimerStop({orderId: selected.id, isExpired: true}))
+            }else {
+                const formated = secsToTime(diffTime)
+                dispatch(saveStatusEditing({orderId: selected.id, expireIn: formated}))
+            }
+
+        })
+    }
+
+return {saveAccordEdit, saveLivraisonEdit, createOrderContrat, moveOrderToHistory, deleteOrder, payFactureTranche, getOrderExpirationState}
 }

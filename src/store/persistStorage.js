@@ -47,6 +47,7 @@ const getUser = async () => {
         if(!token) return null
         const user = jwtDecode(token)
         if(expireIn(user)) {
+            console.log('token is expired...')
             await removeToken()
             return null
         }

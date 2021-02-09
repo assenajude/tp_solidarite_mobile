@@ -10,7 +10,7 @@ function ServiceDetailScreen({route}) {
     const {userRoleAdmin} = useAuth()
     const service = useSelector(state => {
         const list = state.entities.service.list
-        const currentService = list.find(item => item.id === route.params.id)
+        const currentService = list.find(item => item.id === Number(route.params.id))
         return currentService
     })
 
