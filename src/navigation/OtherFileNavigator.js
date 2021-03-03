@@ -5,7 +5,6 @@ import OtherFileMain from "../screens/OtherFileMain";
 import color from '../utilities/colors'
 import CategorieScreen from "../screens/CategorieScreen";
 import NewCategorieScreen from "../screens/NewCategorieScreen";
-import UserPayementScreen from "../screens/UserPayementScreen";
 import NewUserPayementScreen from "../screens/NewUserPayementScreen";
 import PayementScreen from "../screens/PayementScreen";
 import PointRelaisScreen from "../screens/PointRelaisScreen";
@@ -13,6 +12,7 @@ import NewPointRelaisScreen from "../screens/NewPointRelaisScreen";
 import RegionScreen from "../screens/RegionScreen";
 import VilleScreen from "../screens/VilleScreen";
 import Avatar from "../components/user/Avatar";
+import EspaceScreen from "../screens/EspaceScreen";
 
 const StackOther = createStackNavigator();
 
@@ -26,6 +26,9 @@ function OtherFileNavigator({navigation}) {
                 headerLeft: () => <Avatar onPress={() => navigation.openDrawer()}/>,
                 title: 'Gestion des autres fichiers'
             }}/>
+            <StackOther.Screen name='EspaceScreen' component={EspaceScreen} options={{
+                title: 'Gestion des espaces'
+            }}/>
             <StackOther.Screen name='CategorieScreen' component={CategorieScreen} options={{
                 title: 'Gestion des categories'
             }}/>
@@ -35,9 +38,7 @@ function OtherFileNavigator({navigation}) {
             <StackOther.Screen name='PayementScreen' component={PayementScreen} options={{
                 title: 'Gestion des payements'
             }}/>
-            <StackOther.Screen name='UserPayementScreen' component={UserPayementScreen} options={{
-                title: 'Gestion payements utilisateur'
-            }}/>
+
             <StackOther.Screen name='NewUserPayementScreen' component={NewUserPayementScreen} options={{
                 title: 'Nouveau payement utilisateur'
             }}/>

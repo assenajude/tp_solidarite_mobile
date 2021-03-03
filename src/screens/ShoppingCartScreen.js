@@ -201,7 +201,7 @@ function ShoppingCartScreen({navigation}) {
                  data={items} keyExtractor={(item) => item.id.toString()}
                  renderItem={({item}) =>
                      <CartItem showItemDetails={() => {
-                         item.typeCmde === 'article'?navigation.navigate(routes.ARTICLE_DETAIL, item):navigation.navigate(routes.LOCATION_DETAIL, item)
+                         item.typeCmde === 'article'?navigation.navigate({name:routes.ARTICLE_DETAIL, params: {...item, designArticle:item.libelle}}):navigation.navigate(routes.LOCATION_DETAIL, item)
                      }} itemType={cartType} caution={item.caution} frequence={item.frequence} notInStock={getQuantiteInStock(item) === 0} deleteItem={() => handleDeleteItem(item)} quantite={true} montant={true} price={true}  designation={item.libelle} itemQuantite={item.quantite}
                                quantityDecrement={() => {dispatch(getItemQtyDecrement(item))}}
                                quantityIncrement={() => {dispatch(getItemQtyIncrement(item))}}

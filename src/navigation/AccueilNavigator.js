@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux'
 import {useNavigation} from '@react-navigation/native'
 import {createStackNavigator, HeaderBackButton} from "@react-navigation/stack";
+import {Keyboard} from 'react-native'
 
 
 import AccueilScreen from "../screens/AccueilScreen";
@@ -28,7 +29,7 @@ import UserServiceNavigator from "./UserServiceNavigator";
 import UserOrderNavigator from "./UserOrderNavigator";
 import UserFactureNavigator from "./UserFactureNavigator";
 import routes from "./routes";
-import AppSearchBar from "../components/AppSearchBar";
+import AppTopBar from "../components/AppTopBar";
 import EditUserInfoScreen from "../screens/EditUserInfoScreen";
 import LocationDetailScreen from "../screens/LocationDetailScreen";
 import NewOptionScreen from "../screens/NewOptionScreen";
@@ -38,15 +39,12 @@ import PlanPropositionScreen from "../screens/PlanPropositionScreen";
 import NewPropositionScreen from "../screens/NewPropositionScreen";
 import NewPlanScreen from "../screens/NewPlanScreen";
 import Avatar from "../components/user/Avatar";
-import {getSearchProduct} from "../store/slices/mainSlice";
+import {getContentBySpace, getSearchProduct} from "../store/slices/mainSlice";
 import HelpScreen from "../screens/HelpScreen";
 import FaqScreen from "../screens/FaqScreen";
 import QuestionScreen from "../screens/QuestionScreen";
 import ResponseScreen from "../screens/ResponseScreen";
 import ServiceDetailScreen from "../screens/ServiceDetailScreen";
-import ServiceNavigator from "./ServiceNavigator";
-
-
 
 const ArticleStackNavigator = createStackNavigator();
 
@@ -56,11 +54,29 @@ const navigation = useNavigation()
     const user = useSelector(state => state.auth.user)
     const cartItemLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
 
+    const availableSpace = ['tous', 'e-commerce', 'e-location']
     const [seachValue, setSearchValue] = useState('')
+    const [searchState, setSearchState] = useState(false)
+    let [homeModalVisible, setHomeModalVisible] = useState(false)
+    const [selectedSpace, setSelectedSpace] = useState(availableSpace[0])
+
 
     const handleSearch = () => {
         dispatch(getSearchProduct(seachValue))
     }
+
+    const hideKeyBoard = () => {
+        setSearchState(false)
+    }
+
+
+
+    useEffect(() => {
+        Keyboard.addListener('keyboardDidHide', hideKeyBoard)
+        return () => {
+            Keyboard.removeListener('keyboardDidHide', hideKeyBoard)
+        }
+    }, [])
 
     return (
         <ArticleStackNavigator.Navigator screenOptions={({navigation}) => ({
@@ -74,10 +90,18 @@ const navigation = useNavigation()
                options={({navigation}) => ({
                    headerTitleAlign: 'center',
                    headerLeft: () =>
-                       <Avatar userAvatar={{uri:user.avatar}} otherImageStyle={{width:40,height:40}} otherImageContainerStyle={{width:40,height:40}}
+                       <Avatar userAvatar={{uri:user.avatar}} otherImageStyle={{width:40,height:30, borderRadius:20 }} otherImageContainerStyle={{width:40,height:40}}
                                onPress={() =>navigation.openDrawer()}/>,
-                   headerTitle: () => <AppSearchBar searchValue={seachValue} changeSearchValue={(val) => setSearchValue(val)}
-                                                    handleSearch={handleSearch}/>,
+                   headerTitle: () => <AppTopBar searchValue={seachValue} changeSearchValue={(val) => setSearchValue(val)}
+                                                 handleSearch={handleSearch} searching={searchState} selectedSpace={selectedSpace}
+                                                 homeModalVisible={homeModalVisible} availableSpace={availableSpace}
+                                                 startingSearch={() => setSearchState(true)} leaveInput={() => setSearchState(false)}
+                                                 selectSpace={(val) => {
+                                                     setSelectedSpace(val)
+                                                     setHomeModalVisible(false)
+                                                     dispatch(getContentBySpace(val))
+                                                 }
+                                                 } showHomeModal={() => setHomeModalVisible(!homeModalVisible)} espace='home' closeHomeModal={() => setHomeModalVisible(false)}/>,
                })}/>
 
               <ArticleStackNavigator.Screen name='ShoppingCartScreen' component={ShoppingCartScreen}
@@ -138,7 +162,7 @@ const navigation = useNavigation()
             }}/>
             <ArticleStackNavigator.Screen name='ArticleDetailScreen' component={ArticleDetailScreen}
                   options={({route}) =>
-                  ({title: 'Detail '+route.params.designArticle })}/>
+                  ({title: 'Detail '+route.params.designArticle})}/>
 
             <ArticleStackNavigator.Screen name='LocationDetailScreen' component={LocationDetailScreen} options={({route}) => ({
                 title: 'Detail '+route.params.libelleLocation

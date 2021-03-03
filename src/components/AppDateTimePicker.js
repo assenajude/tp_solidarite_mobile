@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, View, Platform, Button} from "react-native";
+import {View} from "react-native";
 import DateTimePicker  from '@react-native-community/datetimepicker'
 import AppButton from "./AppButton";
 import colors from "../utilities/colors";

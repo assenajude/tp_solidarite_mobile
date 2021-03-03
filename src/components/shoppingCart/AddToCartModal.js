@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Text, Modal, View, Image, StyleSheet} from 'react-native'
+import {Modal, View, Image, StyleSheet} from 'react-native'
 import AppButton from "../AppButton";
 import AppText from "../AppText";
 import Color from '../../utilities/colors'

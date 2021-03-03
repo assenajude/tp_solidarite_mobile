@@ -1,6 +1,6 @@
 import React, { useEffect} from 'react';
 import {useDispatch, useStore, useSelector} from "react-redux";
-import {View, FlatList,BackHandler} from "react-native";
+import {View, FlatList} from "react-native";
 import AppText from "../components/AppText";
 import UserServiceItem from "../components/order/UserServiceItem";
 import {
@@ -16,7 +16,6 @@ import initData from "../utilities/initData";
 import useOrderInfos from "../hooks/useOrderInfos";
 
 function UserServiceScreen({navigation}) {
-    const store = useStore()
     const dispatch = useDispatch()
     const { saveAccordEdit, createOrderContrat, moveOrderToHistory, deleteOrder}  = useManageUserOrder()
     const {getModePayement} = useOrderInfos()

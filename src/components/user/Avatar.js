@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React from 'react';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from "react-native";
 import {useSelector} from "react-redux";
 import {AntDesign} from '@expo/vector-icons'
@@ -7,7 +7,7 @@ import AppText from "../AppText";
 
 
 function Avatar({showUsername, otherImageStyle,otherImageContainerStyle,
-                    onPress,notifStyle, userAvatar}) {
+                    onPress,notifStyle, userAvatar, emptyAvatarStyle}) {
 
     const user = useSelector(state => state.auth.user)
     const compterTotal = useSelector(state => {
@@ -27,9 +27,9 @@ function Avatar({showUsername, otherImageStyle,otherImageContainerStyle,
         <View>
             <TouchableOpacity onPress={onPress}>
             <View style={[styles.avatarContainer, otherImageContainerStyle]}>
-            {isUserConnected && user.avatar !== null && <Image source={userAvatar} resizeMode='contain' style={[styles.imageStyle, otherImageStyle]}/>}
+            {isUserConnected && user.avatar !== null && <Image resizeMode='cover' source={userAvatar} resizeMode='contain' style={[styles.imageStyle, otherImageStyle]}/>}
                 {showUserIcon && <View>
-                <AntDesign name='user' size={30} color={colors.dark}/>
+                    <Image source={require('../../assets/avatar_silhouette.png')} style={[styles.nonAvatarStyle, emptyAvatarStyle]}/>
                 </View>}
                 {showUsername && <AppText>{user.username}</AppText>}
             </View>
@@ -44,8 +44,8 @@ function Avatar({showUsername, otherImageStyle,otherImageContainerStyle,
 const styles = StyleSheet.create({
     imageStyle: {
         height: 50,
-        width: 50,
-        borderRadius:250
+        width: 100,
+        borderRadius:50
     },
     avatarContainer: {
         alignItems: 'center',
@@ -53,7 +53,9 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         justifyContent: 'center',
         backgroundColor: colors.blanc,
-        borderRadius: 100
+        borderRadius: 100,
+        borderWidth: 1,
+        marginLeft:10
     },
     notifContainer: {
         backgroundColor: colors.bleuFbi,
@@ -70,7 +72,11 @@ const styles = StyleSheet.create({
         fontSize: 10,
         padding: 3,
         fontWeight: 'bold'
-
+    },
+    nonAvatarStyle: {
+        width: 30,
+        height: 30,
+        borderRadius: 50
     }
 })
 

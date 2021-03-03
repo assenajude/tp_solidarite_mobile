@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {View, TouchableHighlight, FlatList} from 'react-native'
+import React, {useEffect} from 'react';
+import {TouchableHighlight, FlatList} from 'react-native'
 import AppText from "./AppText";
 
 function AppListSelection({dataList, currentValue}) {

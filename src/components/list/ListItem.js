@@ -1,12 +1,12 @@
 import React from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native'
+import {View, StyleSheet, TouchableOpacity, Image} from 'react-native'
 import AppText from "../AppText";
 
-function ListItem({propriety1, propriety2, propriety3, propriety4}) {
+function ListItem({imageUrl, propriety2, propriety3, propriety4}) {
     return (
         <TouchableOpacity>
         <View style={styles.container}>
-            <AppText >{propriety1}</AppText>
+            <Image source={imageUrl} style={styles.imageStyle}/>
 
             <AppText lineNumber={1} style={styles.info}>{propriety2}   {propriety3}   {propriety4}</AppText>
 
@@ -22,6 +22,11 @@ const styles = StyleSheet.create({
     },
     info: {
      marginLeft: 20
+    },
+    imageStyle: {
+        height: 80,
+        width: 80,
+        overflow: 'hidden'
     }
 })
 export default ListItem;

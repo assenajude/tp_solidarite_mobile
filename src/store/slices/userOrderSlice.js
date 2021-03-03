@@ -1,7 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit'
-import user from "../../models/user";
 import {apiRequest} from "../actionsCreators/apiActionCreator";
-import order from "../../models/order";
 
 
 const userOrderSlice = createSlice({

@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 
+import espaceSlice from '../store/slices/espaceSlice'
 import payementSlice from '../store/slices/payementSlice';
 import categorieSlice from '../store/slices/categorieSlice';
 import shoppingCartSlice from '../store/slices/shoppingCartSlice';
@@ -24,6 +25,7 @@ import faqSlice from './slices/faqSlice'
 import messageSlice from './slices/messageSlice'
 
 export default combineReducers({
+    espace: espaceSlice,
     payement: payementSlice,
     categorie: categorieSlice,
     shoppingCart: shoppingCartSlice,

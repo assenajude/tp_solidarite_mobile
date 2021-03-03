@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import {View,StyleSheet, ScrollView} from "react-native";
 import {useSelector, useDispatch} from "react-redux";
 
@@ -7,7 +7,7 @@ import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import {
     getPayementActive,
-    getPayementDisabled, getPlanDetail,
+    getPlanDetail,
     getSelectedPlan
 } from '../store/slices/payementSlice'
 import PayementListItem from "../components/list/PayementListItem";

@@ -1,4 +1,5 @@
 export default Object.freeze({
+    ESPACE:'EspaceScreen',
     ARTICLE_DETAIL: 'ArticleDetailScreen',
     LOCATION_DETAIL: 'LocationDetailScreen',
     SERVICE_DETAIL: 'ServiceDetailScreen',

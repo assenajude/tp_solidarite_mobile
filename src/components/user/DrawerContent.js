@@ -47,7 +47,7 @@ function DrawerContent(props) {
 
                        <View style={styles.avatar}>
                        <View style={{top: 20}}>
-                           <Avatar userAvatar={{uri:user.avatar}} otherImageStyle={{width: 80,height: 80}}/>
+                           <Avatar userAvatar={{uri:user.avatar}} emptyAvatarStyle={{width: 50, height: 50}} otherImageStyle={{width: 80,height: 80}}/>
                        </View>
                            <View>
                                <TouchableOpacity onPress={() => props.navigation.navigate(routes.HELP)}>
@@ -183,11 +183,13 @@ const styles = StyleSheet.create({
     mainContent: {
         marginTop: 10,
         borderBottomWidth: 0.2,
+        borderTopWidth: 0.5
 
     },
     avatar: {
       flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingVertical: 10
     },
     avatarStyle:{
         margin:20,
@@ -207,7 +209,7 @@ const styles = StyleSheet.create({
     avatarImage: {
         width: 60,
         height: 60,
-        borderRadius: 40
+        borderRadius: 50
     }
 })
 

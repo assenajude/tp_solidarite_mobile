@@ -1,5 +1,4 @@
 import {createSlice} from "@reduxjs/toolkit";
-import order from "../../models/order";
 import {addToOrder} from '../actionsCreators/orderActionCreator'
 import {apiRequest} from '../actionsCreators/apiActionCreator'
 

@@ -10,7 +10,7 @@ import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppText from "../components/AppText";
-import {loadCategories} from '../store/slices/categorieSlice';
+import {getSelectedEspace, loadCategories} from '../store/slices/categorieSlice';
 import {saveArticle, loadArticles, saveEditedArticle} from '../store/slices/articleSlice'
 import AppFormSwitch from "../components/forms/AppFormSwitch";
 import AppActivityIndicator from "../components/AppActivityIndicator";
@@ -31,13 +31,15 @@ const articleValidationSchema = Yup.object().shape({
 function NewArticleScreen({route, navigation}) {
     const store = useStore()
     const article = route.params
+    const espaces = useSelector(state => state.entities.espace.list)
     const [categorieId, setCategorieId] = useState(1)
     const loading = useSelector(state => state.entities.article.loading)
     const dispatch = useDispatch();
-    const categories = useSelector(state => state.entities.categorie.list);
+    const categories = useSelector(state => state.entities.categorie.espaceCategories);
     const [addLoading, setAddLoading] = useState(false)
     const [initValues, setInitValues] = useState({})
     const [editMode, setEditMode] = useState(false)
+    const [espace, setEspace] = useState(1)
 
 
     const getCategories = useCallback(async () => {
@@ -48,6 +50,15 @@ function NewArticleScreen({route, navigation}) {
         return state.entities.article.articleAddedSuccess
     }
 
+    const getEspaces = () => {
+        return espaces.map((espace) => <Picker.Item key={espace.id.toString()} label={espace.nom} value={espace.id}/>)
+    }
+
+    const listCategories = () => {
+        return (
+            categories.map((categorie, index) => <Picker.Item label={categorie.libelleCateg} value={categorie.id} key={index.toString()}/>)
+        )
+    }
 
     const handleAddArticle = async (newArticle) => {
         if(!editMode) {
@@ -89,6 +100,7 @@ function NewArticleScreen({route, navigation}) {
     }
 
     useEffect(()=> {
+        dispatch(getSelectedEspace(espaces[0]))
         if(article) {
           setInitValues({
               designation: article.designArticle,
@@ -114,23 +126,25 @@ function NewArticleScreen({route, navigation}) {
         getCategories()
     }, [])
 
-
-    const listCategories = () => {
-        return (
-            categories.map((categorie, index) => <Picker.Item label={categorie.libelleCateg} value={categorie.id} key={index.toString()}/>)
-        )
-    }
-
-
-
     return (
         <>
         <AppActivityIndicator visible={loading}/>
         <ScrollView>
             <View style={styles.container}>
                 <View style={styles.listContainer}>
+                    <AppText style={{marginRight: 20, fontWeight: 'bold'}}>Espace: </AppText>
+                    <Picker mode='dropdown' style={{height: 50, width: 200}} selectedValue={espace} onValueChange={(id) => {
+                        setEspace(id)
+                        const newSelected = espaces.find(item => item.id === id)
+                        dispatch(getSelectedEspace(newSelected))
+                    }}
+                    >
+                        {getEspaces()}
+                    </Picker>
+                </View>
+                <View style={styles.listContainer}>
                     <AppText style={{marginRight: 20, fontWeight: 'bold'}}>Categorie: </AppText>
-                    <Picker mode='dropdown' style={{height: 50, width: 150}} selectedValue={categorieId} onValueChange={(id) => {
+                    <Picker mode='dropdown' style={{height: 50, width: 200}} selectedValue={categorieId} onValueChange={(id) => {
                         setCategorieId(id)}}>
                         {listCategories()}
                     </Picker>

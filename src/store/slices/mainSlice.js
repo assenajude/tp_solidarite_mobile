@@ -91,12 +91,26 @@ const mainSlice = createSlice({
             })
             state.searchList = filteredList
             }
+        },
+        contentBySpace: (state, action) => {
+            const label = action.payload === 'e-commerce'?'article':action.payload === 'e-location'?'location':'tous'
+            let newList = []
+            if(label ==='article') {
+                newList = state.list.filter(item => item.Categorie.typeCateg === 'article')
+            } else if(label === 'location') {
+                newList = state.list.filter(item => item.Categorie.typeCateg === 'location')
+            } else {
+                newList = state.list
+            }
+            state.searchList = newList
         }
+
     }
 })
 
 const {mainReceived, mainRequested, mainRequestFailed, startRefresh, incrementHomeCounter,
-    colorSize, selectedOptions, optionAdded, selectOption, searchProduct, deleteItemSuccess} = mainSlice.actions
+    colorSize, selectedOptions, optionAdded, selectOption, searchProduct, deleteItemSuccess,
+    contentBySpace} = mainSlice.actions
 export default mainSlice.reducer
 
 const url = '/mainDatas'
@@ -156,3 +170,8 @@ export const getItemDeleted = (item) => apiRequest({
     onSuccess: deleteItemSuccess.type,
     onError: mainRequestFailed.type
 })
+
+
+export const getContentBySpace = (space) => dispatch => {
+    dispatch(contentBySpace(space))
+}

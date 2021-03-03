@@ -45,6 +45,7 @@ const messageSlice = createSlice({
             otherMessages.forEach(message => message.getRead = false)
             const responses = selectedMessage.MsgResponses
             state.selectedMsgResponses = responses
+            state.newMsgCompter--
         },
         incrementMsgCompter:(state) =>{
             state.newMsgCompter++

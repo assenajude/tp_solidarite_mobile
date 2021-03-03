@@ -1,6 +1,5 @@
-import React, {useEffect} from 'react';
-import {View} from "react-native";
-import {useFormikContext, Formik} from 'formik'
+import React from 'react';
+import {useFormikContext} from 'formik'
 import AppInput from "../AppInput";
 import AppErrorMessage from "../forms/AppErrorMessage";
 

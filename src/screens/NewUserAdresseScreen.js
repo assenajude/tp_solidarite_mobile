@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector, useStore} from "react-redux";
-import {View, ScrollView, StyleSheet,TouchableHighlight, Alert} from 'react-native'
+import {View, ScrollView, StyleSheet,TouchableHighlight} from 'react-native'
 import * as Yup from 'yup'
 
 
@@ -13,7 +13,6 @@ import AppSubmitButton from "../components/forms/AppSubmitButton";
 import {selectedVilleRelais} from "../store/slices/villeSlice";
 import {
     getCurrentAdresseReset,
-    getCurrentAdresseSelected,
     getUpdateAdresse,
     saveAdresse
 } from '../store/slices/userAdresseSlice';

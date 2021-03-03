@@ -52,12 +52,21 @@ const serviceSlice = createSlice({
                 })
                 state.searchList = filteredList
             }
+        },
+        servicesByCategories: (state, action) => {
+            if(action.payload === 'all') {
+                state.searchList = state.list
+            } else {
+                const newServices = state.list.filter(service => service.CategorieId === action.payload.id)
+                state.searchList = newServices
+            }
         }
     }
 })
 
 
-const {serviceAdded, serviceReceived, serviceRequested, serviceRequestFailed, startingRefresh, searchService} = serviceSlice.actions
+const {serviceAdded, serviceReceived, serviceRequested, serviceRequestFailed, startingRefresh,
+    searchService, servicesByCategories} = serviceSlice.actions
 export default serviceSlice.reducer
 
 const url = '/services'
@@ -89,4 +98,8 @@ export const getServiceRefreshed = () => apiRequest({
 
 export const getSearchService = (service) => dispatch => {
     dispatch(searchService(service))
+}
+
+export const getServicesByCategories = (category) => dispatch => {
+    dispatch(servicesByCategories(category))
 }

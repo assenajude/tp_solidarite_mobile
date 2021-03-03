@@ -7,7 +7,6 @@ import {getTrancheShown} from "../store/slices/factureSlice";
 import routes from "../navigation/routes";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppText from "../components/AppText";
-import UserOrderItem from "../components/list/UserOrderItem";
 
 function UserFactureOkScreen({navigation}) {
     const dispatch = useDispatch()

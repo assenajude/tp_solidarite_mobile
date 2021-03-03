@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import {View, StyleSheet, ScrollView} from "react-native";
+import {View, ScrollView} from "react-native";
 import AppInputImage from "./AppInputImage";
 
 function AppImageListPicker({imagesUrls= [], deleteImage, addNewImage}) {

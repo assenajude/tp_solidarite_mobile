@@ -55,13 +55,21 @@ const articleSlice = createSlice({
                 })
                 state.searchList = filteredList
             }
+        },
+        selectedCategoryArticle: (state, action) => {
+           if(action.payload === 'all'){
+               state.searchList = state.availableArticles
+           } else {
+            const newList = state.availableArticles.filter(article => article.CategorieId === action.payload.id)
+            state.searchList = newList
+           }
         }
     }
 });
 
 export default articleSlice.reducer;
 const {articlesReceived, articlesRequested, articlesRequestFailed,
-    articleAdded, articleEditSuccess, searchArticle} = articleSlice.actions
+    articleAdded, articleEditSuccess, searchArticle, selectedCategoryArticle} = articleSlice.actions
 
 const url = '/articles'
 export const loadArticles = () => apiRequest({
@@ -97,4 +105,8 @@ export const saveEditedArticle = (data) => apiRequest({
 
 export const getSearchArticle = (value) => dispatch => {
     dispatch(searchArticle(value))
+}
+
+export const getSelectedCategoryArticles = (category) => dispatch => {
+    dispatch(selectedCategoryArticle(category))
 }

@@ -14,7 +14,7 @@ import useAuth from "./src/hooks/useAuth";
 function AppWrapper(props) {
     const dispatch = useDispatch()
     const {getOrderExpirationState} = useManageUserOrder()
-    const {resetConnectedUserData} = useAuth()
+    const {resetConnectedUserData, userRoleAdmin} = useAuth()
 
     const [isReady, setIsReady] = useState(false)
 
@@ -30,11 +30,12 @@ function AppWrapper(props) {
         await dispatch(getAllMainData())
     }
 
+
+    if(userRoleAdmin()) {
     setInterval(() => {
         getOrderExpirationState()
-        // 3600000 s = un jour
-        //3600s = une heure
     }, 3600000)
+    }
 
     if(!isReady) {
         return (

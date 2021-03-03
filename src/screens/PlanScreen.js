@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useSelector, useDispatch, useStore} from 'react-redux'
+import {useSelector, useDispatch} from 'react-redux'
 import {View, FlatList, StyleSheet} from 'react-native';
 
 import ListFooter from "../components/list/ListFooter";

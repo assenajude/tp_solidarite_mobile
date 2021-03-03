@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {ScrollView, View, StyleSheet, FlatList} from 'react-native'
 import * as Yup from 'yup'
@@ -6,12 +6,10 @@ import * as Yup from 'yup'
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
-import {addRegion, getRegions} from '../store/slices/regionSlice'
+import {addRegion} from '../store/slices/regionSlice'
 import ListItem from "../components/list/ListItem";
-import {add} from "react-native-reanimated";
 import ListFooter from "../components/list/ListFooter";
 import AppButton from "../components/AppButton";
-import color from '../utilities/colors'
 
 const valideRegionSchema = Yup.object().shape({
     nom: Yup.string(),

@@ -1,15 +1,13 @@
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
-import {View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator} from 'react-native'
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, ScrollView} from 'react-native'
 import * as Yup from 'yup'
-import {useDispatch, useSelector, shallowEqual, useStore} from 'react-redux';
-import {createSelector} from 'reselect'
+import {useDispatch, useSelector, useStore} from 'react-redux';
 import {Picker} from '@react-native-community/picker'
 
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
 import {addPlan} from '../store/slices/planSlice'
-import {loadPayements} from "../store/slices/payementSlice";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 

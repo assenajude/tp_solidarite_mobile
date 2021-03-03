@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useSelector, useDispatch, useStore} from "react-redux";
-import {View, StyleSheet, Alert, ScrollView} from 'react-native'
+import {View, StyleSheet, ScrollView} from 'react-native'
 import {Picker} from '@react-native-community/picker'
 import * as Yup from 'yup'
 

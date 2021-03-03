@@ -1,10 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View} from "react-native";
 import {useFormikContext} from "formik";
 import * as Yup from 'yup'
-import AppImageListPicker from "../AppImageListPicker";
-import AppErrorMessage from "./AppErrorMessage";
-import AppLabelWithValue from "../AppLabelWithValue";
 import AppButton from "../AppButton";
 import AppText from "../AppText";
 import AppInput from "../AppInput";

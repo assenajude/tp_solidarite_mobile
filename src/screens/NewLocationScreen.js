@@ -14,6 +14,7 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppFormSwitch from "../components/forms/AppFormSwitch";
 import {getHomeCounterIncrement} from "../store/slices/mainSlice";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
+import {getSelectedEspace} from "../store/slices/categorieSlice";
 
 const locationValideSchema = Yup.object().shape({
     libelle: Yup.string(),
@@ -26,16 +27,17 @@ const locationValideSchema = Yup.object().shape({
     caution: Yup.number(),
     dispo: Yup.number(),
     aide: Yup.boolean()
-
 })
 
 function NewLocationScreen({navigation}) {
     const store = useStore()
     const dispatch = useDispatch()
-    const categories = useSelector(state => state.entities.categorie.list)
+    const espaces = useSelector(state => state.entities.espace.list)
+    const categories = useSelector(state => state.entities.categorie.espaceCategories)
     const isLoading = useSelector(state => state.entities.location.loading)
     const[selectedCategorie, setSelectedCategorie] = useState(2)
     const [addLoading, setAddLoading] = useState(false)
+    const [selectedEspace, setSelectedEspace] = useState(2)
 
 
     const addNewLocation = async(location) => {
@@ -67,16 +69,35 @@ function NewLocationScreen({navigation}) {
 
     }
 
+    const getEspaces = () => {
+        return(
+            espaces.map((item) =><Picker.Item key={item.id.toString()} label={item.nom} value={item.id}/>)
+        )
+    }
+
     const listCategories = () => {
         return (
             categories.map((categorie, index) => <Picker.Item label={categorie.libelleCateg} value={categorie.id} key={index.toString()}/>)
         )
     }
 
+    useEffect(() => {
+        dispatch(getSelectedEspace(espaces[1]))
+    }, [])
+
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-        <ScrollView style={{bottom: 20}}>
+        <ScrollView style={{bottom: 20, top:20}}>
+            <View style={{flexDirection: 'row'}}>
+                <AppText style={{fontWeight: 'bold', marginRight: 20}}>Espace:</AppText>
+                <Picker style={{height: 50, width: 205}} mode='dropdown' selectedValue={selectedEspace} onValueChange={(id) => {
+                    setSelectedEspace(id)
+                    dispatch(getSelectedEspace(espaces.find(esp => esp.id === id)))
+                }}>
+                    {getEspaces()}
+                </Picker>
+            </View>
             <View style={{flexDirection: 'row'}}>
                 <AppText style={{fontWeight: 'bold', marginRight: 20}}>Categorie:</AppText>
                 <Picker style={{height: 50, width: 205}} mode='dropdown' selectedValue={selectedCategorie} onValueChange={(id) => setSelectedCategorie(id)}>

@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from "react-redux";
-import {View, ScrollView, StyleSheet, FlatList} from 'react-native'
+import {View, StyleSheet, FlatList} from 'react-native'
 import ListFooter from "../components/list/ListFooter";
 import routes from "../navigation/routes";
 import ItemSeparator from "../components/list/ItemSeparator";

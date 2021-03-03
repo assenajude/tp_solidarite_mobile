@@ -1,4 +1,4 @@
-import {useSelector, useStore} from "react-redux";
+import {useSelector} from "react-redux";
 
 let useOrderInfos;
 export default useOrderInfos = () => {

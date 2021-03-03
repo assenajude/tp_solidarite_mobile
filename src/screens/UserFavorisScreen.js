@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, Text, FlatList, Image, TouchableOpacity} from 'react-native'
+import {View, FlatList, Image, TouchableOpacity} from 'react-native'
 import {useDispatch, useSelector} from "react-redux";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";

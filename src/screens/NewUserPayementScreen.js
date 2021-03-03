@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux'
-import {View, StyleSheet, Text, ScrollView} from 'react-native'
+import {View, StyleSheet, ScrollView} from 'react-native'
 import {Picker} from '@react-native-community/picker';
 import * as Yup from 'yup';
-import {useFormikContext, Formik} from 'formik'
 
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";

@@ -1,6 +1,6 @@
 import {useStore, useDispatch} from "react-redux";
 import {Alert} from 'react-native'
-import {addFacture} from "../store/slices/factureSlice";
+import {addFacture, getFacturesByUser} from "../store/slices/factureSlice";
 import {addTranche} from "../store/slices/trancheSlice";
 import {createOrderContrat} from "../store/slices/orderSlice";
 import useOrderInfos from "./useOrderInfos";
@@ -77,6 +77,7 @@ export default useCreateOrderContrat = () => {
                 nbMensualite: orderPlan.nombreMensualite
             }
             dispatch(createOrderContrat(contratData))
+            dispatch(getFacturesByUser())
         }
     }
     return {createContrat}

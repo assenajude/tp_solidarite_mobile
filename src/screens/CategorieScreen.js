@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux'
 import {View, StyleSheet,Text, FlatList} from 'react-native';
 import ListHeader from "../components/list/ListHeader";
@@ -13,15 +13,11 @@ function CategorieScreen({navigation}) {
         const categoriesData = useSelector(state => state.entities.categorie.list);
 
 
-    useEffect(() => {
-    }, [])
-
-
 return (
     <View style={styles.mainContainer}>
         <View style={styles.listContainer}>
             <FlatList ListHeaderComponent={ListHeader} data={categoriesData} keyExtractor={item => item.id.toString()}
-                      renderItem={({item}) => <ListItem propriety1={item.id} propriety2={item.libelleCateg} propriety3={item.descripCateg} propriety4={item.typeCateg} />}
+                      renderItem={({item}) => <ListItem imageUrl={{uri: item.imageCateg}} propriety2={item.libelleCateg} propriety3={item.descripCateg} propriety4={item.typeCateg} />}
             />
             {categoriesData.length === 0 && <Text>Aucune categorie trouvee</Text>}
         </View>

@@ -45,6 +45,7 @@ const getUserAdresses = useCallback(async () => {
 
     return (
         <ScrollView>
+            <AppButton title='Espace' style={styles.buttonStyle} onPress={() =>navigation.navigate(routes.ESPACE)}/>
            <AppButton title='Categorie' style={styles.buttonStyle} onPress={() =>navigation.navigate(routes.CATEGORIE)}/>
            <AppButton title='Payement' style={styles.buttonStyle} onPress={() =>navigation.navigate(routes.PAYEMENT)}/>
            <AppButton title='Plan' style={styles.buttonStyle} onPress={() => navigation.navigate('AccueilNavigator',{screen: routes.PLAN})}/>

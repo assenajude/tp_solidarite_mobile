@@ -1,6 +1,5 @@
 import React from 'react';
 import {View} from "react-native";
-import AppText from "../AppText";
 import LottieView from "lottie-react-native";
 
 function ContratWatch({autoPlay,loop}) {

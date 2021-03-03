@@ -8,7 +8,6 @@ import useOrderInfos from "../hooks/useOrderInfos";
 import useManageUserOrder from "../hooks/useManageUserOrder";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppText from "../components/AppText";
-import UserOrderItem from "../components/list/UserOrderItem";
 
 function UserFactureEncoursScreen({navigation}) {
     const dispatch = useDispatch()

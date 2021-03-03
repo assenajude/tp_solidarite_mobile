@@ -19,7 +19,7 @@ function UserOrderItem({
                            fraisLivraison,tauxInteret,statusAccordValue,isExpired,expireIn,
                            changeAccordEditValue,leaveItemToContract,moveItemToHistory, getLink,modePayement,
                            getDetails,montant,dateCmde, dateLivraison, typeCmde,
-                           loopItemWatch, playItemWatch,solde,endFacture=true,showDeleteIcon=true,
+                           loopItemWatch, playItemWatch,solde,showDeleteIcon=true,
                            accordStyle,accordInitData,livraisonStyle,livraisonInitData
                        }) {
 

@@ -48,12 +48,21 @@ const locationSlice = createSlice({
                 })
                 state.availableLocation = filterList
             }
+        },
+        locationByCategories: (state, action) => {
+            if(action.payload ==='all') {
+                state.availableLocation = state.list
+            } else {
+                const newLocations = state.list.filter(location => location.CategorieId === action.payload.id)
+                state.availableLocation = newLocations
+            }
         }
 
     }
 });
 
-const {locationAdded, locationReceived, locationRequested, locationRequestFailed, searchLocation} = locationSlice.actions
+const {locationAdded, locationReceived, locationRequested, locationRequestFailed, searchLocation,
+    locationByCategories} = locationSlice.actions
 export default locationSlice.reducer
 
 
@@ -78,4 +87,8 @@ export const addLocation = (location) => apiRequest({
 
 export const getLocationSearch = (value)=> dispatch => {
     dispatch(searchLocation(value))
+}
+
+export const getLocationsByCategories = (category) => dispatch => {
+    dispatch(locationByCategories(category))
 }

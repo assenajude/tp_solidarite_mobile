@@ -35,7 +35,6 @@ function ArticleDetailScreen({route, navigation}) {
     const [selectedColor, setSelectedColor] = useState('')
     const [selectedSize, setSelectedSize] = useState('')
     const [selectedQty, setSelectedQty] = useState(1)
-    const [selectedPrice, setSelectedPrice] = useState()
 
     const handleChangeImage = (image) => {
         setSelectedImage(image)

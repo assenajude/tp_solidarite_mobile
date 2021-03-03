@@ -1,6 +1,7 @@
 import React, {useEffect, useCallback} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {Text, FlatList} from "react-native";
+import * as Updates from 'expo-updates'
 import AppInfo from "../components/AppInfo";
 import AppButton from "../components/AppButton";
 import AppCard from "../components/AppCard";
@@ -8,18 +9,14 @@ import Color from '../utilities/colors';
 import routes from '../navigation/routes';
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
 import {loadPayements} from "../store/slices/payementSlice";
-import { getOrdersByUser} from '../store/slices/orderSlice'
-import {getFacturesByUser} from '../store/slices/factureSlice'
 import {getTranches} from '../store/slices/trancheSlice'
 import {loadCategories} from '../store/slices/categorieSlice'
-import {getCartItems, getModalDismiss} from "../store/slices/shoppingCartSlice";
+import {getModalDismiss} from "../store/slices/shoppingCartSlice";
 import useAddToCart from "../hooks/useAddToCart";
 import {loadPlans} from "../store/slices/planSlice";
 import {getItemDeleted, getRefreshing, getSelectedOptions} from "../store/slices/mainSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {getAdresse} from "../store/slices/userAdresseSlice";
 import {getAllVilles} from "../store/slices/villeSlice";
-import {getConnectedUserData} from "../store/slices/userProfileSlice";
 import {loadArticles} from "../store/slices/articleSlice";
 import {getAllLocation} from "../store/slices/locationSlice";
 import {getToggleFavorite, getUserFavoris} from "../store/slices/userFavoriteSlice";
@@ -27,8 +24,8 @@ import {loadRelais} from "../store/slices/pointRelaisSlice";
 import {getAllPropositions} from "../store/slices/propositionSlice";
 import {getServices} from "../store/slices/serviceSlice";
 import useItemReductionPercent from "../hooks/useItemReductionPercent";
-import OfflineNotice from "../components/OfflineNotice";
 import useAuth from "../hooks/useAuth";
+import {getAllEspaces} from "../store/slices/espaceSlice";
 
 function AccueilScreen({navigation}) {
     const dispatch = useDispatch();
@@ -48,6 +45,7 @@ function AccueilScreen({navigation}) {
     const cartLoading = useSelector(state => state.entities.shoppingCart.loading)
 
     const getStarted = useCallback(() => {
+        dispatch(getAllEspaces())
         dispatch(loadCategories())
         dispatch(loadPayements())
         dispatch(loadPlans())
@@ -73,7 +71,7 @@ function AccueilScreen({navigation}) {
     if (error) {
         return <AppInfo buttonTitle='essayer encore..'>
             <Text>une erreur est apparue... {error}</Text>
-            <AppButton title='recharger'/>
+            <AppButton title='recharger' onPress={() => Updates.reloadAsync()}/>
         </AppInfo>
     }
 
@@ -81,6 +79,7 @@ function AccueilScreen({navigation}) {
         return <>
             <AppInfo>
                 <Text>Aucune donnée trouvée...</Text>
+                <AppButton title='recharger' onPress={() => Updates.reloadAsync()}/>
             </AppInfo>
         </>
     };
