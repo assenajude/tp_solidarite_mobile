@@ -10,7 +10,6 @@ function AppInputImage({imageUrl, changeImage}) {
 
     const chooseImage = async () => {
         try {
-
             if(imageUrl) {
                 Alert.alert('Alert', 'Voulez vous supprimer cette image?', [
                     {text: 'oui', onPress: () => changeImage(null)},
@@ -18,11 +17,13 @@ function AppInputImage({imageUrl, changeImage}) {
                     ] )
 
             } else {
-                const result = await ImagePicker.requestCameraRollPermissionsAsync()
+                const result = await ImagePicker.requestMediaLibraryPermissionsAsync()
                 if(!result.granted) return ;
-                const image = await ImagePicker.launchImageLibraryAsync()
+                const image = await ImagePicker.launchImageLibraryAsync({
+                    base64: true
+                })
                 if(image.cancelled) return;
-                changeImage(image.uri)
+                changeImage({url: image.uri, base64Data:image.base64})
             }
         } catch (e) {
             logger.log(e)

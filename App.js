@@ -8,7 +8,7 @@ import {SafeAreaProvider} from "react-native-safe-area-context";
 import AppWrapper from "./AppWrapper";
 import logger from './src/utilities/logger'
 
-    logger.initLogger()
+    // logger.initLogger()
 
 
 export default function App() {

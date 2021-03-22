@@ -5,19 +5,19 @@ import AppImageListPicker from "../AppImageListPicker";
 
 function FormImageListPicker({name}) {
     const {errors, touched, setFieldValue, values} = useFormikContext();
-    const imageUrls = values[name]
+    const imagesTab = values[name]
 
-    const handleAddImage = uri => {
-        setFieldValue(name,[...imageUrls, uri])
+    const handleAddImage = image => {
+        setFieldValue(name,[...imagesTab, image])
     }
 
-    const handleDelImage = uri => {
-        setFieldValue(name, imageUrls.filter(imageUrl => imageUrl !== uri ))
+    const handleDelImage = selectedImage => {
+        setFieldValue(name, imagesTab.filter(image => image.url !== selectedImage.url ))
     }
 
     return (
         <>
-            <AppImageListPicker imagesUrls={values[name]}  deleteImage={handleDelImage} addNewImage={handleAddImage} />
+            <AppImageListPicker  imagesData={values[name]}  deleteImage={handleDelImage} addNewImage={handleAddImage} />
             <AppErrorMessage visible={touched[name]} error={errors[name]}/>
         </>
     );

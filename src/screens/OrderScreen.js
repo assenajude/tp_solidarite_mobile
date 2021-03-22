@@ -29,6 +29,7 @@ function OrderScreen({navigation}) {
     const selectedAdesseRelais = useSelector(state => state.entities.userAdresse.adresseRelais)
     const serviceDate = useSelector(state => state.entities.order.servicePayementDate)
     const loading = useSelector(state => state.entities.order.loading)
+    const selectedParrains = useSelector(state => state.entities.order.currentOrderParrains)
 
     const saveOrder = async () => {
         let adresseId;
@@ -56,7 +57,7 @@ function OrderScreen({navigation}) {
             dateLivraisonDepart:livraisonDate,
             typeCmde: currentOrder.type
         }
-         await dispatch(makeOrder(order))
+         await dispatch(makeOrder({order, parrains:selectedParrains}))
         const error =  store.getState().entities.order.error
         if(error !== null) {
             Alert.alert('Echec!!', 'Impossible de faire la commande maintenant', [

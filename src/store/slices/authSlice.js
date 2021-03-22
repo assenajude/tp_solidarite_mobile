@@ -58,6 +58,12 @@ const authSlice = createSlice({
         resetLogin: (state) => {
             state.loading = false
             state.error = null
+        },
+        pieceUpdated: (state, action) => {
+            state.error = null
+            state.loading = false
+            const pieceArray = action.payload
+            state.user.pieceIdentite = pieceArray
         }
 
     }
@@ -65,7 +71,7 @@ const authSlice = createSlice({
 
 export default authSlice.reducer
 const {authFailed, authRequested, authSuccess, autoLogin, logout, changeAvatar, profileAvatar,
-    registerSucccess, resetLogin} = authSlice.actions
+    registerSucccess, resetLogin, pieceUpdated} = authSlice.actions
 
 
  //action creators
@@ -102,9 +108,9 @@ export const getLogout = () => dispatch => {
     authStorage.removeToken()
 }
 const avatarUrl = '/users/me'
-export const getAvatarChange = (image) => apiRequest({
+export const getAvatarChange = (data) => apiRequest({
     url:avatarUrl+'/avatar',
-    data: image,
+    data,
     method: 'patch',
     onStart: authRequested.type,
     onSuccess: changeAvatar.type,
@@ -120,6 +126,14 @@ export const getUserProfileAvatar = () => apiRequest({
 
 })
 
+export const getUserPieceUpdate = (data) =>apiRequest({
+    url: avatarUrl+'/piece',
+    data,
+    method: 'patch',
+    onStart: authRequested.type,
+    onSuccess: pieceUpdated.type,
+    onError: authFailed.type
+})
 
 export const getLoginReset = () => dispatch => {
     dispatch(resetLogin())

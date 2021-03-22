@@ -10,7 +10,6 @@ import routes from "./routes";
 import AppTopBar from "../components/AppTopBar";
 import Avatar from "../components/user/Avatar";
 import {getSearchService, getServicesByCategories} from "../store/slices/serviceSlice";
-import {getSelectedCategoryArticles} from "../store/slices/articleSlice";
 
 const ServiceStackNav = createStackNavigator()
 
@@ -62,7 +61,7 @@ function ServiceNavigator({navigation}) {
                                               leaveInput={() => setServiceSearching(false)} closeSpaceModal={() => setServiceModalVisible(false)}
                                               startingSearch={() => setServiceSearching(true)} searching={serviceSearching}
                                               spaceModalVisible={serviceModalVisible}  showSpaceModal={()=>setServiceModalVisible(true)}/>,
-                headerLeft: () => <Avatar userAvatar={{uri: user.avatar}} otherImageStyle={{width: 40,height: 40}} onPress={() =>navigation.openDrawer()}/>
+                headerLeft: () => <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>navigation.openDrawer()}/>
             }}/>
             <ServiceStackNav.Screen name='NewServiceScreen' component={NewServiceScreen} options={{
                 title: 'Ajout nouveau service',

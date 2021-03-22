@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import {useDispatch, useStore,useSelector} from "react-redux";
-import {View, ScrollView} from "react-native"
+import {View, ScrollView, Alert} from "react-native"
 import {Picker} from "@react-native-community/picker";
 import * as Yup from 'yup'
 
@@ -13,6 +13,8 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppFormSwitch from "../components/forms/AppFormSwitch";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
 import {getSelectedEspace} from "../store/slices/categorieSlice";
+import useDirectUpload from "../hooks/useDirectUpload";
+import AppUploadProgress from "../components/AppUploadProgress";
 
 const serviceValideSchema = Yup.object().shape({
     libelle: Yup.string(),
@@ -26,12 +28,15 @@ const serviceValideSchema = Yup.object().shape({
 function NewServiceScreen({navigation}) {
     const store = useStore()
     const dispatch = useDispatch()
+    const {dataTransformer, directUpload} = useDirectUpload()
 
     const espaces = useSelector(state => state.entities.espace.list)
     const categories = useSelector(state => state.entities.categorie.espaceCategories)
     const [selectedCategorie, setSelectedCategorie] = useState(3)
     const loading = useSelector(state => state.entities.service.loading)
     const [espace, setEspace] = useState(3)
+    const [serviceUploadProgress, setServiceUploadProgress] = useState(0)
+    const [serviceUploadModal, setServiceUploadModal] = useState(false)
 
     const getCategorieItems = () => {
         return (
@@ -44,14 +49,15 @@ function NewServiceScreen({navigation}) {
             espaces.map((item) => <Picker.Item key={item.id.toString()} label={item.nom} value={item.id}/>)
         )
     }
-    const handleNewService = async (service) => {
+
+    const addNewService = async (service, urlsArray) => {
         const serviceData = {
             categoryId: selectedCategorie,
             libelle: service.libelle,
             description: service.description,
             montantMin: service.montantMin,
             montantMax: service.montantMax,
-            images: service.images,
+            serviceImagesLinks: urlsArray,
             isDispo:service.isDispo
         }
         await dispatch(addService(serviceData))
@@ -64,6 +70,25 @@ function NewServiceScreen({navigation}) {
         }
     }
 
+    const handleNewService = async (service) => {
+        const serviceImages = service.images
+        const transformArray = dataTransformer(serviceImages)
+        setServiceUploadProgress(0)
+        setServiceUploadModal(true)
+        const uploadResult = await directUpload(transformArray, serviceImages, (progress) => setServiceUploadProgress(progress))
+        setServiceUploadModal(false)
+        if(uploadResult) {
+            const signedData = store.getState().s3_upload.signedRequestArray
+            const signedUrls = signedData.map(item => item.url)
+            await addNewService(service, signedUrls)
+        } else {
+            Alert.alert("Alert", "Les images n'ont pas été chargées, voulez-vous continuer?",
+                [{text: 'oui', onPress: async() => await addNewService(service, [])},
+                    {text: 'non', onPress: () => {return;}}])
+        }
+
+    }
+
     useEffect(() => {
         dispatch(getSelectedEspace(espaces[2]))
     }, [])
@@ -71,6 +96,7 @@ function NewServiceScreen({navigation}) {
     return (
         <>
         <AppActivityIndicator visible={loading}/>
+        <AppUploadProgress startProgress={serviceUploadModal} progress={serviceUploadProgress}/>
         <ScrollView>
             <View style={{paddingTop: 10, paddingBottom: 20}}>
             <View style={{flexDirection: 'row'}}>

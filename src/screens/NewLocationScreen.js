@@ -15,6 +15,8 @@ import AppFormSwitch from "../components/forms/AppFormSwitch";
 import {getHomeCounterIncrement} from "../store/slices/mainSlice";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
 import {getSelectedEspace} from "../store/slices/categorieSlice";
+import useDirectUpload from "../hooks/useDirectUpload";
+import AppUploadProgress from "../components/AppUploadProgress";
 
 const locationValideSchema = Yup.object().shape({
     libelle: Yup.string(),
@@ -32,15 +34,16 @@ const locationValideSchema = Yup.object().shape({
 function NewLocationScreen({navigation}) {
     const store = useStore()
     const dispatch = useDispatch()
+    const {dataTransformer, directUpload} = useDirectUpload()
     const espaces = useSelector(state => state.entities.espace.list)
     const categories = useSelector(state => state.entities.categorie.espaceCategories)
     const isLoading = useSelector(state => state.entities.location.loading)
     const[selectedCategorie, setSelectedCategorie] = useState(2)
-    const [addLoading, setAddLoading] = useState(false)
     const [selectedEspace, setSelectedEspace] = useState(2)
+    const [locationProgress, setLocationProgress] = useState(0)
+    const [uploadModal, setUploadModal] = useState(false)
 
-
-    const addNewLocation = async(location) => {
+    const addNew = async (location, imagesArray) => {
         const locationData = {
             categoryId: selectedCategorie,
             libelle: location.libelle,
@@ -48,7 +51,7 @@ function NewLocationScreen({navigation}) {
             adresse: location.adresse,
             coutReel: location.coutReel,
             coutPromo: location.coutPromo,
-            images: location.images,
+            locationImagesLinks: imagesArray,
             frequence: location.frequence,
             caution: location.caution,
             dispo: location.dispo,
@@ -66,6 +69,27 @@ function NewLocationScreen({navigation}) {
             dispatch(getHomeCounterIncrement())
             navigation.goBack()
         }
+    }
+
+    const addNewLocation = async(location) => {
+        const locationImages = location.images
+        const transformerUlrs = dataTransformer(locationImages)
+        setLocationProgress(0)
+        setUploadModal(true)
+        const uploadResult = await directUpload(transformerUlrs, locationImages, (progress) =>setLocationProgress(progress))
+        setUploadModal(false)
+        if(uploadResult) {
+            const uploadSuccessUrls = store.getState().s3_upload.signedRequestArray
+            const urlsArray = uploadSuccessUrls.map(item => item.url)
+            await addNew(location, urlsArray)
+        }else {
+            Alert.alert("Alert", "Les images n'ont pas été chargées, voulez-vous continuer?", [{
+                text: 'oui', onPress: async () => await addNew(location, [])
+            }, {
+                text: 'non', onPress: () => {return;}
+            }])
+        }
+
 
     }
 
@@ -88,6 +112,7 @@ function NewLocationScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
+            <AppUploadProgress startProgress={uploadModal} progress={locationProgress}/>
         <ScrollView style={{bottom: 20, top:20}}>
             <View style={{flexDirection: 'row'}}>
                 <AppText style={{fontWeight: 'bold', marginRight: 20}}>Espace:</AppText>
@@ -127,7 +152,7 @@ function NewLocationScreen({navigation}) {
                 <AppFormField name='caution' title='Nombre de part pour la caution'/>
                 <AppFormField name='frequence' title='Frequence de location'/>
                 <AppFormSwitch title='Possiblité de louer à credit?' name='aide'/>
-                <AppSubmitButton showLoading={addLoading} title='Ajouter'/>
+                <AppSubmitButton title='Ajouter'/>
             </AppForm>
         </ScrollView>
      </>

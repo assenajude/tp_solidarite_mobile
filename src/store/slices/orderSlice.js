@@ -11,6 +11,7 @@ const orderSlice = createSlice({
         listLocations: [],
         listArticles: [],
         currentOrder: {},
+        currentOrderParrains: [],
         loading:false,
         orderSuccess: false,
         error: null,
@@ -121,6 +122,15 @@ const orderSlice = createSlice({
         showFinalOrderDetails: (state, action) => {
             state.currentOrder.showDetails = !state.currentOrder.showDetails
         },
+        orderParainAdded: (state, action) => {
+         let existedCompte = state.currentOrderParrains.find(compte => Number(compte.id) === Number(action.payload.id))
+            if(existedCompte) {
+                existedCompte.parrainAction = action.payload.parrainAction
+            } else {
+          const newParrains = action.payload
+          state.currentOrderParrains.push(newParrains)
+            }
+        },
         resetConnectedOrders: (state) => {
             state.currentUserOrders =  []
             state.listServices =  []
@@ -156,15 +166,15 @@ export default orderSlice.reducer;
 const {orderAdded,resetOrder,
     editStatusSuccess,deleteSuccess,
     userOrdersReceived,showItemDetail, orderRequested, orderRequestFailed,
-    showFinalOrderDetails, resetConnectedOrders} = orderSlice.actions
+    showFinalOrderDetails, resetConnectedOrders, orderParainAdded} = orderSlice.actions
 
 const url = '/commandes'
 
 
-export const makeOrder = (order) => apiRequest({
+export const makeOrder = (data) => apiRequest({
     url,
     method: 'post',
-    data: order,
+    data,
     onStart: orderRequested.type,
     onSuccess: orderAdded.type,
     onError: orderRequestFailed.type
@@ -245,4 +255,8 @@ export const getTimerStop = (data) => apiRequest({
 
 export const getConnectedOrdersReset = () => dispatch => {
     dispatch(resetConnectedOrders())
+}
+
+export const getAddOrderParrain = (parrain) => dispatch => {
+    dispatch(orderParainAdded(parrain))
 }

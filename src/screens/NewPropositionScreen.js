@@ -15,6 +15,8 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppFormSwitch from "../components/forms/AppFormSwitch";
 import AppFormOption from "../components/forms/AppFormOption";
 import useAuth from "../hooks/useAuth";
+import useDirectUpload from "../hooks/useDirectUpload";
+import AppUploadProgress from "../components/AppUploadProgress";
 
 const propositionValidSchema = Yup.object().shape({
     images: Yup.array().min(1, 'Vous devez choisir au moins une image'),
@@ -27,45 +29,63 @@ function NewPropositionScreen({navigation, route}) {
     const dispatch = useDispatch()
     const store = useStore()
     const {userRoleAdmin} = useAuth()
+    const {dataTransformer, directUpload} = useDirectUpload()
 
     const selected = useSelector(state => state.entities.proposition.selected)
     const isLoading = useSelector(state => state.entities.proposition.loading)
-    const [addNewMode, setAddNewMode] = useState(false)
-    const [newOptionLabel, setNewOptionLabel]  = useState('')
-    const [newOptionValue, setNewOptionValue] = useState('')
-    const [optionsList, setOptionsList] = useState([])
+    const [propUploadProgress, setPropUploadProgress] = useState(0)
+    const [propUploadModal, setPropUploadModal] = useState(false)
 
-
-
-
-    const handleSaveProposition = async (proposition) => {
+    const saveProposition = async (proposition, propImagesUrls) => {
         let formData = {
             designation: proposition.designation,
-            images: proposition.images,
+            propImagesLinks: propImagesUrls,
             type: proposition.type,
             idReference: proposition.idReference,
             isOk: proposition.isOk
         }
 
-            const optionsList = proposition.desciptionList
-            optionsList.forEach(proposition => {
-                formData[proposition.label] = proposition.value
-            })
+        const optionsList = proposition.desciptionList
+        optionsList.forEach(proposition => {
+            formData[proposition.label] = proposition.value
+        })
         if(mode === 'add'){
-                    await dispatch(addNewProposition(formData))
-                } else {
-                  const data = {...formData, id: selected.id}
+            await dispatch(addNewProposition(formData))
+        } else {
+            const data = {...formData, id: selected.id}
             await dispatch(getPropositionEdit(data))
-                }
-                const error = store.getState().entities.proposition.error
-                if(error !== null) {
-                  return   alert('Impossible de faire lajout, une erreur est apparue.')
-                } else {
-                    Alert.alert('Félicitation', 'Votre proposition a été envoyée et est en cours de traitement.',[
-                        {text:'ok', onPress: () => {return;}}
-                    ])
-                    return navigation.goBack()
-                }
+        }
+        const error = store.getState().entities.proposition.error
+        if(error !== null) {
+            return   alert('Impossible de faire lajout, une erreur est apparue.')
+        } else {
+            Alert.alert('Félicitation', 'Votre proposition a été envoyée et est en cours de traitement.',[
+                {text:'ok', onPress: () => {return;}}
+            ])
+            return navigation.goBack()
+        }
+    }
+
+    const handleSaveProposition = async (proposition) => {
+        if(mode === 'edit') {
+            const urlsArray = proposition.images.map(item => item.url)
+          return await saveProposition(proposition, urlsArray)
+        }
+        const propImages = proposition.images
+        const transformedData = dataTransformer(propImages)
+        setPropUploadProgress(0)
+        setPropUploadModal(true)
+        const propUloadSuccess = await directUpload(transformedData, propImages, (progress) => setPropUploadProgress(progress))
+        setPropUploadModal(false)
+        if(propUloadSuccess) {
+            const imagesData= store.getState().s3_upload.signedRequestArray
+            const imagesUrls = imagesData.map(item => item.url)
+            await saveProposition(proposition, imagesUrls)
+        } else {
+            Alert.alert("Alert", "Des images n'ont pas été chargées, voulez-vous continuer quand meme?",
+                [{text: 'oui', onPress: async() => await saveProposition(proposition, [])},
+                    {text: 'non', onPress: ()=>{return;}}])
+        }
     }
 
 
@@ -80,12 +100,13 @@ function NewPropositionScreen({navigation, route}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
+            <AppUploadProgress startProgress={propUploadModal} progress={propUploadProgress} dismissUploadModal={() => setPropUploadModal(false)}/>
         <ScrollView>
             <View style={{margin: 10}}>
            <AppForm validationSchema={propositionValidSchema} initialValues={{
                designation: selected.designation,
                desciptionList: selected.description || [],
-               images: selected.images || selected.imagesProposition,
+               images: selected.images || [],
                type: selected.type || '',
                idReference: String(selected.idReference) || '',
                isOk: selected.isOk

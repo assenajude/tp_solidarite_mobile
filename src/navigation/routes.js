@@ -46,6 +46,8 @@ export default Object.freeze({
     RESERVE_LOCATION: 'ReserveLocationScreen',
     NEW_ARTICLE: 'NewArticleScreen',
     NEW_SERVICE: 'NewServiceScreen',
-    USER_SERVICE: 'UserServiceScreen'
+    USER_SERVICE: 'UserServiceScreen',
+    PARRAINAGE: 'ParrainageScreen',
+    ORDER_PARRAINAGE: 'OrderParrainageScreen'
 
 })

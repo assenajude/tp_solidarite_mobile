@@ -11,7 +11,6 @@ import routes from "./routes";
 import AppTopBar from "../components/AppTopBar";
 import Avatar from "../components/user/Avatar";
 import {getLocationsByCategories, getLocationSearch} from "../store/slices/locationSlice";
-import {getSelectedCategoryArticles} from "../store/slices/articleSlice";
 
 const LocationStackNav = createStackNavigator()
 
@@ -55,7 +54,7 @@ function LocationNavigator({navigation}) {
             headerTitleAlign: 'center',
         }}>
             <LocationStackNav.Screen name='LocationScreen' component={ElocationScreen} options={{
-                headerLeft: () => <Avatar userAvatar={{uri: user.avatar}} otherImageStyle={{height: 40,width: 40}} onPress={() =>navigation.openDrawer()}/>,
+                headerLeft: () => <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>navigation.openDrawer()}/>,
                 headerTitle: () => <AppTopBar  getAllCategories={() => {
                     dispatch(getLocationsByCategories('all'))
                     setLocationModalVisible(false)

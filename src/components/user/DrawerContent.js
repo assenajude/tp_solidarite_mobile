@@ -46,8 +46,8 @@ function DrawerContent(props) {
                    <View>
 
                        <View style={styles.avatar}>
-                       <View style={{top: 20}}>
-                           <Avatar userAvatar={{uri:user.avatar}} emptyAvatarStyle={{width: 50, height: 50}} otherImageStyle={{width: 80,height: 80}}/>
+                       <View style={{top: 20, marginBottom: 10}}>
+                           <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>props.navigation.navigate(routes.COMPTE)}  otherImageStyle={{width: 80,height: 80, borderRadius: 40}}/>
                        </View>
                            <View>
                                <TouchableOpacity onPress={() => props.navigation.navigate(routes.HELP)}>
@@ -66,7 +66,7 @@ function DrawerContent(props) {
                        {isUser && <TouchableOpacity onPress={() => props.navigation.navigate(routes.COMPTE)}>
                        <View style={styles.usernameContainer}>
                            <Text>{user.username}</Text>
-                           <EvilIcons name="chevron-right" size={24} color="black" />
+                           <EvilIcons style={{fontWeight: 'bold'}} name="chevron-right" size={24} color="black" />
                        </View>
                        </TouchableOpacity>}
                         {!isUser && <View style={styles.logStyle}>
@@ -145,6 +145,14 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
+                           <AppIconWithBadge
+                                             notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
+                               <MaterialCommunityIcons name="bus-stop-covered" size={size} color={color} />
+                           </AppIconWithBadge> }
+                                   label='Parrainage' onPress={() => {props.navigation.navigate('Parrainage')}} />
+                   </View>
+                   <View>
+                       <DrawerItem icon={({size, color}) =>
                            <AppIconWithBadge badgeCount={prositionCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                <Fontisto name="suitcase-alt" size={size} color={color} />
@@ -198,7 +206,6 @@ const styles = StyleSheet.create({
     usernameStyle: {
         marginTop: 15,
         paddingBottom: 10,
-        borderBottomWidth: 0.2
     },
     usernameContainer: {
         flexDirection: 'row',

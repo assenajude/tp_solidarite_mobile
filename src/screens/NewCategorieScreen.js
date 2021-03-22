@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux'
+import {useDispatch, useSelector, useStore} from 'react-redux'
 import {ScrollView, View, StyleSheet} from 'react-native'
 import {Picker} from '@react-native-community/picker'
 
@@ -12,6 +12,9 @@ import {addCategorie} from '../store/slices/categorieSlice'
 import AppText from "../components/AppText";
 import PickerItem from "react-native-web/src/exports/Picker/PickerItem";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
+import useDirectUpload from "../hooks/useDirectUpload";
+import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppUploadProgress from "../components/AppUploadProgress";
 
 
 const categorieSchema = Yup.object().shape({
@@ -24,20 +27,41 @@ const categorieSchema = Yup.object().shape({
 function NewCategorieScreen({navigation}) {
 
     const dispatch = useDispatch();
+    const store = useStore()
+    const {dataTransformer, directUpload} = useDirectUpload()
     const espaces = useSelector(state => state.entities.espace.list)
     const addFailed = useSelector(state => state.entities.categorie.error)
     const loading = useSelector(state => state.entities.categorie.loading)
     const [selectedEspace, setSelectedEspace] = useState(1)
+    const [uploadModal, setUploadModal] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0)
 
     const AddNewCategorie = async (categorie) => {
-        const categorieData = {
-            libelle: categorie.libelle,
-            description: categorie.description,
-            images: categorie.images,
-            idEspace: selectedEspace
+        const images = categorie.images
+        const transformedArray = dataTransformer(images)
+        setUploadProgress(0)
+        setUploadModal(true)
+       const uploadResult =  await directUpload(transformedArray, images, (progress) => {
+           setUploadProgress(progress)
+       })
+        setUploadModal(false)
+        if(uploadResult) {
+            let signedUrl = store.getState().s3_upload.signedRequestArray
+            const imagesUrls = signedUrl.map(item => item.url)
+            const categorieData = {
+                libelle: categorie.libelle,
+                description: categorie.description,
+                categImagesLinks: imagesUrls,
+                idEspace: selectedEspace
+            }
+          await dispatch(addCategorie(categorieData))
+            const error = store.getState().entities.categorie.error
+            if(error !== null){
+                alert('Impossible de faire lajour')
+            } else navigation.goBack()
+        } else {
+            console.log('ajout sans images...')
         }
-           await dispatch(addCategorie(categorieData))
-           navigation.goBack()
     }
 
     const getEspacePicker = () => {
@@ -45,6 +69,9 @@ function NewCategorieScreen({navigation}) {
     }
 
     return (
+        <>
+            <AppActivityIndicator visible={loading}/>
+            <AppUploadProgress progress={uploadProgress} startProgress={uploadModal}/>
         <View style={styles.container}>
         <ScrollView>
             <View style={{
@@ -72,6 +99,7 @@ function NewCategorieScreen({navigation}) {
 
         </ScrollView>
         </View>
+            </>
     );
 }
 

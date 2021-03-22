@@ -25,7 +25,7 @@ function PlanPropositionScreen({navigation}) {
                         <View style={{
                             paddingRight: 10
                         }}>
-                        <AppText style={{color: colors.bleuFbi}}>Cherchez-vous un plan de payement qui puisse correspondre à vos préoccupations? Regardez ici.</AppText>
+                        <AppText style={{color: colors.bleuFbi}}>Cherchez-vous un plan de payement qui puisse correspondre à vos préoccupations? Consultez ici.</AppText>
                         </View>
                     </View>
                     <View style={styles.planContainer}>
@@ -54,7 +54,7 @@ function PlanPropositionScreen({navigation}) {
                         <View style={{
                             paddingRight: 10
                         }}>
-                            <AppText style={{color: colors.bleuFbi}}>Cherchez-vous un produit (article, location ou service) que vous n'avez pas trouvé dans nos espaces? Regardez ici.</AppText>
+                            <AppText style={{color: colors.bleuFbi}}>Cherchez-vous un produit (article, location ou service) que vous n'avez pas trouvé dans nos espaces? Proposez ici.</AppText>
                         </View>
                     </View>
                     <View style={styles.planContainer}>

@@ -18,7 +18,7 @@ function PropositionScreen({navigation}) {
     return (
         <>
           {listProposition.length>0 && <FlatList data={listProposition} keyExtractor={item => item.id.toString()}
-           renderItem={({item}) => <PropositionItem propositionImage={{uri: item.imagesProposition[0]}} isPropositionImage={item.imagesProposition.length>0}
+           renderItem={({item}) => <PropositionItem  propositionImage={{uri: item.imagesProposition[0]}} isPropositionImage={item.imagesProposition.length>0}
                                                     label={item.designation} descriptionOptions={item.description}
                                                     propositionNotReady={!item.isOk}
                                                     editProposition={() => {

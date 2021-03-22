@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import authStorage from "./src/store/persistStorage";
 import {getAutoLogin, getLogout, getUserProfileAvatar} from "./src/store/slices/authSlice";
 import {getAllMainData} from "./src/store/slices/mainSlice";
-import {AppLoading} from "expo";
+import AppLoading from "expo-app-loading";
 import {NavigationContainer} from "@react-navigation/native";
 import UserCompteNavigation from "./src/navigation/UserCompteNavigation";
 import OfflineNotice from "./src/components/OfflineNotice";
@@ -37,11 +37,15 @@ function AppWrapper(props) {
     }, 3600000)
     }
 
+    const errorOnStarting = (error) => {
+        console.log('error starting the app', error)
+    }
+
     if(!isReady) {
         return (
         <>
             <AppActivityIndicator visible={isReady === false}/>
-        <AppLoading startAsync={getStarted}  onFinish={() => setIsReady(true)} />
+        <AppLoading autoHideSplash={false} startAsync={getStarted}  onFinish={() => setIsReady(true)} onError={(error) => errorOnStarting(error)}/>
         </>
         )
     }

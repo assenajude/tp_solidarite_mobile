@@ -7,14 +7,7 @@ const propositionSlice = createSlice({
         list: [],
         loading: false,
         error: null,
-        selected: {
-            designation: '',
-            description: [],
-            images: [],
-            type: '',
-            idReference: '',
-            isOk: false
-        },
+        selected: {},
         newPropositionCompter: 0
     },
     reducers: {
@@ -46,7 +39,21 @@ const propositionSlice = createSlice({
             state.list.splice(selectedItemIndex, 1, action.payload)
         },
         selectedProposition: (state, action) => {
-            state.selected = action.payload
+              let currentSelected = {};
+              const selectedProposition  = action.payload
+            const imageArray = []
+            const selectedImagePropArray = selectedProposition.imagesProposition
+            selectedImagePropArray.forEach(item => {
+                imageArray.push({url: item})
+            })
+            currentSelected.id = selectedProposition.id
+            currentSelected.designation = selectedProposition.designation
+            currentSelected.description = selectedProposition.description
+            currentSelected.images = imageArray
+            currentSelected.type = ''
+            currentSelected.idReference = ''
+            currentSelected.isOk = false
+            state.selected = currentSelected
         },
         resetSelectedProposition:(state) => {
             state.selected = {}

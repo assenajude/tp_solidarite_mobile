@@ -131,9 +131,9 @@ function UserMessageScreen({navigation}) {
                                                            dispatch(getRespondeToMessage(item))
                                                            setSelectedMessage(item)
                                                        }} responde={item.responde}
-                                                       handleResponse={handleResponse} responses={selectedMsgResp} newResponses={item.MsgResponses.filter(resp => resp.isRead === false).length}
+                                                       handleResponse={handleResponse} responses={selectedMsgResp} newResponses={item.MsgResponses?.filter(resp => resp.isRead === false).length}
                                                        readResponse={() => dispatch(getResponseRead(item))} responseReading={item.readResponse}
-                                                       allResponses={item.MsgResponses.length} msgResponses={item.MsgResponses}/>} />
+                                                       allResponses={item.MsgResponses?.length} msgResponses={item.MsgResponses}/>} />
             <View style={styles.addNewButton}>
             <ListFooter onPress={() => setShowModal(true)}/>
             </View>

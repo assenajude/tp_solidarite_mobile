@@ -1,36 +1,33 @@
 import React from 'react';
-import {View, TouchableOpacity, ScrollView, StyleSheet, Animated, Image} from "react-native";
-import {Modal} from "react-native";
-import { Entypo, AntDesign} from '@expo/vector-icons';
+import {View, TouchableOpacity, StyleSheet,Image} from "react-native";
+import { Entypo} from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'
 
-import AppButton from "../AppButton";
 import colors from "../../utilities/colors";
 import AppText from "../AppText";
-import AppLabelLink from "../AppLabelLink";
-import {useSelector} from "react-redux";
+import UserImageModal from "./UserImageModal";
 
 
-function ProfileImagePicker({showPickerModal,onChangeImage,onChangePhoto,changeProfileAvatar,
-                                dismissPickerModal, getPickerModalShown, imageUrl,deleteAvatar
-}) {
+function ProfileImagePicker({onChangeImage,onChangePhoto, imageUrl,showImageModal,
+                                imageLabel,deleteImage,imageModalVisible,dismissImageModal,
+                                deleteExistImage, otherImageStyle})
+{
 
-    const user = useSelector(state => state.auth.user)
 
     const chooseImage = async() => {
         try {
-        const result = await ImagePicker.requestCameraRollPermissionsAsync()
+        const result = await ImagePicker.requestMediaLibraryPermissionsAsync()
         if(!result.granted) {
             alert("Vous devez accepter pour choisir l'image.")
             return ;
         }
-        const selectedImage = await ImagePicker.launchImageLibraryAsync()
+        const selectedImage = await ImagePicker.launchImageLibraryAsync({base64: true})
 
         if(selectedImage.cancelled) {
             return ;
         }
-        onChangeImage(selectedImage.uri)
 
+        onChangeImage({url: selectedImage.uri, base64Data: selectedImage.base64})
         } catch (e) {
            console.log(e)
         }
@@ -39,90 +36,71 @@ function ProfileImagePicker({showPickerModal,onChangeImage,onChangePhoto,changeP
 
     const takePhoto = async () => {
         try {
-        const result  = await ImagePicker.requestCameraRollPermissionsAsync()
+        const result  = await ImagePicker.requestCameraPermissionsAsync()
         if(!result.granted) {
             alert('Vous devez accepter pour prendre la photo')
             return ;
         }
-        const photo = await ImagePicker.launchCameraAsync()
+        const photo = await ImagePicker.launchCameraAsync({base64: true})
         if(photo.cancelled) {
             return;
         }
-        onChangePhoto(photo.uri)
+        onChangePhoto({url: photo.uri, base64Data: photo.base64})
         } catch (e) {
             console.log(e)
         }
     }
 
-
-
     return (
         <>
-            <ScrollView>
-            <View style={{
-                flexDirection: 'row'
-            }}>
-                {imageUrl && imageUrl.uri !== null && <Image source={imageUrl} style={{height: 60, width: 60, margin: 20}}/>}
-            <TouchableOpacity onPress={getPickerModalShown}>
-                <View style={{
-                    width: 60,
-                    height: 60,
-                    margin: 20,
-                    backgroundColor: colors.blanc,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}>
+            <UserImageModal imageModalVisible={imageModalVisible} dismissImageModal={dismissImageModal}
+                            chooseImage={chooseImage} takePhoto={takePhoto} deleteImage={deleteImage}/>
+            <View style={styles.container}>
+                <View>
+                    {!imageUrl && <View style={styles.imageContainer}>
+                        <AppText>{imageLabel}</AppText>
+                    </View>}
+                    {imageUrl &&  <TouchableOpacity onPress={deleteExistImage}>
+                     <Image source={imageUrl} style={[styles.imageStyle, otherImageStyle]}/>
+                    </TouchableOpacity>}
+                </View>
+            <TouchableOpacity onPress={showImageModal}>
+                <View style={styles.cameraStyle}>
                 <Entypo name="camera" size={40} color="black" />
                 </View>
             </TouchableOpacity>
             </View>
-                <AppButton title='valider la photo' style={{width: '40%', margin: 20}} onPress={changeProfileAvatar}/>
-                <View style={{borderTopWidth: 1, width: '100%'}}>
-                    <View style={{alignSelf: 'center', backgroundColor: colors.rougeBordeau}}>
-                        <AppText style={{color: colors.blanc}}>Vos infos</AppText>
-                    </View>
-
-                </View>
-            </ScrollView>
-            <Modal animated animationType='slide' transparent visible={showPickerModal}>
-                <View style={styles.overlay}>
-                    <Animated.View style={[styles.contentContainer]}>
-                    <View style={{
-                        alignSelf: 'flex-end'
-                    }}>
-                        <TouchableOpacity onPress={dismissPickerModal}>
-                        <AntDesign name="closecircle" size={40} color={colors.rougeBordeau} />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{
-                        justifyContent: 'center',
-                        alignItems: "center"
-                    }}>
-                        <AppLabelLink content='prendre une photo'  handleLink={takePhoto}/>
-                        <AppLabelLink content='Choisir une image'  handleLink={chooseImage}/>
-                        <AppLabelLink content='Supprimer la photo' handleLink={deleteAvatar}/>
-                    </View>
-                    </Animated.View>
-                </View>
-
-            </Modal>
-        </>
+            </>
     );
 }
 
-
 const styles = StyleSheet.create({
-    overlay: {
-        backgroundColor: 'rgba(0,0,0,0.2)',
-        flex: 1,
-        justifyContent: 'flex-end',
+    container: {
+      justifyContent: 'center',
+      alignItems: 'center',
+        margin: 10
     },
-    contentContainer: {
+    cameraStyle: {
+        width: 60,
+        height: 60,
         backgroundColor: colors.blanc,
-        paddingTop: 12,
-        borderTopRightRadius: 12,
-        borderTopLeftRadius: 12
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imageContainer: {
+        width: 100,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.blanc,
+        borderWidth: 1
+    },
+    imageStyle: {
+        height:80,
+        width: 80,
+        margin: 10
     }
+
 })
 
 export default ProfileImagePicker;

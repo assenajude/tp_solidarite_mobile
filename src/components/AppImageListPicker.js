@@ -2,19 +2,19 @@ import React, {useRef} from 'react';
 import {View, ScrollView} from "react-native";
 import AppInputImage from "./AppInputImage";
 
-function AppImageListPicker({imagesUrls= [], deleteImage, addNewImage}) {
+function AppImageListPicker({imagesData= [], deleteImage, addNewImage}) {
     const scrollView = useRef()
     
     return (
         <View>
             <ScrollView  ref={scrollView} horizontal onContentSizeChange={() => scrollView.current.scrollToEnd()}>
                    <View style={{flexDirection: 'row',justifyContent: "center", alignItems: "center"}}>
-                    {imagesUrls.map((url, index) => <View key={index.toString()} style={{margin: 10}}>
-                        <AppInputImage  imageUrl={url} changeImage={() => deleteImage(url)}
+                    {imagesData.map((image, index) => <View key={index.toString()} style={{margin: 10}}>
+                        <AppInputImage imageUrl={image.url} changeImage={() => deleteImage(image)}
                         />
                         </View>
                         )}
-                <AppInputImage  changeImage={(url) => addNewImage(url)}/>
+                          <AppInputImage changeImage={(image) => addNewImage(image)}/>
                    </View>
             </ScrollView>
         </View>

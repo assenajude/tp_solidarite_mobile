@@ -1,6 +1,6 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React from 'react';
 import {View, TextInput,TouchableOpacity, StyleSheet, Modal, Image, FlatList} from 'react-native'
-import {EvilIcons, FontAwesome, MaterialCommunityIcons,AntDesign, MaterialIcons} from '@expo/vector-icons'
+import {EvilIcons, FontAwesome, MaterialCommunityIcons,AntDesign} from '@expo/vector-icons'
 import Color from '../utilities/colors'
 import AppText from "./AppText";
 import CategoryItem from "./list/CategoryItem";
@@ -67,7 +67,6 @@ function AppTopBar({style, leaveInput, changeSearchValue, searchValue, handleSea
                            <View style={styles.allCategoriesStyle}>
                                <TouchableOpacity onPress={getAllCategories}>
                                    <View style={{alignItems: 'center'}}>
-                                   {/*<MaterialIcons name="category" size={30} color={Color.blanc} />*/}
                                    <AntDesign name="appstore-o" size={24} color="white" />
                                    <AppText style={{color:Color.blanc}}>Tous</AppText>
                                    </View>

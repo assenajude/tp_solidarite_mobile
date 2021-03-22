@@ -5,17 +5,23 @@ import {getConnectedUserData, getConnectedUserReset} from "../store/slices/userP
 import {getConnectedFavoritesReset, getUserFavoris} from "../store/slices/userFavoriteSlice";
 import {getAdresse, getConnectedAdressesReset} from "../store/slices/userAdresseSlice";
 import {getCartItems} from "../store/slices/shoppingCartSlice";
-import {useDispatch, useStore} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {getConnectedMessagesReset, getUserMessages} from "../store/slices/messageSlice";
+import {
+    getAllParrains,
+    getCompteParrainReset,
+    getUserParrainageCompte,
+    getUserParrains
+} from "../store/slices/parrainageSlice";
 
 let useAuth;
 export default useAuth = () => {
     const dispatch = useDispatch()
-    const store = useStore()
+    const user = useSelector(state => state.auth.user)
+    const isUser = Object.keys(user).length>0
 
 
     const userRoleAdmin = () => {
-        const user = store.getState().auth.user
         if (Object.entries(user).length > 0){
             const adminIndex = user.roles.indexOf('ROLE_ADMIN')
             if(adminIndex !== -1) {
@@ -34,6 +40,10 @@ export default useAuth = () => {
         dispatch(getAdresse())
         dispatch(getCartItems())
         dispatch(getUserMessages())
+        dispatch(getAllParrains())
+        if(isUser)dispatch(getUserParrainageCompte({userId: user.id}))
+        if(isUser) dispatch(getUserParrains({userId: user.id}))
+
 
     }
 
@@ -44,6 +54,7 @@ export default useAuth = () => {
         dispatch(getConnectedAdressesReset())
         dispatch(getConnectedMessagesReset())
         dispatch(getConnectedUserReset())
+        dispatch(getCompteParrainReset())
     }
 
     return {initUserDatas,userRoleAdmin, resetConnectedUserData}

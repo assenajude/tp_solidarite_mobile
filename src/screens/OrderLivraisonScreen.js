@@ -90,7 +90,7 @@ function OrderLivraisonScreen({navigation}) {
 
                                                                             </PayementListItem>
                                                                           )}
-                        {isAdresseNotEmpty && <AppButton style={styles.buttonStyle} title='continuer' onPress={() => {navigation.navigate(routes.ORDER)}}/>}
+                        {isAdresseNotEmpty && <AppButton style={styles.buttonStyle} title='continuer' onPress={() => {navigation.navigate(routes.ORDER_PAYEMENT)}}/>}
                     </View>
 
                 </ScrollView>

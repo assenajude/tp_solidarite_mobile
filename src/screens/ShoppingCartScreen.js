@@ -136,10 +136,12 @@ function ShoppingCartScreen({navigation}) {
         if(cartType === 'service') {
             dispatch(getPayementDisabled(1))
             dispatch(getPayementActive(2))
+            navigation.navigate(routes.ORDER_PAYEMENT)
         } else {
             dispatch(getPayementActive(1))
+            if(cartType === 'location') return navigation.navigate(routes.ORDER_PAYEMENT)
+             navigation.navigate(routes.ORDER_LIVRAISON)
         }
-        navigation.navigate(routes.ORDER_PAYEMENT)
 
     }
 

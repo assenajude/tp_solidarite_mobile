@@ -26,6 +26,7 @@ import {getServices} from "../store/slices/serviceSlice";
 import useItemReductionPercent from "../hooks/useItemReductionPercent";
 import useAuth from "../hooks/useAuth";
 import {getAllEspaces} from "../store/slices/espaceSlice";
+import {getAllParrains} from "../store/slices/parrainageSlice";
 
 function AccueilScreen({navigation}) {
     const dispatch = useDispatch();
@@ -57,6 +58,7 @@ function AccueilScreen({navigation}) {
         dispatch(getTranches())
         dispatch(getServices())
         dispatch(getServices())
+        dispatch(getAllParrains())
     }, [])
 
 
@@ -70,7 +72,7 @@ function AccueilScreen({navigation}) {
 
     if (error) {
         return <AppInfo buttonTitle='essayer encore..'>
-            <Text>une erreur est apparue... {error}</Text>
+            <Text>Desolé, nous ne pouvons pas joindre le serveur</Text>
             <AppButton title='recharger' onPress={() => Updates.reloadAsync()}/>
         </AppInfo>
     }

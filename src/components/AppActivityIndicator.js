@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, StyleSheet, ActivityIndicator} from "react-native";
 import colors from "../utilities/colors";
+import LottieView from "lottie-react-native";
 
 
 function AppActivityIndicator({visible}) {
@@ -9,6 +10,7 @@ function AppActivityIndicator({visible}) {
     } else {
     return (
         <View style={styles.container}>
+            <LottieView style={{ width: 200}} autoPlay={true} loop={true} source={require('../assets/animations/loading.json')}/>
             <ActivityIndicator size='large' color={colors.rougeBordeau}/>
         </View>
     );

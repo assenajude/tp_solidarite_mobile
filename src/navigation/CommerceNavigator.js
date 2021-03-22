@@ -61,7 +61,7 @@ function CommerceNavigator({navigation}) {
                                               handleSearch={handleCommerceSearch} showSpaceModal={() => setShowCommerceModal(true)}
                                               closeSpaceModal={() => setShowCommerceModal(false)} spaceModalVisible={showCommerceModal}
                                               searching={searchingInCommerce} startingSearch={() => setSearchingInCommerce(true)} leaveInput={() => setSearchingInCommerce(false)}/>,
-                headerLeft: () => <Avatar userAvatar={{uri: user.avatar}} otherImageStyle={{height: 40, width: 40}} onPress={() =>navigation.openDrawer()}/>
+                headerLeft: () => <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>navigation.openDrawer()}/>
             }}/>
             <CommerceStackNav.Screen name='NewArticleScreen' component={NewArticleScreen} options={{
                 title: 'Ajout nouvel article'

@@ -10,6 +10,8 @@ import AppSubmitButton from "../components/forms/AppSubmitButton";
 import {addPlan} from '../store/slices/planSlice'
 import FormImageListPicker from "../components/forms/FormImageListPicker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import useDirectUpload from "../hooks/useDirectUpload";
+import AppUploadProgress from "../components/AppUploadProgress";
 
 
 const planValideSchema = Yup.object().shape({
@@ -24,32 +26,57 @@ function NewPlanScreen({navigation, route}) {
 
     const dispatch = useDispatch();
     const store = useStore()
+    const {dataTransformer, directUpload} = useDirectUpload()
 
     const listPayements = useSelector(state => state.entities.payement.list)
     const isLoading = useSelector(state => state.entities.plan.loadingPlan)
-
     const [payementId, setPayementId]  = useState(1);
+    const [planUploadModal, setPlanUploadModal] = useState(false)
+    const [planUploadProgress, setPlanUploadProgress] = useState(0)
 
-
-    const addNewPlan = async (plan) => {
+    const newPlan = async (plan, planImagesUrls) => {
         const planData = {
             payementId,
             libelle: plan.libelle,
             description: plan.description,
             mensualite: plan.mensualite,
             compensation: plan.compensation,
-            images: plan.images
+            planImagesLinks: planImagesUrls
         }
-            await dispatch(addPlan(planData));
+        await dispatch(addPlan(planData));
         const error = store.getState().entities.plan.error
         if(error !== null) {
             return alert('Impossible dajouter le plan, une erreur est apparue.')
         }
         navigation.goBack();
+    }
+
+    const addNewPlan = async(plan) => {
+        const planImages = plan.images
+        if(planImages.length>0) {
+            const transformedData = dataTransformer(planImages)
+            setPlanUploadProgress(0)
+            setPlanUploadModal(true)
+            const uploadResult = await directUpload(transformedData, planImages, (progress) => setPlanUploadProgress(progress))
+            setPlanUploadModal(false)
+            if(uploadResult){
+                const imagesData = store.getState().s3_upload.signedRequestArray
+                const urls = imagesData.map(item => item.url)
+                await newPlan(plan, urls)
+            } else {
+                Alert.alert("Alert", "Des images n'ont pas été chargées, voulez-vous continuer quand meme?",
+                    [{text: 'oui', onPress: async () => await newPlan(plan, [])},
+                        {text: 'non', onPress: () => {return;}}])
+            }
+        } else {
+            await newPlan(plan, [])
+        }
+
     };
             return (
                 <View style={styles.container}>
                     <AppActivityIndicator visible={isLoading}/>
+                    <AppUploadProgress startProgress={planUploadModal} progress={planUploadProgress}/>
                     <ScrollView>
                         <View style={styles.listContainer}>
                             <Text style={{fontWeight: 'bold', marginRight: 15}}>Payement: </Text>

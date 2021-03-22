@@ -1,15 +1,14 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, ScrollView, Alert} from "react-native";
+import React from 'react';
+import { ScrollView, Alert} from "react-native";
 import * as Yup from 'yup'
 
 import {useDispatch, useSelector, useStore} from "react-redux";
-import ProfileImagePicker from "../components/user/ProfileImagePicker";
 import {getSaveEditInfo} from "../store/slices/userProfileSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppForm from "../components/forms/AppForm";
 import AppFormField from "../components/forms/AppFormField";
 import AppSubmitButton from "../components/forms/AppSubmitButton";
-import {getAvatarChange} from "../store/slices/authSlice";
+
 
 const valideEditInfo = Yup.object().shape({
     username: Yup.string(),
@@ -27,33 +26,8 @@ function EditUserInfoScreen({navigation}) {
 
     const user = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.profile.loading)
-    const loading = useSelector(state => state.auth.loading)
     const currentUser = useSelector(state => state.profile.connectedUser)
 
-
-    const [showProfileModal, setShowProfileModal] = useState(false)
-    const [newPhoto, setNewPhoto] = useState([user.avatar])
-
-
-    const handleChangeAvatar = (imageUrl) => {
-        setNewPhoto([imageUrl])
-    }
-
-    const handleChangePhoto = (url) => {
-        setNewPhoto([url])
-    }
-
-    const handleSaveAvatarUpdate = async () => {
-        await dispatch(getAvatarChange({images: newPhoto}))
-        const error = store.getState().auth.error
-        if(error !== null) {
-            alert('Impossible de changer votre photo de profil')
-        } else {
-            Alert.alert('Info', 'vous avez changé votre photo de profil avec succès', [
-                {text:'ok', onPress:() => {navigation.goBack()}}
-            ])
-        }
-    }
 
     const handleSaveEditInfo = async (info) => {
         const data = {
@@ -69,39 +43,18 @@ function EditUserInfoScreen({navigation}) {
         await dispatch(getSaveEditInfo(data))
         const error = store.getState().profile.error
         if(error !== null) {
-            alert('Une erreur est apparue. Veillez reessayer')
+            alert('Une erreur est apparue. Veillez reessayer plutard')
         } else {
-            navigation.goBack()
+            Alert.alert('Info', "Votre profile a été modifié avec succès",
+                [{text: 'ok', onPress: () => navigation.goBack()}])
         }
 
-    }
-
-    const handleDeleteAvatar = async () => {
-        await dispatch(getAvatarChange({images: newPhoto, deleting: true}))
-        const error = store.getState().auth.error
-        if(error !== null) {
-            alert('Impossible de supprimer votre photo de profil')
-        }else {
-            Alert.alert('Alert', 'vous avez supprimé votre photo de profil avec succès', [
-                {text:'ok', onPress:() => {
-                    setNewPhoto([])
-                        navigation.goBack()
-                    }}
-            ])
-        }
     }
 
     return (
         <>
-            <AppActivityIndicator visible={isLoading || loading}/>
-        <ScrollView>
-        <View style={styles.container}>
-
-                <ProfileImagePicker showPickerModal={showProfileModal} dismissPickerModal={() => setShowProfileModal(false)}
-                                   getPickerModalShown={() => setShowProfileModal(true)}
-                                   imageUrl={{uri: newPhoto[0]}} onChangeImage={handleChangeAvatar} onChangePhoto={handleChangePhoto}
-                                    changeProfileAvatar={handleSaveAvatarUpdate} deleteAvatar={handleDeleteAvatar}/>
-
+            <AppActivityIndicator visible={isLoading}/>
+        <ScrollView contentContainerStyle={{paddingTop: 10, paddingBottom: 10}}>
             <AppForm initialValues={{
                 username: currentUser.username || '',
                 email: currentUser.email || '',
@@ -120,17 +73,10 @@ function EditUserInfoScreen({navigation}) {
                 <AppFormField title='Profession' name='profession'/>
                 <AppSubmitButton title='Valider' showLoading={isLoading}/>
             </AppForm>
-        </View>
         </ScrollView>
             </>
     );
 }
 
-const styles = StyleSheet.create({
-    container:{
-        flex: 1,
-        padding: 20
-    }
-})
 
 export default EditUserInfoScreen;

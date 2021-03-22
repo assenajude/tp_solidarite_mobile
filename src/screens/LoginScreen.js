@@ -21,6 +21,8 @@ import {getUserFavoris} from "../store/slices/userFavoriteSlice";
 import {getConnectedUserData} from "../store/slices/userProfileSlice";
 import AppLabelLink from "../components/AppLabelLink";
 import {getCartItems} from "../store/slices/shoppingCartSlice";
+import useAuth from "../hooks/useAuth";
+import {getUserParrainageCompte} from "../store/slices/parrainageSlice";
 
 const loginValidationSchema = yup.object().shape({
     username: yup.string().required("Veillez saisir un nom d'utilisateur"),
@@ -35,19 +37,16 @@ function LoginScreen({navigation}) {
 
     const dispatch = useDispatch();
     const store = useStore()
+    const {initUserDatas} = useAuth()
 
 
     const handleLogin = async (user) => {
         await dispatch(signin(user))
         const error = store.getState().auth.error
+        const loggedInUser = store.getState().auth.user
         if(error !== null) return;
-        dispatch(getOrdersByUser())
-        dispatch(getFacturesByUser())
-        dispatch(getUserProfileAvatar())
-        dispatch(getConnectedUserData())
-        dispatch(getUserFavoris())
-        dispatch(getAdresse())
-        dispatch(getCartItems())
+        dispatch(getUserParrainageCompte({userId: loggedInUser.id}))
+        initUserDatas()
         navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
     }
 

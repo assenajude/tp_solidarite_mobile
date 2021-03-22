@@ -45,6 +45,9 @@ import FaqScreen from "../screens/FaqScreen";
 import QuestionScreen from "../screens/QuestionScreen";
 import ResponseScreen from "../screens/ResponseScreen";
 import ServiceDetailScreen from "../screens/ServiceDetailScreen";
+import EditUserImagesScreen from "../screens/EditUserImagesScreen";
+import ParrainageNavigator from "./ParrainageNavigator";
+import OrderParrainageScreen from "../screens/OrderParrainageScreen";
 
 const ArticleStackNavigator = createStackNavigator();
 
@@ -90,8 +93,7 @@ const navigation = useNavigation()
                options={({navigation}) => ({
                    headerTitleAlign: 'center',
                    headerLeft: () =>
-                       <Avatar userAvatar={{uri:user.avatar}} otherImageStyle={{width:40,height:30, borderRadius:20 }} otherImageContainerStyle={{width:40,height:40}}
-                               onPress={() =>navigation.openDrawer()}/>,
+                       <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri:user.avatar}} onPress={() =>navigation.openDrawer()}/>,
                    headerTitle: () => <AppTopBar searchValue={seachValue} changeSearchValue={(val) => setSearchValue(val)}
                                                  handleSearch={handleSearch} searching={searchState} selectedSpace={selectedSpace}
                                                  homeModalVisible={homeModalVisible} availableSpace={availableSpace}
@@ -193,7 +195,13 @@ const navigation = useNavigation()
             <ArticleStackNavigator.Screen name='ServiceDetailScreen' component={ServiceDetailScreen} options={({route}) => ({
                 title: 'Detail '+route.params.libelle
             })}/>
-
+            <ArticleStackNavigator.Screen name='Parrainage' component={ParrainageNavigator}/>
+            <ArticleStackNavigator.Screen name='EditUserImagesScreen' component={EditUserImagesScreen} options={({route}) => ({
+                title: 'Edition image profil'
+            })}/>
+            <ArticleStackNavigator.Screen name='OrderParrainageScreen' component={OrderParrainageScreen} options={({route}) => ({
+                title: 'Parrainage commande'
+            })}/>
 
         </ArticleStackNavigator.Navigator>
 )};
