@@ -18,7 +18,6 @@ import serviceSlice from './slices/serviceSlice'
 import mainSlice from './slices/mainSlice'
 import userLocationSlice from './slices/userLocationSlice'
 import userServiceSlice from './slices/userServiceSlice'
-import userOrderSlice from './slices/userOrderSlice'
 import userFavoriteSlice from './slices/userFavoriteSlice'
 import propositionSlice from './slices/propositionSlice'
 import faqSlice from './slices/faqSlice'
@@ -44,7 +43,6 @@ export default combineReducers({
     main: mainSlice,
     userLocation: userLocationSlice,
     userService: userServiceSlice,
-    userOrder: userOrderSlice,
     userFavorite: userFavoriteSlice,
     proposition: propositionSlice,
     faq: faqSlice,

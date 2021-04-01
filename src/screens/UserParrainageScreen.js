@@ -6,9 +6,14 @@ import {getOrderParrainDetails, getSponsorDetails} from "../store/slices/parrain
 import routes from "../navigation/routes";
 import useOrderInfos from "../hooks/useOrderInfos";
 import AppText from "../components/AppText";
+import colors from "../utilities/colors";
+import useAuth from "../hooks/useAuth";
+import useParrainage from "../hooks/useParrainage";
 
 function UserParrainageScreen({navigation}) {
     const {getLastCompteFactureProgress, getUserParrainageOrders} = useOrderInfos()
+    const {formatPrice} = useAuth()
+    const {getInvestissement, getTotalGain, getRestituteInvest} = useParrainage()
     const dispatch = useDispatch()
 
     const userActiveParrainage = useSelector(state => {
@@ -24,7 +29,7 @@ function UserParrainageScreen({navigation}) {
 
 
     useEffect(() => {
-  }, [])
+    }, [])
 
 
     if(userActiveParrainage.length === 0){
@@ -39,6 +44,30 @@ function UserParrainageScreen({navigation}) {
 
     return (
         <>
+                <View style={{backgroundColor: colors.rougeBordeau, alignSelf: 'center', marginTop: 20}}>
+                    <AppText style={{color: colors.blanc}}>Mon portefeuille</AppText>
+                </View>
+            <View style={{borderWidth: 1, padding: 10}}>
+                <View style={{flexDirection: 'row'}}>
+                <View style={{width: '50%', marginTop: 20}}>
+                    <View>
+                        <AppText>{getRestituteInvest().restituteQuotite} / {formatPrice(getInvestissement())}</AppText>
+                    </View>
+                    <View style={{backgroundColor: colors.bleuFbi, marginTop: 30}}>
+                        <AppText style={{color: colors.blanc}}>Investissement</AppText>
+                    </View>
+                </View>
+                    <View style={{borderWidth: 1, marginLeft: 5, marginRight: 5, marginBottom: 30}}>
+
+                    </View>
+                <View style={{width: '50%', marginTop: 20}}>
+                    <AppText>{getRestituteInvest().actuGain} / {formatPrice(getTotalGain())}</AppText>
+                    <View style={{backgroundColor: colors.bleuFbi, marginTop: 30}}>
+                        <AppText style={{color: colors.blanc}}>Bénéfice</AppText>
+                    </View>
+                </View>
+                </View>
+            </View>
             <FlatList data={userActiveParrainage} keyExtractor={item => item.id.toString()}
                       renderItem={({item}) => <ParrainageEncoursItem ownerUserAvatar={item.User.avatar} avatarUrl={{uri:item.User.avatar}}
                                                                      ownerUsername={item.User.username} ownerEmail={item.User.email}

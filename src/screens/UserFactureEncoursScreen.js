@@ -33,6 +33,7 @@ function UserFactureEncoursScreen({navigation}) {
     return (
         <>
              <AppActivityIndicator visible={loading}/>
+             <View style={{bottom: 20}}>
         <FlatList data={encoursList} keyExtractor={item => item.id.toString()}
                   renderItem={({item}) =>
                       <FactureListItem numero={item.numero}
@@ -46,6 +47,7 @@ function UserFactureEncoursScreen({navigation}) {
                                        solde={item.solde} endFacture={item.montant === item.solde}
                                        goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}/>
                   } />
+             </View>
                   </>
     );
 }

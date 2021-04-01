@@ -8,11 +8,13 @@ import AppText from "../AppText";
 import colors from "../../utilities/colors";
 import useOrderInfos from "../../hooks/useOrderInfos";
 import useAuth from "../../hooks/useAuth";
+import useParrainage from "../../hooks/useParrainage";
 
 function ParrainageEncoursItem({ownerUserAvatar,sponsorDetails,openSponsorDetails, avatarUrl, ownerEmail,
                                    ownerUsername, parrainageOrders, getUserProfile, getParrainOrderDetails,
                                    orderProgress, showProgress}) {
-    const {getParrainagePercent, getParrainageGain, getOrderFactureEcheance} = useOrderInfos()
+    const {getOrderFactureEcheance} = useOrderInfos()
+    const {getParrainagePercent, getParrainageGain} = useParrainage()
     const {formatPrice} = useAuth()
     return (
         <View style={styles.container}>
@@ -44,7 +46,7 @@ function ParrainageEncoursItem({ownerUserAvatar,sponsorDetails,openSponsorDetail
                            <AppText>{item.montant}</AppText>
                            <AppText>{item.OrderParrain.action}</AppText>
                            <AppText>({getParrainagePercent(item.montant, item.OrderParrain.action)}%)</AppText>
-                           <AppText style={{color: colors.vert}}>{getParrainageGain(item, item.OrderParrain.action)}</AppText>
+                           <AppText style={{color: colors.vert}}>{getParrainageGain(item)}</AppText>
                            </View>
                             {item.showDetails && <View style={{backgroundColor: colors.blanc}}>
                                 <View style={{alignSelf: 'flex-end', padding: 5}}>
@@ -65,7 +67,7 @@ function ParrainageEncoursItem({ownerUserAvatar,sponsorDetails,openSponsorDetail
                                 <AppText style={{marginLeft: 10}} >{formatPrice(item.interet)}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row', paddingBottom: 10, paddingTop: 10}}>
-                                <AppText style={{fontWeight: 'bold'}}>Gain</AppText>
+                                <AppText style={{fontWeight: 'bold'}}>Gain:</AppText>
                                 <AppText style={{marginLeft: 10}}>{formatPrice(getParrainageGain(item, item.OrderParrain.action))}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row'}}>

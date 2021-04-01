@@ -132,7 +132,7 @@ function CompteParrainScreen({navigation}) {
                                   </View>
                               </View>
                               <View style={styles.compteParrain}>
-                                  <CompteParrainageItem fondsLabel='Fonds initial' fonds={item.initial} editFundValue={item.editInitial}
+                                  <CompteParrainageItem fondContainerStyle={{borderTopWidth: 1}} fondsLabel='Fonds initial' fonds={item.initial} editFundValue={item.editInitial}
                                                         annuleEdit={() => {
                                                             setEditInitialValue('')
                                                             dispatch(getStartInitialEdit(item))
@@ -146,13 +146,13 @@ function CompteParrainScreen({navigation}) {
                                                                   }}/>}
                                   </CompteParrainageItem>
                                   <CompteParrainageItem fonds={item.gain} fondsLabel='Gain' labelStyle={{color: colors.vert}}
-                                                        fondContainerStyle={{borderColor: colors.vert}}>
+                                                        fondContainerStyle={{ borderTopWidth: 1}}>
                                       <MaterialCommunityIcons name="credit-card-plus" size={24} color={colors.vert} />
                                   </CompteParrainageItem>
-                                  <CompteParrainageItem fondsLabel='Depenses' fonds={item.depense} labelStyle={{color: colors.rougeBordeau}}>
+                                  <CompteParrainageItem fondContainerStyle={{borderTopWidth: 1}} fondsLabel='Depenses' fonds={item.depense} labelStyle={{color: colors.rougeBordeau}}>
                                       <MaterialCommunityIcons name="credit-card-minus" size={24} color={colors.rougeBordeau} />
                                   </CompteParrainageItem>
-                                  <CompteParrainageItem fondsLabel='Quotité' fonds={item.quotite}
+                                  <CompteParrainageItem fondContainerStyle={{borderTopWidth: 1, borderBottomWidth: 1}} fondsLabel='Quotité' fonds={item.quotite}
                                                         editFundValue={item.editQuotite}
                                                         annuleEdit={() => {
                                                             dispatch(getStartQuotiteEdit(item))
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         padding: 40,
         marginTop: 20,
-        marginBottom: 20
+        marginBottom: 20,
     },
     inactive: {
         flexDirection: 'row',

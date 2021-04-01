@@ -211,23 +211,23 @@ function OrderPayementScreen({navigation}) {
                     }}>
 
                     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
-                        <View style={{height: 20,width: 20, borderWidth: 1, borderRadius: 10, marginRight: 5,
+                        <View style={{height: 20,width: 20, borderWidth: 1, borderRadius: 10,
                             justifyContent: 'center', alignItems: 'center'}}>
                             {selectedOption.toLowerCase() === 'fidelityseuil' && <Octicons name="primitive-dot" size={24} color={colors.or} />}
                         </View>
-                        <AppText style={{fontWeight: 'bold' }}>Seuil de fidelité</AppText>
+                        <AppText style={{fontWeight: 'bold', marginLeft: 10}}>Seuil de fidelité</AppText>
                     </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => setSelectedOption('parrainage')}>
                     <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 20}}>
                         <View style={{height: 20,width: 20, borderWidth: 1,
-                            borderRadius: 10, marginRight: 20,
+                            borderRadius: 10,
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}>
                           {selectedOption.toLowerCase() === 'parrainage' &&  <Octicons name="primitive-dot" size={24} color={colors.or} />}
                         </View>
-                        <AppText style={{fontWeight: 'bold'}}>Parrainage</AppText>
+                        <AppText style={{fontWeight: 'bold', marginLeft: 10}}>Parrainage</AppText>
                     </View>
                     </TouchableOpacity>
                 </View>

@@ -14,10 +14,16 @@ import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import {useSelector} from "react-redux";
 import Avatar from "../components/user/Avatar";
+import routes from "../navigation/routes";
+import ParrainageHeader from "../components/parrainage/ParrainageHeader";
+import useAuth from "../hooks/useAuth";
+import useParrainage from "../hooks/useParrainage";
 
 function OrderDetailsScreen({route, navigation}) {
 
-    const user = useSelector(state => state.auth.user)
+    const {formatPrice} = useAuth()
+    const {getParrainagePercent} = useParrainage()
+    const comptesParrainage = useSelector(state => state.entities.parrainage.list)
     const commande = useSelector(state => {
         const userListOrder = state.entities.order.currentUserOrders
         const selectedOrder = userListOrder.find(order => {
@@ -67,7 +73,11 @@ function OrderDetailsScreen({route, navigation}) {
 
                     </View>
                     <View style={styles.contentStyle}>
-                        <Avatar userAvatar={{uri: user.avatar}} showUsername={true} onPress={() => navigation.navigate('AccueilNavigator', {screen: 'CompteScreen'})}/>
+                        <View>
+                            <Avatar ownerUserAvatar={commande.User.avatar} avatarUrl={{uri: commande.User.avatar}}
+                                onPress={() => navigation.navigate(routes.COMPTE,commande.User)}/>
+                                <AppText>{commande.User.username}</AppText>
+                        </View>
                        <View style={{marginLeft: 50}}>
                            <AppLabelWithValue label='Total montant: ' labelValue={commande.montant} secondLabel='fcfa'/>
                            <AppLabelWithValue label='Total payé: ' labelValue={commande.Facture?commande.Facture.solde:0} secondLabel='fcfa'/>
@@ -91,6 +101,18 @@ function OrderDetailsScreen({route, navigation}) {
                         <AppLabelWithValue label='Frais de livraison: ' labelValue={commande.fraisTransport} secondLabel='fcfa'/>
                         <AppLabelWithValue label="Taux d'interet: " labelValue={commande.interet} secondLabel='fcfa'/>
                     </View>
+                {commande.CompteParrainages.length>0 && <View style={{padding: 5, borderWidth: 1, marginTop: 10}}>
+                    <View style={{backgroundColor: colors.rougeBordeau}}>
+                        <AppText style={{color: colors.blanc}}>Infos parrainage</AppText>
+                    </View>
+                    {commande.CompteParrainages.map((cpt) =><View key={cpt.id.toString()} style={styles.compteParrainStyle}>
+                        <ParrainageHeader ownerUsername={comptesParrainage.find(cptpar => cptpar.id === cpt.id)?.User.username}
+                                          ownerUserAvatar={comptesParrainage.find(cptpar => cptpar.id === cpt.id)?.User.avatar}
+                                          avatarUrl={{uri: comptesParrainage.find(cptpar => cptpar.id === cpt.id)?.User.avatar}}
+                                          ownerEmail={comptesParrainage.find(cptpar => cptpar.id === cpt.id)?.User.email}/>
+                        <AppText style={{fontWeight: 'bold'}}>{formatPrice(cpt.OrderParrain.action)} ({getParrainagePercent((commande.montant-commande.interet), cpt.OrderParrain.action)} %)</AppText>
+                    </View>)}
+                </View>}
                     <View style={{marginTop: 20}}>
                         <AppLabelWithValue label="Commandé le: " labelValue={dayjs(commande.dateCmde).format('DD/MM/YYYY HH:mm:ss')}/>
                         <AppLabelWithValue label={commande.dateLivraisonFinal?'Livré le: ':'Sera livré le: '} labelValue={commande.dateLivraisonFinal?dayjs(commande.dateLivraisonFinal).format('DD/MM/YYYY HH:mm:ss'):dayjs(commande.dateLivraisonDepart).format('DD/MM/YYYY HH:mm:ss')}/>
@@ -130,6 +152,12 @@ const styles = StyleSheet.create({
     contentStyle: {
         flexDirection: 'row',
         alignItems: 'center'
+    },
+    compteParrainStyle: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        margin: 10
     }
 })
 export default OrderDetailsScreen;

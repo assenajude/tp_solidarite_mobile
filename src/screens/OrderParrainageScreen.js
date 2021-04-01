@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, StyleSheet, TextInput, TouchableOpacity, View} from "react-native";
+import {FlatList, StyleSheet,ScrollView, TextInput, TouchableOpacity, View} from "react-native";
 import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
 import usePlaceOrder from "../hooks/usePlaceOrder";
@@ -15,8 +15,9 @@ import useAuth from "../hooks/useAuth";
 
 function OrderParrainageScreen({navigation}) {
     const dispatch = useDispatch()
-    const {getTotal} = usePlaceOrder()
+    const {getTotal, getPayementRate} = usePlaceOrder()
     const {formatPrice} = useAuth()
+
     const listParrains = useSelector(state => {
         const parrains = state.entities.parrainage.userParrains
         const activeCompte = parrains.filter(parr => parr.active)
@@ -70,12 +71,14 @@ function OrderParrainageScreen({navigation}) {
                     <AntDesign name="infocirlceo" size={20} color={colors.bleuFbi} />
                     <AppText style={{marginLeft: 10, color: colors.bleuFbi}}>La couverture parrains doit être à 100% de votre commande</AppText>
                 </View>
-                <View style={{flexDirection: 'row', borderWidth: 1, width: '100%',
-                    justifyContent: 'center', alignSelf: 'center', margin: 10}}>
+                <View style={{ borderWidth: 1, width: '90%',borderRadius: 20,
+                    justifyContent: 'center', alignItems: 'center', margin: 10}}>
+                    <View style={{flexDirection: 'row'}}>
                     <AppText style={{fontWeight: 'bold'}}>Couverture parrains: </AppText>
                     <AppText style={{color: colors.rougeBordeau}}> {formatPrice(totalParrains)}</AppText>
                     <AppText>/</AppText>
-                    <AppText>{formatPrice(getTotal())}</AppText>
+                    <AppText>{formatPrice(getTotal()-getPayementRate())}</AppText>
+                    </View>
                 </View>
 
                 {listParrains.length>0 && <FlatList ItemSeparatorComponent={() =><ItemSeparator/>} data={listParrains} keyExtractor={item => item.id.toString()}
@@ -117,7 +120,7 @@ function OrderParrainageScreen({navigation}) {
                                                         </View>
 
                                                     </View>}/>}
-                    {totalParrains === getTotal() && <View style={{
+                    {totalParrains === (getTotal()-getPayementRate()) && <View style={{
                         alignItems: 'center',
                         margin: 50
                     }}>

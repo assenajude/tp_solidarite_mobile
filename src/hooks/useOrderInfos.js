@@ -34,18 +34,7 @@ export default useOrderInfos = () => {
         } else return null
     }
 
-    const getParrainagePercent = (total, amount) => {
-        const percent = amount * 100 / total
-        const formated = Math.round(percent)
-        return formated || 0
-    }
 
-    const getParrainageGain = (order, parrainageAmount) => {
-        const percent = getParrainagePercent(order.montant, parrainageAmount)
-        const gain = percent * order.interet / 100
-        return gain || 0
-
-    }
 
 
     const getLastCompteFactureProgress = (compte) => {
@@ -87,6 +76,5 @@ export default useOrderInfos = () => {
         return selectedOrders
 
     }
-    return {getItems, getModePayement, getPointRelais, getParrainagePercent,
-        getParrainageGain,getLastCompteFactureProgress, getOrderFactureEcheance, getUserParrainageOrders}
+    return {getItems, getModePayement, getPointRelais,getLastCompteFactureProgress, getOrderFactureEcheance, getUserParrainageOrders}
 }

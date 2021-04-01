@@ -53,6 +53,7 @@ function UserFactureScreen({navigation}) {
        return (
            <>
                <AppActivityIndicator visible={isLoading}/>
+               <View style={{bottom: 20}}>
            <FlatList data={userFactures} keyExtractor={item => item.id.toString()}
                     renderItem={({item}) =>
                         <FactureListItem numero={item.numero}
@@ -66,6 +67,7 @@ function UserFactureScreen({navigation}) {
                                          solde={item.solde} endFacture={item.montant === item.solde}
                                         goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}/>
                     } />
+               </View>
                     </>
        )
     } else if (user && userFactures.length === 0) {
