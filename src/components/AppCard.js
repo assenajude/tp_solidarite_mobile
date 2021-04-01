@@ -11,7 +11,7 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, isFavorite
                      aideInfo, button2, children, addToCart, frequence, itemType,deleteItem,
                      toggleFavorite, serviceMin, serviceMax, otherImgaeStyle, notInStock, itemReductionPercent}) {
 
-    const {userRoleAdmin} = useAuth()
+    const {userRoleAdmin, formatPrice} = useAuth()
     return (
         <>
         <View style={{
@@ -19,10 +19,13 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, isFavorite
             padding: 10
         }}>
         <TouchableHighlight onPress={onPress}>
-        <View  style={[styles.mainContainer, {height: itemType==='service'?330:360}]}>
-            {itemType !== 'service' &&  <View style={{
+        <View  style={[styles.mainContainer, {height: itemType==='service'?360:380}]}>
+            {itemType !== 'service' && itemReductionPercent>0 &&  <View style={{
                 flexDirection: 'row',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                paddingLeft: 10,
+                paddingRight: 10,
+                paddingTop: itemType==='service'?10:20
             }}>
                 <AppText style={{color: Color.rougeBordeau, fontWeight: 'bold', fontSize: 20}}>-{itemReductionPercent}%</AppText>
                 <View>
@@ -32,15 +35,23 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, isFavorite
                     </TouchableOpacity>
                 </View>
             </View>}
+          {itemType !== 'service' && itemReductionPercent <= 0 &&  <View style={{alignItems: 'flex-end', margin: 10}}>
+                <TouchableOpacity onPress={toggleFavorite}>
+                    {isFavorite && <MaterialCommunityIcons name='heart' size={30}/>}
+                    {!isFavorite && <MaterialCommunityIcons name='heart-outline' size={30}/>}
+                </TouchableOpacity>
+            </View>}
             {image && <Image resizeMode='contain' style={[styles.imageStyle, otherImgaeStyle]} source={image}/>}
               <View>
                 <View style={styles.infoContainer}>
                     <View style={{
                         flexDirection: 'row',
                         alignItems: 'center',
+                        justifyContent: 'space-between',
+                        margin: 5
                     }}>
                     <AppText style={{color: Color.or}}>{'Dispo: ' + dispo}</AppText>
-                    <AppText style={{fontSize: 15, fontWeight: 'bold', marginLeft: 20}}>{title}</AppText>
+                    <AppText lineNumber={2} style={{fontSize: 15, fontWeight: 'bold', marginLeft: 20, width: '60%'}}>{title}</AppText>
                     </View>
                     {aideInfo && <MaterialCommunityIcons name="help-circle-outline" size={24} color={Color.bleuFbi}/>}
                 </View>
@@ -50,14 +61,14 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, isFavorite
                             flexDirection: 'row',
                             alignItems: 'center'
                         }}>
-                            <Text style={{color: Color.rougeBordeau, fontWeight: 'bold'}}>{subtitle1}</Text>
+                            <Text style={{color: Color.rougeBordeau, fontWeight: 'bold'}}>{formatPrice(subtitle1)}</Text>
                             {itemType == 'location' && <Text>{frequence}</Text> }
                         </View>
                         <View style={{
                             flexDirection: 'row',
                             alignItems: 'center'
                         }}>
-                            <Text style={{textDecorationLine: 'line-through', fontSize: 12}}>{subtitle2}</Text>
+                            <Text style={{textDecorationLine: 'line-through', fontSize: 12}}>{formatPrice(subtitle2)}</Text>
                             {itemType == 'location' && <Text>{frequence}</Text> }
                         </View>
                     </View>}
@@ -69,7 +80,7 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, isFavorite
                             alignItems: 'center'
                         }}>
                         <AppText style={{fontSize: 15, fontWeight: 'bold'}}>Min: </AppText>
-                        <AppText> {serviceMin} fcfa</AppText>
+                        <AppText> {formatPrice(serviceMin)}</AppText>
                         </View>
                         <View style={{
                             flexDirection: 'row',
@@ -77,7 +88,7 @@ function AppCard({image, title, subtitle1, subtitle2 ,dispo, onPress, isFavorite
                             alignItems: 'center'
                         }}>
                         <AppText style={{fontSize: 15, fontWeight: 'bold'}}>Max: </AppText>
-                        <AppText>{serviceMax} fcfa</AppText>
+                        <AppText>{formatPrice(serviceMax)}</AppText>
                         </View>
                     </View>}
                 </View>
@@ -116,6 +127,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingRight: 10,
         paddingLeft: 10,
+        paddingBottom: 20
     },
     imageStyle: {
         width: '100%',

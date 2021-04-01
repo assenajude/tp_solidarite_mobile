@@ -64,7 +64,7 @@ const orderSlice = createSlice({
                 state.serviceRefreshCompter += 1
                 state.listServices.push(justAdded)
             }
-            state.totalCompter++
+            state.totalCompter+=1
         },
         resetOrder: (state) => {
             state.currentOrder = {}
@@ -85,38 +85,32 @@ const orderSlice = createSlice({
         editStatusSuccess: (state, action) => {
             state.loading = false
             const newItem = action.payload
-            let oldItem;
+            let oldItemIndex;
             if(newItem.typeCmde === 'location') {
-                oldItem = state.listLocations.find(item => item.id === newItem.id)
+                oldItemIndex = state.listLocations.findIndex(item => item.id === newItem.id)
+                state.listLocations[oldItemIndex] = newItem
             } else if(newItem.typeCmde === 'service') {
-                oldItem = state.listServices.find(item => item.id === newItem.id)
+                 oldItemIndex = state.listServices.findIndex(item => item.id === newItem.id)
+                state.listServices[oldItemIndex] = newItem
             } else {
-                oldItem = state.listArticles.find(item => item.id === newItem.id)
+                 oldItemIndex = state.listArticles.findIndex(item => item.id === newItem.id)
+                state.listArticles[oldItemIndex] = newItem
             }
-                oldItem.statusLivraison = newItem.statusLivraison
-                oldItem.statusAccord = newItem.statusAccord
-                oldItem.historique = newItem.historique
-                oldItem.Contrats = newItem.Contrats
-                oldItem.Facture = newItem.Facture
-                oldItem.dateLivraisonFinal = newItem.dateLivraisonFinal
-                oldItem.isExpired = newItem.isExpired
-                oldItem.expireIn = newItem.expireIn
 
         },
         deleteSuccess: (state, action)=> {
           state.loading = false
           state.error = null
             const deletedItem = action.payload
-            let deletedItemIndex
             if(deletedItem.typeCmde === 'service') {
-                deletedItemIndex = state.listServices.findIndex(item => item.id === deletedItem.id)
-                state.listServices.splice(deletedItemIndex, 1)
+                const services = state.listServices.filter(item => item.id !== deletedItem.id)
+                state.listServices = services
             } else if(deletedItem.typeCmde === 'location') {
-                deletedItemIndex = state.listLocations.findIndex(item => item.id === deletedItem.id)
-                state.listLocations.splice(deletedItemIndex, 1)
+                const newLocations = state.listLocations.filter(item => item.id !== deletedItem.id)
+                state.listLocations = newLocations
             } else {
-                deletedItemIndex = state.listArticles.findIndex(item => item.id === deletedItem.id)
-                state.listArticles.splice(deletedItemIndex, 1)
+                const newArticles = state.listArticles.filter(item => item.id !== deletedItem.id)
+                state.listArticles = newArticles
             }
         },
         showFinalOrderDetails: (state, action) => {

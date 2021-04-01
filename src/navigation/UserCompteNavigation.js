@@ -12,7 +12,6 @@ import LocationNavigator from "./LocationNavigator";
 import ServiceNavigator from "./ServiceNavigator";
 import CommerceNavigator from "./CommerceNavigator";
 import {useDispatch} from "react-redux";
-import ParrainageNavigator from "./ParrainageNavigator";
 
 const Drawer = createDrawerNavigator();
 

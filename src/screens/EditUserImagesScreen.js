@@ -45,6 +45,9 @@ function EditUserImagesScreen(props) {
     }
 
     const handleSaveAvatar = async () => {
+        if(Object.keys(selectedAvatar).length === 0) {
+            return alert("Veuiller choisir une image")
+        }
         const transformedAvatar = dataTransformer([selectedAvatar])
         setUploadProgress(0)
         setUploadModal(true)
@@ -95,6 +98,9 @@ function EditUserImagesScreen(props) {
     }
 
     const handleSavePiece = async () => {
+        if(Object.keys(setSelectedRecto).length === 0 || Object.keys(selectedVerso).length === 0) {
+            return alert("Veuillez choisir les 2 cotés de votre pièces avant de sauvegarder.")
+        }
         let dataArray = []
         dataArray.push(selectedRecto, selectedVerso)
         const transformedArray = dataTransformer(dataArray)

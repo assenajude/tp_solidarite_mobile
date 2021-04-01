@@ -8,13 +8,15 @@ import AppButton from "../components/AppButton";
 import colors from "../utilities/colors";
 import {getConnectedUserData} from "../store/slices/userProfileSlice";
 import Avatar from "../components/user/Avatar";
+import useAuth from "../hooks/useAuth";
 
-function CompteScreen({navigation}) {
+function CompteScreen({navigation, route}) {
+    const selectedUser = route.params
     const dispatch = useDispatch()
+    const  {userRoleAdmin} = useAuth()
     const user = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.profile.loading)
-    const currentUser = useSelector(state => state.profile.connectedUser)
-    const userPiece = currentUser.pieceIdentite?.length>0
+    const allowEdit = userRoleAdmin() || selectedUser.id === user.id
 
     const getUserInfo = useCallback(async () => {
         await dispatch(getConnectedUserData())
@@ -40,74 +42,75 @@ function CompteScreen({navigation}) {
 
            }}>
                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                   <Avatar otherImageStyle={{width: 80,height: 80,borderRadius: 40}} ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}}/>
-                   <AppText style={{fontWeight: 'bold'}}>{user.username}</AppText>
+                   <Avatar otherImageStyle={{width: 80,height: 80,borderRadius: 40}} ownerUserAvatar={selectedUser.avatar} avatarUrl={{uri: selectedUser.avatar}}/>
+                   <AppText style={{fontWeight: 'bold'}}>{selectedUser.username}</AppText>
                </View>
                <View>
                    <AppText style={{color: colors.dark, fontWeight: 'bold'}}>piece identité</AppText>
                    <View style={{flexDirection: 'row'}}>
                    <View style={styles.pieceStyle}>
-                      {!userPiece && <View>
+                      {!selectedUser.pieceIdentite && <View>
                        <AppText>recto</AppText>
                            <AppText>aucune image</AppText>
                        </View>}
-                      {currentUser.pieceIdentite?.length>0 && <Image style={styles.pieceImageStyle} source={{uri: currentUser.pieceIdentite[0]}}/>}
+                      {selectedUser.pieceIdentite?.length>0 && <Image style={styles.pieceImageStyle} source={{uri: selectedUser.pieceIdentite[0]}}/>}
                    </View>
                    <View style={styles.pieceStyle}>
-                      {!userPiece  && <View>
+                      {!selectedUser.pieceIdentite  && <View>
                        <AppText>verso</AppText>
                            <AppText>aucune image</AppText>
                        </View>}
-                       {currentUser.pieceIdentite?.length>1 && <Image style={styles.pieceImageStyle} source={{uri: currentUser.pieceIdentite[1]}}/>}
+                       {selectedUser.pieceIdentite?.length>1 && <Image style={styles.pieceImageStyle} source={{uri: selectedUser.pieceIdentite[1]}}/>}
                    </View>
                    </View>
                </View>
            </View>
-            <View style={styles.buttonStyle}>
+            {allowEdit && <View style={styles.buttonStyle}>
                 <AppButton onPress={() => navigation.navigate('EditUserImagesScreen')} title='Edit images' iconSize={24} iconColor={colors.blanc}
                            iconName='edit' textStyle={{marginLeft: 10}}/>
-            </View>
+            </View>}
             </View>
             <View style={{
-                borderTopWidth: 1
+                borderTopWidth: 1,
+                marginTop: 20
             }}>
                 <View style={{
                     alignSelf: 'center',
                     marginBottom: 20,
                     backgroundColor: colors.rougeBordeau
                 }}>
-                    <AppText style={{color: colors.blanc}}>Vos infos</AppText>
+                    <AppText style={{color: colors.blanc}}>Infos complementaires</AppText>
                 </View>
-                <View style={{alignSelf: 'flex-end'}}>
+                {allowEdit && <View style={{alignSelf: 'flex-end'}}>
                     <AppButton style={{marginRight: 10}} onPress={() => navigation.navigate('EditUserInfoScreen')} title='Edit infos' iconSize={24} iconColor={colors.blanc}
                                iconName='edit' textStyle={{marginLeft: 10}}/>
-                </View>
+                </View>}
                 <View style={{alignItems: 'flex-start'}}>
                     <View style={styles.labelStyle}>
 
                         <AppText style={{fontWeight: 'bold', fontSize: 20}}>Nom</AppText>
 
-                        <AppText>{currentUser.nom}</AppText>
+                        <AppText>{selectedUser.nom}</AppText>
                     </View>
                     <View style={styles.labelStyle}>
                         <AppText style={{fontWeight: 'bold', fontSize: 20}}>Prenom</AppText>
-                        <AppText>{currentUser.prenom}</AppText>
+                        <AppText>{selectedUser.prenom}</AppText>
                     </View>
                     <View style={styles.labelStyle}>
                         <AppText style={{fontWeight: 'bold', fontSize: 20}}>Telephone</AppText>
-                        <AppText>{currentUser.phone}</AppText>
+                        <AppText>{selectedUser.phone}</AppText>
                     </View>
                     <View style={styles.labelStyle}>
                         <AppText style={{fontWeight: 'bold', fontSize: 20}}>Email</AppText>
-                        <AppText>{currentUser.email}</AppText>
+                        <AppText>{selectedUser.email}</AppText>
                     </View>
                     <View style={styles.labelStyle}>
                         <AppText style={{fontWeight: 'bold', fontSize: 20}}>Adresse</AppText>
-                        <AppText>{currentUser.adresse}</AppText>
+                        <AppText>{selectedUser.adresse}</AppText>
                     </View>
                     <View style={styles.labelStyle}>
                         <AppText style={{fontWeight: 'bold', fontSize: 20}}>Profession</AppText>
-                        <AppText>{currentUser.profession}</AppText>
+                        <AppText>{selectedUser.profession}</AppText>
                     </View>
                 </View>
             </View>

@@ -8,7 +8,8 @@ import UserServiceHistoryScreen from "../screens/UserServiceHistoryScreen";
 const ServiceTopNavigator = createMaterialTopTabNavigator()
 function UserServiceNavigator(props) {
     return (
-        <ServiceTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}} initialRouteName='UserServiceScreen'>
+        <ServiceTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}}
+                                       initialRouteName='UserServiceScreen' >
             <ServiceTopNavigator.Screen name='UserServiceContratScreen' component={UserServiceContratScreen} options={{
                 title: 'Contrats'
             }}/>

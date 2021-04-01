@@ -9,7 +9,9 @@ const UserFactTopNavigator = createMaterialTopTabNavigator()
 
 function UserFactureNavigator(props) {
     return (
-        <UserFactTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}}>
+        <UserFactTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}} tabBarOptions={{
+            labelStyle: { textTransform: 'none' }
+        }}>
             <UserFactTopNavigator.Screen name='UserFactureScreen' component={UserFactureScreen} options={{
                 title: 'Tous'
             }}/>

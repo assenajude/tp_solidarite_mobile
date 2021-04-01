@@ -32,7 +32,7 @@ function AccueilScreen({navigation}) {
     const dispatch = useDispatch();
     const {getReductionPercent} = useItemReductionPercent()
     const {addItemToCart} = useAddToCart()
-    const {initUserDatas} = useAuth()
+    const {initUserDatas, resetConnectedUserData} = useAuth()
 
     const user = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.entities.main.loading)
@@ -63,6 +63,7 @@ function AccueilScreen({navigation}) {
 
 
     useEffect(() => {
+            resetConnectedUserData()
         if (Object.keys(user).length>0) {
             initUserDatas()
         }

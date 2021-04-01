@@ -97,7 +97,7 @@ function NewUserAdresseScreen({navigation, route}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-        <ScrollView>
+        <ScrollView contentContainerStyle={{paddingBottom: 20}}>
         <View>
             <View>
                 <View style={styles.container}>
@@ -110,30 +110,10 @@ function NewUserAdresseScreen({navigation, route}) {
                      } }
                      onFocus={() => {
                          setShowVille(true)
+                         setShowRelais(false)
                      }}/>
                 </View>
-                   {showVille && <View>
-                       <ScrollView style={styles.villeList}>
-                           <View style={{
-                               height: 100,
-                               width: 200
-                           }}>
-                       {filteredVilles(selectedVille).map((ville, index) =>
-                           <TouchableHighlight underlayColor={color.or} key={index} onPress={() => {
-                           setSelectedVille(ville)
-                               dispatch(selectedVilleRelais(ville))
-                               setShowVille(false);
-                           setSelectedRelais('')
-                               setNewRelais({})
-                       }}>
-                           <View style={styles.regionList}>
-                               <AppText>{ville}</AppText>
-                           </View>
-                           </TouchableHighlight>
-                       )}
-                           </View>
-                       </ScrollView>
-                    </View>}
+
                 </View>
 
                 <View >
@@ -144,26 +124,10 @@ function NewUserAdresseScreen({navigation, route}) {
                             setSelectedRelais(val)
                         }} onFocus={() => {
                             setShowRelais(true)
+                            setShowVille(false)
                         }}/>
                     </View>
-                    <View>
-                  { showRelais && <ScrollView style={styles.relaisList}>
-                                <View style={{
-                                    height: 100,
-                                    width: 200
-                                }}>
-                          {filteredRelais(selectedRelais).map((item, index) =>
-                              <TouchableHighlight key={index} underlayColor={color.or} onPress={() => {
-                                  setSelectedRelais(item.nom);
-                                  setShowRelais(false);
-                                  setNewRelais(item)
-                              }}>
-                              <AppText >{item.nom}</AppText>
-                              </TouchableHighlight>
-                          )}
-                                </View>
-                  </ScrollView>}
-                    </View>
+
                 </View>
             </View>
             <View style={styles.infoPerso}>
@@ -185,6 +149,41 @@ function NewUserAdresseScreen({navigation, route}) {
             </View>
 
         </View>
+            {showVille && !showRelais && <View style={styles.villeContainer}>
+                <ScrollView>
+                    {filteredVilles(selectedVille).map((ville, index) =>
+                        <TouchableHighlight underlayColor={color.or} key={index} onPress={() => {
+                            setSelectedVille(ville)
+                            dispatch(selectedVilleRelais(ville))
+                            setShowVille(false);
+                            setSelectedRelais('')
+                            setNewRelais({})
+                        }}>
+                            <View style={styles.regionList}>
+                                <AppText>{ville}</AppText>
+                            </View>
+                        </TouchableHighlight>
+                    )}
+                </ScrollView>
+            </View>}
+            { showRelais && !showVille &&  <View style={styles.relaisContainer}>
+              <ScrollView>
+                    <View style={{
+                        height: 100,
+                        width: 200
+                    }}>
+                        {filteredRelais(selectedRelais).map((item, index) =>
+                            <TouchableHighlight key={index} underlayColor={color.or} onPress={() => {
+                                setSelectedRelais(item.nom);
+                                setShowRelais(false);
+                                setNewRelais(item)
+                            }}>
+                                <AppText >{item.nom}</AppText>
+                            </TouchableHighlight>
+                        )}
+                    </View>
+                </ScrollView>
+            </View>}
         </ScrollView>
             </>
 
@@ -209,16 +208,28 @@ const styles = StyleSheet.create({
     relais: {
         flexDirection: 'row'
     },
-    villeList: {
-        width: 'auto',
-        alignSelf: 'center'
-    },
     regionList: {
         padding: 5,
     },
     infoPerso: {
-        borderWidth: 1,
+        borderTopWidth: 1,
         marginTop: 20
+    },
+    villeContainer: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: color.leger,
+        alignItems: 'center',
+        top: 60
+    },
+    relaisContainer: {
+        position: 'absolute',
+        alignItems: 'center',
+        backgroundColor: color.leger,
+        width: '100%',
+        height: '100%',
+        top: 120
     }
 })
 export default NewUserAdresseScreen;

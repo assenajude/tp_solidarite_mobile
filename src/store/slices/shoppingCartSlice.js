@@ -123,6 +123,9 @@ const shoppingCartSlice = createSlice({
                     state.items[selectedItem.id] = selectedItem
                 } else {
                     delete state.items[itemId]
+                }
+                const newItems = state.items
+                if(Object.keys(newItems).length === 0) {
                     state.type = ''
                 }
                     state.itemsLenght--

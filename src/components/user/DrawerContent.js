@@ -18,6 +18,7 @@ function DrawerContent(props) {
     const {userRoleAdmin,resetConnectedUserData} = useAuth()
 
     const user = useSelector(state => state.auth.user)
+    const userData = useSelector(state => state.profile.connectedUser)
     const isUser = useSelector(state => {
         const connetedUser = state.auth.user
         const isLoggedIn = Object.entries(connetedUser).length > 0?true:false
@@ -47,7 +48,7 @@ function DrawerContent(props) {
 
                        <View style={styles.avatar}>
                        <View style={{top: 20, marginBottom: 10}}>
-                           <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>props.navigation.navigate(routes.COMPTE)}  otherImageStyle={{width: 80,height: 80, borderRadius: 40}}/>
+                           <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>props.navigation.navigate(routes.COMPTE, {...user, ...userData})}  otherImageStyle={{width: 80,height: 80, borderRadius: 40}}/>
                        </View>
                            <View>
                                <TouchableOpacity onPress={() => props.navigation.navigate(routes.HELP)}>
@@ -63,7 +64,7 @@ function DrawerContent(props) {
                            </View>
                        </View>
                        <View style={styles.usernameStyle}>
-                       {isUser && <TouchableOpacity onPress={() => props.navigation.navigate(routes.COMPTE)}>
+                       {isUser && <TouchableOpacity onPress={() => props.navigation.navigate(routes.COMPTE, {...user, ...userData})}>
                        <View style={styles.usernameContainer}>
                            <Text>{user.username}</Text>
                            <EvilIcons style={{fontWeight: 'bold'}} name="chevron-right" size={24} color="black" />
@@ -169,7 +170,7 @@ function DrawerContent(props) {
                </View>
            </DrawerContentScrollView>
             {isUser &&
-                <AppButton style={{padding: 5, borderRadius: 0}}  iconName='logout' iconColor={Color.blanc} title='Se deconnecter'
+                <AppButton style={{padding: 5, borderRadius: 0, paddingTop: 10, paddingBottom: 10}}  iconName='logout' iconColor={Color.blanc} title='Se deconnecter'
                            textStyle={{marginLeft: 10}} onPress={() => handleLogout()}/>}
         </View>
     );

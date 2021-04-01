@@ -37,8 +37,13 @@ const villeSlice = createSlice({
 
         },
         getLivraisonVille: (state, action) => {
-            const selectedVille = state.list.find(ville => ville.id === action.payload);
+           const selectedAdress = action.payload
+            if(Object.keys(selectedAdress).length>0) {
+            const selectedVille = state.list.find(ville => ville.id === selectedAdress.PointRelai.VilleId);
             state.userVille = selectedVille
+            } else {
+                state.userVille = {}
+            }
         },
         resetUserVille: (state, action) => {
             state.userVille = {}
@@ -75,8 +80,8 @@ export const selectedVilleRelais = (ville) => dispatch => {
     dispatch(getVilleRelais(ville))
 }
 
-export const getSelectedLivraisonVille = (villeId) => dispatch => {
-    dispatch(getLivraisonVille(villeId))
+export const getSelectedLivraisonVille = (relais) => dispatch => {
+    dispatch(getLivraisonVille(relais))
 }
 
 

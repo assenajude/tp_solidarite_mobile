@@ -1,6 +1,6 @@
 import React from 'react';
 import {useSelector, useDispatch, useStore} from 'react-redux'
-import {View, Text, StyleSheet, Alert, ScrollView} from 'react-native'
+import {View, Text, StyleSheet, Alert, ScrollView, Image} from 'react-native'
 
 import Color  from '../utilities/colors'
 import FinalOrderItem from "../components/order/FinalOrderItem";
@@ -16,10 +16,14 @@ import AppLabelWithValue from "../components/AppLabelWithValue";
 import {getCartClear} from "../store/slices/shoppingCartSlice";
 import {getUserVilleReset} from "../store/slices/villeSlice";
 import usePlaceOrder from "../hooks/usePlaceOrder";
+import AppModePayement from "../components/AppModePayement";
+import ParrainageHeader from "../components/parrainage/ParrainageHeader";
+import useAuth from "../hooks/useAuth";
 
 function OrderScreen({navigation}) {
     const store = useStore()
     const dispatch = useDispatch();
+    const {formatPrice} = useAuth()
     const {getTotal,getShippingRate, getPayementRate, getTauxPercent} = usePlaceOrder()
 
     const selectedPayemet = useSelector(state => state.entities.payement.selectedPayement)
@@ -89,6 +93,28 @@ function OrderScreen({navigation}) {
                     <AppText style={{color: Color.blanc}}>Verifiez les details de votre commande puis finaliser</AppText>
                 </View>
             <ScrollView>
+                <View>
+                    <View style={{flexDirection: 'row', justifyContent: 'flex-end', margin: 20}}>
+                        <AppModePayement modePayement={selectedPayemet.mode}/>
+                    </View>
+                    {selectedPayemet.mode.toLowerCase() === 'credit' && <View>
+                        <View style={{backgroundColor: Color.rougeBordeau, alignSelf: 'center'}}>
+                            <AppText style={{color: Color.blanc}}>Option de couverture</AppText>
+                        </View>
+                        <AppText style={{color: Color.or, fontWeight: 'bold'}}>{selectedParrains.length>0?'Parrainage':'Seuil de fidelité'}</AppText>
+                        {selectedParrains.length>0 && <View>
+                            {selectedParrains.map((item, index) => <View key={item.id.toString()} style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                padding: 10
+                            }}>
+                                <ParrainageHeader ownerUserAvatar={item.User.avatar} avatarUrl={{uri: item.User.avatar}}
+                                                  ownerUsername={item.User.username} ownerEmail={item.User.email}/>
+                                   <AppText style={{color: Color.rougeBordeau, fontWeight: 'bold'}}>{formatPrice(item.parrainAction)}</AppText>
+                            </View>)}
+                        </View>}
+                    </View>}
+                </View>
                {currentOrder.type === 'location' &&
                <FinalOrderItem  header="Location" label1={currentOrder.items[0].libelle}
                                 label2='Montant: ' label2Value={currentOrder.amount}
@@ -144,9 +170,10 @@ function OrderScreen({navigation}) {
                      <AppLabelWithValue label='Autres adresses: ' labelValue={selectedAdesse.adresse}/>
                  </View>
              </FinalOrderItem>}
+
                 <View style={styles.totalFinal}>
                     <AppText style={{fontSize: 20, fontWeight: 'bold'}}>Montant total TTC: </AppText>
-                    <AppText style={{color: Color.rougeBordeau, fontSize: 20, fontWeight: 'bold'}}>{getTotal()} FCFA</AppText>
+                    <AppText style={{color: Color.rougeBordeau, fontSize: 20, fontWeight: 'bold'}}>{formatPrice(getTotal())}</AppText>
                 </View>
                  <AppButton onPress={saveOrder} textStyle={{fontWeight: 'bold', fontSize: 15}} style={styles.finalButton}
                             title='Finaliser votre demande'/>

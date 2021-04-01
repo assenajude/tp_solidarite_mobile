@@ -30,7 +30,7 @@ const registerValidationSchema = yup.object().shape({
             [yup.ref("password")],
             "Les mots de passe  ne correspondent pas."
         )
-    })
+    }).required("Veuillez confirmer le mot de passe.")
 })
 
 function RegisterScreen({navigation}) {

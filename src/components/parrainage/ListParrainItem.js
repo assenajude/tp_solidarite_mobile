@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Image, StyleSheet, TouchableOpacity} from "react-native";
+import {View, StyleSheet, TouchableOpacity} from "react-native";
 import {FontAwesome, MaterialCommunityIcons, AntDesign} from '@expo/vector-icons';
 
 import AppText from "../AppText";
@@ -9,9 +9,9 @@ import AppButton from "../AppButton";
 
 
 function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername, parrainEmail,
-                             parrainPhone, parrainQuotite, showParrainDetails, getParrainDetialsShown,
-                             sendMessageToParrain, activeCompte, inSponsoring, ownerUserAvatar,
-                             compteDetailExist, isParrain, isFilleul,msgResponded, parrainageResponseEditing,
+                             parrainPhone, parrainQuotite,remakeParrainage,getUserProfile,
+                             sendMessageToParrain, activeCompte, inSponsoring=false, ownerUserAvatar,
+                             compteDetailExist, isParrain, isFilleul,msgResponded=false, parrainageResponseEditing,
                              editParrainageResponse, sendParrainageResponse, stopParrainage}) {
     return (
         <>
@@ -22,7 +22,7 @@ function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername,
                             <AntDesign style={{fontWeight: 'bold'}} name="close" size={24} color={colors.rougeBordeau} />
                         </TouchableOpacity>
                     </View>
-                   {!inSponsoring && <View style={{flexDirection: 'row'}}>
+                   {!inSponsoring && !msgResponded && <View style={{flexDirection: 'row'}}>
                         <AppText style={{fontWeight: 'bold'}}>Demande de parrainage</AppText>
                         <AppButton textStyle={{padding: 5}}  style={{backgroundColor: colors.bleuFbi}} title='accepter' onPress={sendParrainageResponse}/>
                     </View>}
@@ -30,11 +30,15 @@ function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername,
                         <AppText style={{fontWeight:'bold'}}>Arrêt de parrainage</AppText>
                         <AppButton title='Arreter' style={{padding: 5}} onPress={stopParrainage}/>
                     </View>}
+                    {!inSponsoring && msgResponded && <View style={{flexDirection: 'row'}}>
+                        <AppText style={{fontWeight:'bold'}}>Reprise de parrainage</AppText>
+                        <AppButton title='Reprendre' style={{padding: 5, backgroundColor: colors.vert}} onPress={remakeParrainage}/>
+                    </View>}
+
                 </View>}
-                <TouchableOpacity onPress={getParrainDetialsShown}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 10}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Avatar avatarUrl={avatarUrl} ownerUserAvatar={ownerUserAvatar}/>
+                        <Avatar avatarUrl={avatarUrl} ownerUserAvatar={ownerUserAvatar} onPress={getUserProfile}/>
                         <View style={{alignItems: 'flex-start'}}>
                             <AppText style={{fontWeight: 'bold'}}>{parrainUsername}</AppText>
                             <AppText>{parrainEmail}</AppText>
@@ -49,7 +53,7 @@ function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername,
                                     <AppText style={{color: colors.vert, fontWeight: 'bold'}}>P</AppText>
                                 </View>
                             </TouchableOpacity>}
-                            {msgResponded && !inSponsoring && <TouchableOpacity>
+                            {msgResponded && !inSponsoring && <TouchableOpacity onPress={editParrainageResponse}>
                                 <MaterialCommunityIcons name="bus-stop-covered" size={24} color={colors.rougeBordeau} />
                             </TouchableOpacity>}
                         </View>}
@@ -57,7 +61,7 @@ function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername,
                            {!msgResponded && !inSponsoring && <TouchableOpacity onPress={editParrainageResponse}>
                                <MaterialCommunityIcons name="bus-stop-covered" size={24} color='orange' />
                            </TouchableOpacity>}
-                           {msgResponded && !inSponsoring && <TouchableOpacity>
+                           {msgResponded && !inSponsoring && <TouchableOpacity onPress={editParrainageResponse}>
                                <MaterialCommunityIcons name="bus-stop-covered" size={24} color={colors.rougeBordeau} />
                            </TouchableOpacity>}
                            {msgResponded && inSponsoring && <TouchableOpacity onPress={editParrainageResponse}>
@@ -79,16 +83,15 @@ function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername,
                     <AppText style={{fontWeight: 'bold', fontSize: 18, color: colors.rougeBordeau}}>Quotité</AppText>
                     <AppText style={{marginLeft: 50, fontWeight: 'bold', fontSize: 18, color: colors.rougeBordeau}}>{parrainQuotite} fcfa</AppText>
                 </View>
-                </TouchableOpacity>
-             {showParrainDetails && <View style={{alignItems: 'flex-start'}}>
-                 {compteDetailExist && <View>
+                {compteDetailExist && <View style={{alignItems: 'flex-start'}}>
+                 <View>
                     <View style={{flexDirection: 'row'}}>
                     <AppText style={{fontWeight: 'bold'}}>{parrainNom}</AppText>
                     <AppText style={{fontWeight: 'bold'}}>{parrainPrenom}</AppText>
                 </View>
                  <AppText>{parrainPhone}</AppText>
-                 </View>}
-                 {!compteDetailExist && <AppText>Aucun detail trouvé.</AppText>}
+                 </View>
+
              </View>}
             {!activeCompte && <View style={styles.inactive}>
             </View>}

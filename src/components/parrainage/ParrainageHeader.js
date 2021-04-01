@@ -3,11 +3,11 @@ import {View, StyleSheet} from "react-native";
 import Avatar from "../user/Avatar";
 import AppText from "../AppText";
 
-function ParrainageHeader({ownerUserAvatar,avatarUrl, ownerUsername, ownerEmail}) {
+function ParrainageHeader({ownerUserAvatar,avatarUrl, ownerUsername, ownerEmail, getUserProfile}) {
     return (
         <View>
             <View style={styles.headerContainer}>
-                <Avatar ownerUserAvatar={ownerUserAvatar} avatarUrl={avatarUrl}/>
+                <Avatar onPress={getUserProfile} ownerUserAvatar={ownerUserAvatar} avatarUrl={avatarUrl}/>
                 <View style={{alignItems: 'flex-start'}}>
                     <AppText>{ownerUsername}</AppText>
                     <AppText>{ownerEmail}</AppText>

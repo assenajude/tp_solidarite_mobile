@@ -1,7 +1,10 @@
-import {useSelector} from "react-redux";
+import {useSelector, useStore} from "react-redux";
+import dayjs from "dayjs";
 
 let useOrderInfos;
 export default useOrderInfos = () => {
+    const store = useStore()
+    const user = useSelector(state => state.auth.user)
     const listOrder = useSelector(state => state.entities.order.currentUserOrders)
     const listPayement = useSelector(state => state.entities.payement.list)
     const listRelais = useSelector(state => state.entities.pointRelais.list)
@@ -31,5 +34,59 @@ export default useOrderInfos = () => {
         } else return null
     }
 
-    return {getItems, getModePayement, getPointRelais}
+    const getParrainagePercent = (total, amount) => {
+        const percent = amount * 100 / total
+        const formated = Math.round(percent)
+        return formated || 0
+    }
+
+    const getParrainageGain = (order, parrainageAmount) => {
+        const percent = getParrainagePercent(order.montant, parrainageAmount)
+        const gain = percent * order.interet / 100
+        return gain || 0
+
+    }
+
+
+    const getLastCompteFactureProgress = (compte) => {
+        let progress = 0
+        const allFacture = store.getState().entities.facture.list
+        const compteOrders = compte.Commandes
+        const ordersIds = compteOrders.map(item => item.id)
+        const compteFacture = allFacture.filter(item => ordersIds.some(id => id === item.CommandeId))
+        compteFacture.sort((a, b) => {
+            if(a.createdAt > b.createdAt) return -1
+            if(a.createdAt < b.createdAt) return 1
+            return 0
+        })
+        const lastFacture = compteFacture[0]
+        if(lastFacture) {
+         const result = lastFacture.solde / lastFacture.montant
+        const rounded = Math.round(result * 10) / 10
+        progress = rounded.toFixed(1)
+        }
+        return Number(progress) || 0
+    }
+
+    const getOrderFactureEcheance = (order) => {
+        const allFactures = store.getState().entities.facture.list
+        const orderFacture = allFactures.find(fac => fac.CommandeId === order.id)
+        let formatedEcheance;
+        if(orderFacture) {
+        const echeance = orderFacture.dateCloture
+        formatedEcheance = dayjs(echeance).format('DD/MM/YYYY HH:mm:ss')
+        }
+        return formatedEcheance || ""
+
+    }
+
+    const getUserParrainageOrders = (compte) => {
+        let selectedOrders = []
+        const compteOrders = store.getState().entities.parrainage.parrainageOrders
+        selectedOrders = compteOrders.filter(order => order.UserId === compte.UserId)
+        return selectedOrders
+
+    }
+    return {getItems, getModePayement, getPointRelais, getParrainagePercent,
+        getParrainageGain,getLastCompteFactureProgress, getOrderFactureEcheance, getUserParrainageOrders}
 }

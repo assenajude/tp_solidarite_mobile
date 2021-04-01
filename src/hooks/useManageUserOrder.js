@@ -100,7 +100,7 @@ export default useManageUserOder = () => {
                 solde: tranche.montant
             }
             await dispatch(getFactureUpdated(factureData))
-            const list = store.getState().entities.facture.userFactures
+            const list = store.getState().entities.facture.list
             const justUpdated = list.find(fact => fact.id === tranche.FactureId)
             if(justUpdated.montant === justUpdated.solde) {
                 dispatch(getOrderContratUpdate({

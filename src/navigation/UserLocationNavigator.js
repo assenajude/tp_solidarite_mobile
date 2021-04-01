@@ -9,7 +9,9 @@ const LocationTopTab = createMaterialTopTabNavigator()
 
 function UserLocationNavigator(props) {
     return (
-        <LocationTopTab.Navigator initialRouteName='UserLocationScreen' initialLayout={{width: Dimensions.get('window').width}}>
+        <LocationTopTab.Navigator initialRouteName='UserLocationScreen' initialLayout={{width: Dimensions.get('window').width}} tabBarOptions={{
+            labelStyle: { textTransform: 'none' }
+        }}>
             <LocationTopTab.Screen name='UserLocationContratScreen' component={UserLocationContratScreeen} options={{
                 title: 'Contrats'
             }}/>

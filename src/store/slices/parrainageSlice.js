@@ -10,7 +10,8 @@ const parrainageSlice = createSlice({
         list : [],
         userParrains: [],
         userFilleuls: [],
-        parrainageState: {},
+        inSponsoringState: [],
+        respondMessageState: [],
         searchCompteList: [],
         parrainageOrders: []
     },
@@ -47,23 +48,76 @@ const parrainageSlice = createSlice({
         allParrainageCompteReceived: (state, action) => {
             state.error = null
             state.loading = false
-            const receiveds = action.payload
+            const receiveds = action.payload.comptes
+            const currentUserCompte = receiveds.find(cpt => cpt.UserId === action.payload.userId)
+            if(currentUserCompte) {
+            state.parrainageOrders = currentUserCompte.Commandes
+            }
             state.list = receiveds
             state.searchCompteList = receiveds
         },
         compteParrainEdited: (state, action) => {
           state.error = null
             state.loading = false
-            const result = action.payload
+            let result = action.payload
             const soldeCpte = result.initial + result.gain - result.depense-result.quotite
-            let selectedCompte = state.comptes.find(cpte => cpte.id ===result.id)
-            selectedCompte.initial = result.initial
-            selectedCompte.depense = result.depense
-            selectedCompte.quotite = result.quotite
-            selectedCompte.gain = result.gain
-            selectedCompte.active  = result.active
-            selectedCompte.compteState = result.compteState
-            selectedCompte.solde = soldeCpte
+            result.solde = soldeCpte
+            const selectedIndex = state.comptes.findIndex(item => item.id === result.id)
+            const searchIndex = state.searchCompteList.findIndex(item => item.id === result.id)
+            if(selectedIndex !== -1 ) {
+                state.comptes[selectedIndex] = result
+            }
+            if(searchIndex !== -1) state.searchCompteList[searchIndex] = result
+            else state.searchCompteList.push(result)
+        },
+        parrainageMessageEdited: (state, action) => {
+            state.loading = false
+            state.error = null
+            const updatedCompte = action.payload
+            const parrainUser = updatedCompte.parrain
+            const parrainageCompte = updatedCompte.compte
+                const sponsoringIndex = state.inSponsoringState.findIndex(item => item.id === parrainUser.id)
+            if(parrainUser.ParrainFilleul.inSponsoring) {
+            if(sponsoringIndex !== -1) {
+                state.inSponsoringState[parrainUser.id] = parrainUser
+            } else {
+                state.inSponsoringState.push(parrainUser)
+            }
+            } else {
+                if(sponsoringIndex !== -1) {
+                    const newStates = state.inSponsoringState.filter(item => item.id !== parrainUser.id)
+                    state.inSponsoringState = newStates
+                }
+            }
+
+                const respondedIndex = state.respondMessageState.findIndex(item => item.id === parrainUser.id)
+            if(parrainUser.ParrainFilleul.sponsoringState !== 'pending') {
+                if(respondedIndex !== -1) {
+                    state.respondMessageState[respondedIndex] = parrainUser
+                } else {
+                    state.respondMessageState.push(parrainUser)
+                }
+            } else {
+                if(respondedIndex !== -1) {
+                    const newResponseState = state.respondMessageState.filter(msg => msg.id !== parrainUser.id)
+                    state.respondMessageState = newResponseState
+                }
+            }
+
+                const parrainIndex = state.userParrains.findIndex(item => item.id === parrainageCompte.id)
+                const filleulIndex = state.userFilleuls.findIndex(item => item.id === parrainageCompte.id)
+            if(updatedCompte.isParrain) {
+                if(filleulIndex !== -1) state.userFilleuls.splice(filleulIndex, 1)
+                if (parrainIndex !== -1) state.userParrains[parrainIndex] = parrainageCompte
+                else state.userParrains.push(parrainageCompte)
+            }
+            if(updatedCompte.isFilleul) {
+                if(parrainIndex !== -1) state.userParrains.splice(parrainIndex, 1)
+                if(filleulIndex !== -1) state.userFilleuls[filleulIndex] = parrainageCompte
+                else state.userFilleuls.push(parrainageCompte)
+            }
+
+
         },
         resetParrainCompte: (state, action) => {
             state.loading = false
@@ -72,7 +126,10 @@ const parrainageSlice = createSlice({
             state.list  = []
             state.userParrains = []
             state.userFilleuls = []
+            state.inSponsoringState = []
+            state.respondMessageState = []
             state.searchCompteList = []
+            state.parrainageOrders = []
         },
         showParrainDetials : (state, action) => {
             let selectedCompte = state.searchCompteList.find(compte => compte.id === action.payload.id)
@@ -99,7 +156,18 @@ const parrainageSlice = createSlice({
                 const parrainageData = action.payload
             state.userParrains = parrainageData.parrains
             state.userFilleuls = parrainageData.filleuls
-            state.parrainageState = parrainageData.parrainageState
+            const newTab = [...parrainageData.userParrainsState, ...parrainageData.userFilleulsState]
+            newTab.forEach(item => {
+                const itemSponsoring  = item.ParrainFilleul.inSponsoring;
+                const itemRespondMessage = item.ParrainFilleul.sponsoringState;
+                if(itemSponsoring) {
+                    state.inSponsoringState.push(item)
+                }
+                if( itemRespondMessage!== 'pending') {
+                    state.respondMessageState.push(item)
+                }
+
+            })
         },
         editQuotite :(state, action) => {
             let selectedCompte = state.comptes.find(compte => compte.id === action.payload.id)
@@ -113,18 +181,6 @@ const parrainageSlice = createSlice({
             let selectedCompte = state.searchCompteList.find(cpte => cpte.id === action.payload.id)
             selectedCompte.editResponse = !selectedCompte.editResponse
         },
-        parrainageStopped: (state, action) => {
-            state.loading = false
-            state.error = null
-            const stoppedCompte = action.payload
-            let inList = state.list.find(cpt => cpt.id === stoppedCompte.id)
-            let inSearchList = state.searchCompteList.find(cpt => cpt.id === stoppedCompte.id)
-        },
-        parrainageOrders: (state, action) => {
-            state.error = null
-            state.loading = false
-            state.parrainageOrders = action.payload
-        },
         selectedParrain: (state, action) => {
             let selectedParrainCompte = state.userParrains.find(compte => compte.id === action.payload.id)
             selectedParrainCompte.selected = !selectedParrainCompte.selected
@@ -135,8 +191,19 @@ const parrainageSlice = createSlice({
             selectedCompte.parrainAction = action.payload.parrainAction
             const oldQuotite = selectedCompte.quotite
             const newQuotite = action.payload.parrainAction
-            const resteQuotite = newQuotite>0?oldQuotite-newQuotite:oldQuotite
+            const resteQuotite = newQuotite? oldQuotite - newQuotite: oldQuotite
             selectedCompte.resteQuotite = resteQuotite
+        },
+        showSponsorDetails: (state, action) => {
+            const sponsoringTab = [...state.userParrains, ...state.userFilleuls]
+            let selectedSponsor = sponsoringTab.find(sp => sp.id === action.payload.id)
+            selectedSponsor.sponsorDetails = !selectedSponsor.sponsorDetails
+        },
+        showParrainOrderDetais : (state, action) => {
+            const compteOrders = state.parrainageOrders
+            let selectedOrder = compteOrders.find(order => order.id === action.payload.id)
+            selectedOrder.showDetails = !selectedOrder.showDetails
+
         }
 
     }
@@ -146,14 +213,15 @@ export default parrainageSlice.reducer
 const {parrainageRequested, parrainageRequestFailed, parrainCompteReceived,
     allParrainageCompteReceived, resetParrainCompte, showParrainDetials,
     searchParrain, parrainsReceived, editInitial, editQuotite, compteParrainEdited,
-    parrainCompteAdded, parrainageResponseEdited, parrainageStopped, parrainageOrders,
-    selectedParrain, showQuotiteEditer} = parrainageSlice.actions
+    parrainCompteAdded, parrainageResponseEdited,showParrainOrderDetais,
+    selectedParrain, showQuotiteEditer, showSponsorDetails, parrainageMessageEdited} = parrainageSlice.actions
 
 const url = '/compteParrainages'
 
-export const getAllParrains = () => apiRequest({
-    url,
-    method: 'get',
+export const getAllParrains = (data) => apiRequest({
+    url:url+"/allComptes",
+    method: 'post',
+    data,
     onStart: parrainageRequested.type,
     onSuccess: allParrainageCompteReceived.type,
     onError: parrainageRequestFailed.type
@@ -213,32 +281,31 @@ export const getUserParrains = (data) => apiRequest({
     onError: parrainageRequestFailed.type
 })
 
+export const getParrainageRequestSent = (data) => apiRequest({
+    url: url+'/parrainageRequest',
+    data,
+    method: 'patch',
+    onStart: parrainageRequested.type,
+    onSuccess: parrainageMessageEdited.type,
+    onError: parrainageRequestFailed.type
+})
 export const getParrainageResponseSend = (data) => apiRequest({
     url: url+'/parrainageResponse',
     data,
     method: 'patch',
     onStart: parrainageRequested.type,
-    onSuccess: allParrainageCompteReceived.type,
+    onSuccess: parrainageMessageEdited.type,
     onError: parrainageRequestFailed.type
 })
 
-export const getStopParrainage = (data) =>apiRequest({
-    url:url+'/stopParrainage',
+export const getManageParrainage = (data) =>apiRequest({
+    url:url+'/manageParrainage',
     data,
     method: 'patch',
     onStart: parrainageRequested.type,
-    onSuccess: allParrainageCompteReceived.type,
+    onSuccess: parrainageMessageEdited.type,
     onError: parrainageRequestFailed.type
 
-})
-
-export const getParrainageOrders =(data)=> apiRequest({
-    url: url + '/parrainageOrders',
-    data,
-    method: 'post',
-    onStart: parrainageRequested.type,
-    onSuccess: parrainageOrders.type,
-    onError: parrainageRequestFailed.type
 })
 
 export const getCompteParrainReset = () => dispatch => {
@@ -271,4 +338,12 @@ export const getSelectedParrain = (compte) => dispatch => {
 
 export const getQuotiteEditShown = (compte) => dispatch => {
     dispatch(showQuotiteEditer(compte))
+}
+
+export const getSponsorDetails = (sponsor) => dispatch => {
+    dispatch(showSponsorDetails(sponsor))
+}
+
+export const getOrderParrainDetails = (data) => dispatch => {
+    dispatch(showParrainOrderDetais(data))
 }

@@ -6,12 +6,14 @@ import Color from '../../utilities/colors'
 import AppText from "../AppText";
 import AppButton from "../AppButton";
 import CartItemQuantite from "./CartItemQuantite";
+import useAuth from "../../hooks/useAuth";
 
 
 function CartItem({source, designation,icon=false, activeDecrement,deleteItem,caution,frequence,
                       price, min, max, montantMin,montantMax,  montant, activeIncrement,showItemDetails,
                       quantite, itemQuantite,itemAmount, itemPrice, showCartItem,quantityDecrement, quantityIncrement,
                   disabledDecrement, disabledIncrement, notInStock, itemType}) {
+    const {formatPrice} = useAuth()
     return (
         <View style={styles.mainContainer}>
             <View style={styles.itemContainer}>
@@ -28,13 +30,13 @@ function CartItem({source, designation,icon=false, activeDecrement,deleteItem,ca
                     </View>
                 </View>
                 <View style={styles.secondContainer}>
-               {price && <AppText style={{marginLeft: 40, marginRight: 10}}>{itemPrice}</AppText>}
+               {price && <AppText style={{marginLeft: 40, marginRight: 10}}>{formatPrice(itemPrice)}</AppText>}
                     {quantite && <CartItemQuantite disabledDecrement={disabledDecrement} disabledIncrement={disabledIncrement} minusActive={activeDecrement} plusActive={activeIncrement} quantite={itemQuantite} decrementQuantite={quantityDecrement} incrementQuantite={quantityIncrement} style={{marginRight: 15, marginLeft: 15}}/>}
-                {montant && <AppText>{itemAmount}</AppText>}
+                {montant && <AppText>{formatPrice(itemAmount)}</AppText>}
 
-                    {min && <AppText>{montantMin}</AppText>}
+                    {min && <AppText>{formatPrice(montantMin)}</AppText>}
                     {icon && <AntDesign name='minus' size={24} color='black'/>}
-                    {max && <AppText>{montantMax}</AppText>}
+                    {max && <AppText>{formatPrice(montantMax)}</AppText>}
 
                 </View>
             </View>

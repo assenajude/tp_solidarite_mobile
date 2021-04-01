@@ -6,7 +6,6 @@ const factureSlice = createSlice({
     name:'facture',
     initialState: {
         list: [],
-        userFactures: [],
         encoursList: [],
         soldeList: [],
         newAdded: {},
@@ -21,30 +20,28 @@ const factureSlice = createSlice({
             state.error = null
 
         },
+        allFacturesReceived: (state, action) => {
+          state.loading = false
+          state.error = null
+            state.newFactureCompter = 0
+            const receiveds = action.payload
+          state.list = receiveds
+            state.encoursList = receiveds.filter(item => item.montant !== item.solde)
+            state.soldeList = receiveds.filter(item => item.montant === item.solde)
+        },
         factureAdded: (state, action) => {
             state.loading = false
             state.error = null
             state.newFactureCompter ++
             state.newAdded = action.payload
-            state.userFactures.push(action.payload)
+            state.list.push(action.payload)
         },
         factureRequestFailed: (state, action) => {
             state.loading = false
             state.error = action.payload
         },
-        factureReceived: (state, action) => {
-            state.loading = false
-            state.error = null
-            state.newFactureCompter = 0
-            const userFactures = action.payload
-            state.userFactures = userFactures
-            state.encoursList = userFactures.filter(item => item.montant !== item.solde)
-            state.soldeList = userFactures.filter(item => item.montant === item.solde)
-
-
-        },
         showItemTranche: (state, action) => {
-            let selectedItem = state.userFactures.find(item => item.id === action.payload)
+            let selectedItem = state.list.find(item => item.id === action.payload)
             selectedItem.showTranche = !selectedItem.showTranche
             if(selectedItem.montant === selectedItem.solde) {
                 let soldeItem = state.soldeList.find(item => item.id === selectedItem.id)
@@ -57,20 +54,19 @@ const factureSlice = createSlice({
         factureUpdated: (state, action) => {
             state.error = null
             state.loading = false
-            const updatedIndex = state.userFactures.findIndex(item => item.id === action.payload.id)
-            state.userFactures.splice(updatedIndex, 1, action.payload)
+            const updatedIndex = state.list.findIndex(item => item.id === action.payload.id)
+            state.list[updatedIndex] = action.payload
             if(action.payload.montant === action.payload.solde) {
-                let soldeIndex = state.encoursList.findIndex(item => item.id === action.payload.id)
-                state.encoursList.splice(soldeIndex, 1)
+                const newEncours = state.encoursList.filter(item => item.id !== action.payload.id)
+                state.encoursList = newEncours
                 state.soldeList.push(action.payload)
             } else {
                 let encoursIndex = state.encoursList.findIndex(item => item.id === action.payload.id)
-                state.encoursList.splice(encoursIndex, 1, action.payload)
+                state.encoursList[encoursIndex] = action.payload
             }
         },
         resetConnectedFactures: (state) => {
             state.list =  []
-            state.userFactures =  []
             state.encoursList =  []
             state.soldeList =  []
             state.newAdded =  {}
@@ -83,7 +79,7 @@ const factureSlice = createSlice({
 })
 
 export default factureSlice.reducer
-const {factureAdded, factureReceived, factureRequested, factureUpdated,
+const {factureAdded, factureRequested, factureUpdated, allFacturesReceived,
     factureRequestFailed, showItemTranche, resetConnectedFactures} = factureSlice.actions
 
 
@@ -119,7 +115,7 @@ export const getFacturesByUser = () => apiRequest({
     url: url+'/byUser',
     method: 'get',
     onStart: factureRequested.type,
-    onSuccess:factureReceived.type,
+    onSuccess:allFacturesReceived.type,
     onError: factureRequestFailed.type
 })
 

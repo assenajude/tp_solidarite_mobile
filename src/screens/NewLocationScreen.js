@@ -113,7 +113,7 @@ function NewLocationScreen({navigation}) {
         <>
             <AppActivityIndicator visible={isLoading}/>
             <AppUploadProgress startProgress={uploadModal} progress={locationProgress}/>
-        <ScrollView style={{bottom: 20, top:20}}>
+        <ScrollView contentContainerStyle={{paddingTop: 10, paddingBottom: 20}}>
             <View style={{flexDirection: 'row'}}>
                 <AppText style={{fontWeight: 'bold', marginRight: 20}}>Espace:</AppText>
                 <Picker style={{height: 50, width: 205}} mode='dropdown' selectedValue={selectedEspace} onValueChange={(id) => {

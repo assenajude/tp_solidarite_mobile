@@ -1,5 +1,5 @@
 import React from 'react';
-import {useSelector, useDispatch} from "react-redux";
+import {useSelector, useDispatch, useStore} from "react-redux";
 import {View, StyleSheet, ScrollView} from "react-native";
 
 import AppText from "../components/AppText";
@@ -12,9 +12,12 @@ import AppButton from "../components/AppButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import usePlaceOrder from "../hooks/usePlaceOrder";
+import useAuth from "../hooks/useAuth";
 
 function OrderLivraisonScreen({navigation}) {
     const dispatch = useDispatch()
+    const store = useStore()
+    const {formatPrice} = useAuth()
     const {getShippingRate, getTotal} = usePlaceOrder()
     const loading = useSelector(state => state.entities.userAdresse.loading)
     const adresseByUser = useSelector(state => state.entities.userAdresse.list);
@@ -46,21 +49,21 @@ function OrderLivraisonScreen({navigation}) {
                     <AppText style={{
                         fontWeight: 'bold',
                         color: colors.rougeBordeau
-                    }}>{getTotal()-getShippingRate()} FCFA</AppText>
+                    }}>{formatPrice(getTotal()-getShippingRate())}</AppText>
                 </View>
                 <View style={styles.itemLine}>
                     <AppText style={{fontWeight: 'bold'}}>Frais de livraison: </AppText>
                     <AppText style={{
                         fontWeight: 'bold',
                         color: colors.rougeBordeau
-                    }}>{getShippingRate()} FCFA</AppText>
+                    }}>{formatPrice(getShippingRate())}</AppText>
                 </View>
                 <View style={styles.itemLine}>
                     <AppText style={{fontWeight: 'bold'}}>Net actuel à payer: </AppText>
                     <AppText style={{
                         fontWeight: 'bold',
                         color: colors.rougeBordeau
-                    }}>{getTotal()} FCFA</AppText>
+                    }}>{formatPrice(getTotal())}</AppText>
                 </View>
             </View>
             <View>
@@ -77,9 +80,14 @@ function OrderLivraisonScreen({navigation}) {
                     {adresseByUser.map((item, index) => <PayementListItem libelle={item.nom}
                                                                           description={`${item.tel} --- ${item.adresse}`}
                                                                           key={index}
-                                                                          selectItem={() => {
-                                                                              dispatch(getSelectedLivraisonVille(item.PointRelai.VilleId))
-                                                                              dispatch(getSelectedAdress(item.id))
+                                                                          selectItem={async () => {
+                                                                              await dispatch(getSelectedAdress(item.id))
+                                                                              const selectedAd = store.getState().entities.userAdresse.selectedAdresse
+                                                                              if(selectedAd.selected) {
+                                                                                  dispatch(getSelectedLivraisonVille(item))
+                                                                              }else {
+                                                                                  dispatch(getSelectedLivraisonVille({}))
+                                                                              }
                                                                           }
                                                                           } checked={item.selected} showDelai={false} showDetail={item.showLivraisonDetail}
                                                                           getDetails={() => dispatch(getAdLivraisonDetail(item.id))} isAdLivraison={true}

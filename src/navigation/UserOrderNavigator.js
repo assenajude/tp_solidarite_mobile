@@ -10,7 +10,9 @@ const UserCmdeTopNavigator = createMaterialTopTabNavigator()
 
 function UserOrderNavigator(props) {
     return (
-        <UserCmdeTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}} initialRouteName='UserOrderScreen'>
+        <UserCmdeTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}} initialRouteName='UserOrderScreen' tabBarOptions={{
+            labelStyle: { textTransform: 'none' }
+        }}>
             <UserCmdeTopNavigator.Screen name='UserOrderContratScreen' component={UserOrderContratScreen} options={{
                 title: 'Contrats'
             }}/>

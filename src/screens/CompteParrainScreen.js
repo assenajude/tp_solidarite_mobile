@@ -113,19 +113,19 @@ function CompteParrainScreen({navigation}) {
                               </View>}
                               <View style={styles.avatarContainer}>
                                   <View style={styles.avatar}>
-                                      <Avatar ownerUserAvatar={item.User.avatar} avatarUrl={{uri: item.User.avatar}} onPress={() => navigation.navigate(routes.COMPTE)} otherImageStyle={{width: 80,height: 80,borderRadius: 40}}/>
+                                      <Avatar ownerUserAvatar={item.User.avatar} avatarUrl={{uri: item.User.avatar}} onPress={() => navigation.navigate(routes.COMPTE, item.User)} otherImageStyle={{width: 80,height: 80,borderRadius: 40}}/>
                                       <AppText style={{fontWeight: 'bold'}}>{item.User.username}</AppText>
                                   </View>
                                   <View>
                                       <View style={{flexDirection: 'row'}}>
                                           <AppText style={{fontWeight: 'bold'}}>{item.User.nom?item.User.nom:"pas de nom"}</AppText>
-                                          {!item.User.nom && <TouchableOpacity onPress={() => navigation.navigate('EditUserInfoScreen')}>
+                                          {!item.User.nom && <TouchableOpacity onPress={() => navigation.navigate(routes.Compte, item.User)}>
                                               <AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}>Ajouter</AppText>
                                           </TouchableOpacity>}
                                       </View>
                                       <View style={{flexDirection: 'row'}}>
                                           <AppText style={{fontWeight: 'bold'}}>{item.User.prenom?item.User.prenom:"pas de prenom"}</AppText>
-                                          {!item.User.prenom && <TouchableOpacity onPress={() => navigation.navigate('EditUserInfoScreen')}>
+                                          {!item.User.prenom && <TouchableOpacity onPress={() => navigation.navigate(routes.COMPTE, item.User)}>
                                               <AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}>Ajouter</AppText>
                                           </TouchableOpacity>}
                                       </View>
@@ -145,15 +145,15 @@ function CompteParrainScreen({navigation}) {
                                                                       dispatch(getStartInitialEdit(item))
                                                                   }}/>}
                                   </CompteParrainageItem>
-                                  <CompteParrainageItem fonds={item.gain} fondsLabel='Gain'
+                                  <CompteParrainageItem fonds={item.gain} fondsLabel='Gain' labelStyle={{color: colors.vert}}
                                                         fondContainerStyle={{borderColor: colors.vert}}>
-                                      <MaterialCommunityIcons name="credit-card-plus" size={24} color="black" />
+                                      <MaterialCommunityIcons name="credit-card-plus" size={24} color={colors.vert} />
                                   </CompteParrainageItem>
-                                  <CompteParrainageItem fondsLabel='Depenses' fonds={item.depense} fondContainerStyle={{borderColor: colors.rougeBordeau}}>
-                                      <MaterialCommunityIcons name="credit-card-minus" size={24} color="black" />
+                                  <CompteParrainageItem fondsLabel='Depenses' fonds={item.depense} labelStyle={{color: colors.rougeBordeau}}>
+                                      <MaterialCommunityIcons name="credit-card-minus" size={24} color={colors.rougeBordeau} />
                                   </CompteParrainageItem>
                                   <CompteParrainageItem fondsLabel='Quotité' fonds={item.quotite}
-                                                        fondContainerStyle={{borderColor: colors.or}} editFundValue={item.editQuotite}
+                                                        editFundValue={item.editQuotite}
                                                         annuleEdit={() => {
                                                             dispatch(getStartQuotiteEdit(item))
                                                             setEditQuotiteValue('')

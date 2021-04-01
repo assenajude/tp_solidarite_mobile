@@ -1,6 +1,8 @@
 import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {View, FlatList} from "react-native";
+import * as Updates from 'expo-updates'
+
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import AppCard from "../components/AppCard";
@@ -34,7 +36,7 @@ function EserviceScreen({navigation}) {
             alignItems: 'center'
         }}>
             <AppText>Une erreur est apparue...Veuillez recharger la page</AppText>
-            <AppButton title='Recharger' onPress={getServiceData}/>
+            <AppButton title='Recharger' onPress={() => Updates.reloadAsync()}/>
         </View>
     }
 

@@ -2,13 +2,13 @@ import {useSelector} from "react-redux";
 
 let usePlaceOrder;
 export default usePlaceOrder = () => {
-    const currentAmount = useSelector(state => state.entities.order.currentOrder.amount)
+    const currentOrder = useSelector(state => state.entities.order.currentOrder)
     const currentPlan = useSelector(state => state.entities.payement.currentPlan)
     const selectedVille = useSelector(state => state.entities.ville.userVille)
 
     const getPayementRate = () => {
         let payementRate;
-        payementRate = currentAmount * currentPlan.compensation
+        payementRate = currentOrder.amount * currentPlan.compensation
         return payementRate || 0
     }
 
@@ -26,7 +26,7 @@ export default usePlaceOrder = () => {
     const getTotal = () => {
         const payementFees = getPayementRate()
         const shippingFees = getShippingRate()
-        const total = currentAmount + payementFees + shippingFees
+        const total = currentOrder.amount + payementFees + shippingFees
         return total || 0
     }
 

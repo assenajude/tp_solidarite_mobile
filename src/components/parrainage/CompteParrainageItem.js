@@ -8,13 +8,13 @@ import AppButton from "../AppButton";
 function CompteParrainageItem({fonds, fondsLabel,fondContainerStyle,
                                   editFundValue=false, annuleEdit,
                                    editValue, onEditValueChange,
-                                  children}) {
+                                  children, labelStyle}) {
     return (
         <View style={[styles.fondsStyle, fondContainerStyle]}>
             <View>
             <View style={{flexDirection: 'row'}}>
                 {children}
-                <AppText style={{fontWeight: 'bold'}}>{fondsLabel}</AppText>
+                <AppText style={[{fontWeight: 'bold'}, labelStyle]}>{fondsLabel}</AppText>
             </View>
             <AppText style={{fontWeight: 'bold'}}>{fonds} fcfa</AppText>
             </View>
@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
         margin: 10,
         borderRadius: 10,
         borderColor: colors.dark,
-        borderWidth: 2,
         padding: 10
     }
 })

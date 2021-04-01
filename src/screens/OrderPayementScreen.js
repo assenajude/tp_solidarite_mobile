@@ -20,12 +20,13 @@ import {AntDesign, EvilIcons, Octicons} from "@expo/vector-icons";
 import ConditionsModal from "../components/payement/ConditionsModal";
 import ParrainListModal from "../components/payement/ParrainListModal";
 import routes from "../navigation/routes";
+import useAuth from "../hooks/useAuth";
 
 function OrderPayementScreen({navigation}) {
     const dispatch = useDispatch()
+    const {formatPrice} = useAuth()
     const {getPayementRate, getTotal} = usePlaceOrder()
     const {permitCredit, isPlanDisabled} = usePayementPlan()
-    const articleAmount = useSelector(state => state.entities.shoppingCart.totalAmount)
     const currentUserData = useSelector(state => state.profile.connectedUser)
     const totalParrains = useSelector(state => {
         let total = 0
@@ -38,13 +39,12 @@ function OrderPayementScreen({navigation}) {
     const payements = useSelector(state => state.entities.payement.list)
     const payementPlans = useSelector(state => state.entities.payement.payementPlans)
     const loading = useSelector(state => state.entities.payement.loading)
+    const selectedPayement = useSelector(state => state.entities.payement.selectedPayement)
     const selectedPlan = useSelector(state => state.entities.payement.currentPlan)
     const livraisonLoading = useSelector(state => state.entities.userAdresse.loading)
     const typeCmde = useSelector(state => state.entities.shoppingCart.type)
     const [openConditionsModal, setOpenConditionsModal] = useState(false)
     const [parrainModalVisible, setParrainModalVisible] = useState(false)
-    const [creditSelected, setCreditSelected] = useState(false)
-    const [isPLanSelected, setIsPlanSelected] = useState(false)
     const [creditOptionModal, setCreditOptionModal] = useState(false)
     const [selectedOption, setSelectedOption] = useState('')
 
@@ -58,7 +58,9 @@ function OrderPayementScreen({navigation}) {
 
 
     const handleOrderNext = () => {
-        if (creditSelected && isPLanSelected) {
+        const isCredit = selectedPayement.mode.toLowerCase() === 'credit'
+        const isPLanSelected = Object.keys(selectedPlan).length>0
+        if (isCredit && isPLanSelected) {
             setCreditOptionModal(true)
         } else navigation.navigate(routes.ORDER)
     }
@@ -73,10 +75,6 @@ function OrderPayementScreen({navigation}) {
             navigation.navigate(routes.ORDER_PARRAINAGE)
         }
     }
-
-  useEffect(() => {
-  }, [])
-
 
 
     if(loading) {
@@ -108,16 +106,16 @@ function OrderPayementScreen({navigation}) {
             </View>
             <View style={styles.summary}>
                 <View style={styles.itemLine}>
-                    <AppText style={{fontWeight: 'bold'}} >Montant commande: </AppText>
-                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{articleAmount} FCFA</AppText>
+                    <AppText style={{fontWeight: 'bold'}} >Montant actuel commande: </AppText>
+                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{formatPrice(getTotal()-getPayementRate())}</AppText>
                 </View>
                 <View style={styles.itemLine}>
                     <AppText style={{fontWeight: 'bold'}}>Interet payement: </AppText>
-                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}> {getPayementRate()} FCFA</AppText>
+                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}> {formatPrice(getPayementRate())}</AppText>
                 </View>
                 <View style={styles.itemLine}>
                     <AppText style={{fontWeight: 'bold'}}>Net actuel à payer: </AppText>
-                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{getTotal()} FCFA</AppText>
+                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{formatPrice(getTotal())}</AppText>
                 </View>
             </View>
             <View>
@@ -145,7 +143,6 @@ function OrderPayementScreen({navigation}) {
                                     if(item.mode.toLowerCase() === 'credit' && !permitCredit()) {
                                         alert('Impossible de choisir ce mode, un ou plusieurs articles de votre commande ne peuvent pas être vendus à credit')
                                     } else {
-                                        if(item.mode.toLowerCase() === 'credit') setCreditSelected(true)
                                       dispatch(getPayementActive(item.id))
                                     }
                                 }
@@ -175,7 +172,6 @@ function OrderPayementScreen({navigation}) {
                                               if(isPlanDisabled(plan)) {
                                                   return alert('Vous ne pouvez pas choisir ce plan pour cette commande, veuillez choisir un autre plan SVP')
                                               }
-                                              setIsPlanSelected(true)
                                             dispatch(getSelectedPlan(plan))
                                           }} planDelai={plan.nombreMensualite>0?plan.nombreMensualite+' m':'3 j'}
                                           showDetail={plan.showPlanDetail} getDetails={() => dispatch(getPlanDetail(plan.id))}
@@ -190,7 +186,8 @@ function OrderPayementScreen({navigation}) {
             </ScrollView>
         </ScrollView>
             <Modal visible={creditOptionModal} transparent>
-
+                <View style={styles.mainContainer}>
+                </View>
                 <View style={styles.optionContainer}>
                     <View style={{alignSelf: 'flex-end', margin: 30}}>
                         <TouchableOpacity onPress={() => setCreditOptionModal(false)}>
@@ -203,7 +200,7 @@ function OrderPayementScreen({navigation}) {
                     <View>
                     <AppText style={{color: colors.bleuFbi}}>Veuillez choisir une option de credit pour continuer </AppText>
                     </View>
-                    <View style={{alignItems: 'center', marginTop: 50}}>
+                    <View style={{alignItems: 'flex-start', marginTop: 10, marginLeft: 50}}>
                     <TouchableOpacity onPress={() => {
                         if(currentUserData.fidelitySeuil < 500000) {
                             alert("Vous ne pouvez pas utiliser cette option, vous n'avez pas encore atteint votre seuil de fidelité")
@@ -216,7 +213,7 @@ function OrderPayementScreen({navigation}) {
                     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
                         <View style={{height: 20,width: 20, borderWidth: 1, borderRadius: 10, marginRight: 5,
                             justifyContent: 'center', alignItems: 'center'}}>
-                            {selectedOption.toLowerCase() === 'fidelitySeuil' && <Octicons name="primitive-dot" size={24} color={colors.or} />}
+                            {selectedOption.toLowerCase() === 'fidelityseuil' && <Octicons name="primitive-dot" size={24} color={colors.or} />}
                         </View>
                         <AppText style={{fontWeight: 'bold' }}>Seuil de fidelité</AppText>
                     </View>
@@ -235,10 +232,11 @@ function OrderPayementScreen({navigation}) {
                     </TouchableOpacity>
                 </View>
 
-                {selectedOption.length>0 && <View style={{alignItems: 'center', marginTop: 60}}>
+                {selectedOption.length>0 && <View style={{alignItems: 'center', marginTop: 5}}>
                   <AppButton style={{padding: 5, paddingLeft: 20,paddingRight: 20}} title='continuer' onPress={handleModalOptionNext}/>
                 </View>}
                 </View>
+
             </Modal>
           </>
     );
@@ -283,9 +281,18 @@ const styles = StyleSheet.create({
     },
     optionContainer: {
         backgroundColor: colors.blanc,
+        position: 'absolute',
+        zIndex: 10,
         width: '100%',
-        height: '85%',
-        top: 60,
+        height: '40%',
+        top: '30%',
+        bottom: 50,
+    },
+    mainContainer: {
+        flex: 1,
+        zIndex: -10,
+        backgroundColor: colors.dark,
+        opacity: 0.7
     }
 })
 

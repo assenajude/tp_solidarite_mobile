@@ -26,7 +26,7 @@ function FactureListItem({numero,okPayement,orderItems, deleteItem,goToItemDetai
               <View style={styles.mainContainer}>
                       <AppModePayement modePayement={modePayement}/>
                   {showProgress &&  <View style={{marginTop: 10, marginLeft: 10, alignSelf: 'center'}}>
-                      <Progress.Bar progress={progress} borderColor={colors.rougeBordeau}  width={200} color={colors.marronClair}/>
+                      <Progress.Bar progress={progress}  width={200} color={progress<0.5?colors.rougeBordeau:0.5<progress<1?'orange':colors.vert}/>
                   </View>}
                   {orderItems && <ScrollView horizontal>
                       {orderItems.map((item, index) => <TouchableOpacity  key={index}>

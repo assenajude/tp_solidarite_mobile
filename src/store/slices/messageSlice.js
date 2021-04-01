@@ -197,14 +197,6 @@ export const getMsgRespDelete = (response) => apiRequest({
     onError: messageRequestFailed.type
 })
 
-export const sendParrainageMessage = (data) =>apiRequest({
-    url: url+'/parrainageMessage',
-    data,
-    method: 'post',
-    onStart: messageRequested.type,
-    onSuccess: messageSent.type,
-    onError: messageRequestFailed.type
-})
 
 export const getConnectedMessagesReset = () => dispatch => {
     dispatch(resetConnectedMessage())

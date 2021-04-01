@@ -13,13 +13,25 @@ import routes from "../navigation/routes";
 import useManageUserOrder from "../hooks/useManageUserOrder";
 import useOrderInfos from "../hooks/useOrderInfos";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import useAuth from "../hooks/useAuth";
 
 function UserFactureScreen({navigation}) {
     const dispatch = useDispatch()
+    const {userRoleAdmin} = useAuth()
     const {payFactureTranche} = useManageUserOrder()
     const {getModePayement, getItems} = useOrderInfos()
     const user = useSelector(state => state.auth.user)
-    const userFactures = useSelector(state => state.entities.facture.userFactures)
+    const userFactures = useSelector(state => {
+        let newFactures = []
+        const user = state.auth.user
+        const factures = state.entities.facture.list
+        const userFactures = factures.filter(item => item.Commande.UserId === user.id)
+        if(userRoleAdmin()) {
+            return factures
+        }
+        newFactures = userFactures
+        return newFactures
+    })
     const isLoading = useSelector(state => state.entities.facture.loading)
     const newCompter = useSelector(state => state.entities.facture.newFactureCompter)
 

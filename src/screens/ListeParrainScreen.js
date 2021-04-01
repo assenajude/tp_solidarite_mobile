@@ -1,30 +1,26 @@
 import React, {useState, useEffect} from 'react';
-import {FlatList, TextInput, View, StyleSheet} from "react-native";
+import {FlatList, TextInput, View, StyleSheet, Alert} from "react-native";
 import {useDispatch, useSelector} from "react-redux";
 import { EvilIcons } from '@expo/vector-icons';
 
 import ListParrainItem from "../components/parrainage/ListParrainItem";
 import {
-    getAllParrains,
+    getAllParrains, getManageParrainage, getParrainageRequestSent,
     getParrainageResponseEdit, getParrainageResponseSend,
-    getParrainCompteDetails,
-    getSearchCompteParrain, getStopParrainage
+    getSearchCompteParrain
 } from "../store/slices/parrainageSlice";
 import colors from "../utilities/colors";
-import {sendParrainageMessage} from "../store/slices/messageSlice";
 import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import routes from "../navigation/routes";
 
-function ListeParrainScreen(props) {
+function ListeParrainScreen({navigation}) {
     const dispatch = useDispatch()
     const user = useSelector(state => state.auth.user)
-    const parrainageState = useSelector(state => {
-        const allState = state.entities.parrainage.parrainageState
-        const combinedState = allState.parrainsUser?.concat(allState.filleulsUser)
-        return combinedState
-    })
     const loadingParrainage = useSelector(state => state.entities.parrainage.loading)
+    const inSponsoringState = useSelector(state => state.entities.parrainage.inSponsoringState)
+    const respondMessageState = useSelector(state => state.entities.parrainage.respondMessageState)
     const userParrains = useSelector(state => state.entities.parrainage.userParrains)
     const userFilleuls = useSelector(state => state.entities.parrainage.userFilleuls)
     const parrainageError = useSelector(state => state.entities.parrainage.error)
@@ -35,17 +31,30 @@ function ListeParrainScreen(props) {
     })
 
     const handleSendMessageToParrain = (parrainCompte) => {
-        const data = {
-            idSender: user.id,
-            idReceiver: parrainCompte.User.id
-        }
-        dispatch(sendParrainageMessage(data))
+        const data = {...parrainCompte, idSender: user.id, idReceiver: parrainCompte.UserId}
+        dispatch(getParrainageRequestSent(data))
 
     }
 
     const handleStopParrainage = (compte) => {
-        dispatch(getStopParrainage(compte))
-        dispatch(getParrainageResponseEdit(compte))
+        const compteOrders = compte.Commandes
+        const isOrderNotEnded = compteOrders.some(order => order.OrderParrain.ended === false)
+        if(isOrderNotEnded) {
+            return alert("Vous ne pouvez pas arreter ce compte, des commandes en cours l'utilisent.")
+        }
+        Alert.alert("Alert", "Voulez-vous arreter le parrainage avec ce compte?",
+            [{text: 'oui', onPress: () => {
+                dispatch(getManageParrainage({...compte, senderId: user.id, receiverId: compte.UserId, label: 'stop'}))
+                dispatch(getParrainageResponseEdit(compte))
+                }}, {text: 'non', onPress: () => {return;}}])
+    }
+
+    const handleRepriseParrainage = (compte) => {
+        Alert.alert("Alert", "Voulez-vous reprendre le parrainage avec ce compte?",
+            [{text: 'oui', onPress: () => {
+                    dispatch(getManageParrainage({...compte, senderId: user.id, receiverId: compte.UserId, label: 'remake'}))
+                    dispatch(getParrainageResponseEdit(compte))
+                }}, {text: 'non', onPress: () => {return;}}])
     }
 
     const handleSearch = (text) => {
@@ -53,7 +62,7 @@ function ListeParrainScreen(props) {
     }
 
     const handleSendParrainageResponse = (compte) => {
-        dispatch(getParrainageResponseSend(compte))
+        dispatch(getParrainageResponseSend({...compte, currentUserId: user.id}))
         dispatch(getParrainageResponseEdit(compte))
     }
 
@@ -93,17 +102,18 @@ function ListeParrainScreen(props) {
           renderItem={({item}) => <ListParrainItem avatarUrl={{uri: item.User.avatar}} ownerUserAvatar={item.User.avatar} parrainNom={item.User.nom}
                                                    parrainPrenom={item.User.prenom} parrainUsername={item.User.username}
                                                    parrainEmail={item.User.email} parrainPhone={item.User.phone}
-                                                   parrainQuotite={item.quotite} showParrainDetails={item.showDetails}
-                                                   getParrainDetialsShown={() => dispatch(getParrainCompteDetails(item))}
+                                                   parrainQuotite={item.quotite}
                                                    sendMessageToParrain={() => handleSendMessageToParrain(item)}
                                                    activeCompte={item.active}
                                                    isParrain={userParrains.some(cpte => cpte.id === item.id)}
                                                    isFilleul={userFilleuls.some(filleul => filleul.id === item.id)}
                                                    compteDetailExist={item.User.nom || item.User.prenom || item.User.phone}
-                                                   msgResponded={parrainageState.some(cpt => cpt.ParrainFilleul.sponsoringState !== 'pending')}
-                                                   inSponsoring={parrainageState.some(cpte => cpte.ParrainFilleul.inSponsoring === true)}
+                                                   msgResponded={respondMessageState.some(cpt => cpt.id === item.UserId)}
+                                                   inSponsoring={inSponsoringState.some(cpt => cpt.id === item.UserId)}
                                                    parrainageResponseEditing={item.editResponse} editParrainageResponse={() => dispatch(getParrainageResponseEdit(item))}
-                                                   sendParrainageResponse={()=> handleSendParrainageResponse(item)} stopParrainage={() => handleStopParrainage(item)}/>}/>
+                                                   sendParrainageResponse={()=> handleSendParrainageResponse(item)} stopParrainage={() => handleStopParrainage(item)}
+                                                   remakeParrainage={() => handleRepriseParrainage(item)}
+                                                   getUserProfile={() => navigation.navigate(routes.COMPTE, item.User)}/>}/>
         </>
     );
 }

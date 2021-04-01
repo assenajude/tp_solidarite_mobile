@@ -20,6 +20,10 @@ export default useAuth = () => {
     const user = useSelector(state => state.auth.user)
     const isUser = Object.keys(user).length>0
 
+    const formatPrice = (price) => {
+        const formated = price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+        return `${formated} XOF`
+    }
 
     const userRoleAdmin = () => {
         if (Object.entries(user).length > 0){
@@ -40,9 +44,11 @@ export default useAuth = () => {
         dispatch(getAdresse())
         dispatch(getCartItems())
         dispatch(getUserMessages())
-        dispatch(getAllParrains())
-        if(isUser)dispatch(getUserParrainageCompte({userId: user.id}))
-        if(isUser) dispatch(getUserParrains({userId: user.id}))
+        if(isUser) {
+        dispatch(getAllParrains({userId: user.id}))
+        dispatch(getUserParrainageCompte({userId: user.id}))
+        dispatch(getUserParrains({userId: user.id}))
+        }
 
 
     }
@@ -57,5 +63,5 @@ export default useAuth = () => {
         dispatch(getCompteParrainReset())
     }
 
-    return {initUserDatas,userRoleAdmin, resetConnectedUserData}
+    return {initUserDatas,userRoleAdmin, resetConnectedUserData, formatPrice}
 }

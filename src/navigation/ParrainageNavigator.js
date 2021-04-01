@@ -9,10 +9,12 @@ const ParrainTopNavigator = createMaterialTopTabNavigator()
 
 function ParrainageNavigator(props) {
     return (
-        <ParrainTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}}>
-            <ParrainTopNavigator.Screen name='CompteParrainScreen' component={CompteParrainScreen} options={{title:'compte'}}/>
-            <ParrainTopNavigator.Screen name='UserParrainageScreen' component={UserParrainageScreen} options={{title:'vos parrainage'}}/>
-            <ParrainTopNavigator.Screen name='ListeParrainScreen' component={ListeParrainScreen} options={{title: 'liste parrains'}}/>
+        <ParrainTopNavigator.Navigator initialLayout={{width: Dimensions.get('window').width}} tabBarOptions={{
+            labelStyle: { textTransform: 'none' }
+        }}>
+            <ParrainTopNavigator.Screen name='CompteParrainScreen' component={CompteParrainScreen} options={{title:'Compte'}}/>
+            <ParrainTopNavigator.Screen name='UserParrainageScreen' component={UserParrainageScreen} options={{title:'Parrainage'}}/>
+            <ParrainTopNavigator.Screen name='ListeParrainScreen' component={ListeParrainScreen} options={{title: 'Liste'}}/>
 
         </ParrainTopNavigator.Navigator>
     );
