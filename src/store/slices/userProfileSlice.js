@@ -69,6 +69,15 @@ export const getSaveEditInfo = (data) => apiRequest({
     onError: profileRequestFailed.type
 })
 
+export const getUserCompterReset = (data) => apiRequest({
+    url:url+'/resetCompter',
+    data,
+    method: 'patch',
+    onStart: profileRequested.type,
+    onSuccess: saveInfoEdit.type,
+    onError: profileRequestFailed.type
+})
+
 export const getConnectedUserReset = () => dispatch => {
     dispatch(resetConnectedUser())
 }

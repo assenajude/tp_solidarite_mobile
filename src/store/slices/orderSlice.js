@@ -119,7 +119,10 @@ const orderSlice = createSlice({
         orderParainAdded: (state, action) => {
          let existedCompte = state.currentOrderParrains.find(compte => Number(compte.id) === Number(action.payload.id))
             if(existedCompte) {
-                existedCompte.parrainAction = action.payload.parrainAction
+                if(existedCompte.parrainAction === 0) {
+                    const newParrains = state.currentOrderParrains.filter(parrain => Number(parrain.id) !== Number(action.payload.id))
+                    state.currentOrderParrains = newParrains
+                }else existedCompte.parrainAction = action.payload.parrainAction
             } else {
           const newParrains = action.payload
           state.currentOrderParrains.push(newParrains)

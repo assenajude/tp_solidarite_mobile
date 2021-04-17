@@ -24,14 +24,7 @@ function DrawerContent(props) {
         const isLoggedIn = Object.entries(connetedUser).length > 0?true:false
         return isLoggedIn
     })
-    const favoriteCompter = useSelector(state => state.entities.userFavorite.favoriteCompter)
-    const articleCompter = useSelector(state => state.entities.order.articleRefreshCompter)
-    const serviceCompter = useSelector(state => state.entities.order.serviceRefreshCompter)
-    const locationCompter = useSelector(state => state.entities.order.locationRefreshCompter)
-    const factureCompter = useSelector(state => state.entities.facture.newFactureCompter)
-    const prositionCompter = useSelector(state => state.entities.proposition.newPropositionCompter)
-    const helpCompter = useSelector(state => state.entities.faq.helpCompter)
-    const msgCompter = useSelector(state => state.entities.message.newMsgCompter)
+
 
 
     const handleLogout = () => {
@@ -53,7 +46,7 @@ function DrawerContent(props) {
                            <View>
                                <TouchableOpacity onPress={() => props.navigation.navigate(routes.HELP)}>
                                    <View style={{flexDirection: 'row'}}>
-                                       <AppIconWithBadge notifStyle={{backgroundColor: Color.rougeBordeau}} badgeCount={helpCompter}>
+                                       <AppIconWithBadge notifStyle={{backgroundColor: Color.rougeBordeau}} badgeCount={userData.helpCompter}>
                                            <View style={{flexDirection: 'row'}}>
                                                <Entypo name="help-with-circle" size={20} color={Color.bleuFbi}/>
                                            </View>
@@ -89,13 +82,13 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge name='message1' badgeCount={msgCompter}
+                           <AppIconWithBadge name='message1' badgeCount={userData.messageCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau}} size={size} color={color} />}
                            label='Messages' onPress={() => {props.navigation.navigate(routes.USER_MESSAGE)}} />
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge badgeCount={favoriteCompter}
+                           <AppIconWithBadge badgeCount={userData.favoriteCompter}
                                    notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                   <MaterialIcons name="favorite-border" size={size} color={color}/>
                        </AppIconWithBadge> }
@@ -103,7 +96,7 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge badgeCount={factureCompter}
+                           <AppIconWithBadge badgeCount={userData.factureCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                <FontAwesome5 name='money-bill-alt' size={size} color={color}/>
                            </AppIconWithBadge> }
@@ -112,29 +105,29 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge badgeCount={articleCompter}
+                           <AppIconWithBadge badgeCount={userData.articleCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                <Feather name="command" size={size} color={color}/>
                            </AppIconWithBadge> }
-                                   label='Mes commandes' onPress={() => {props.navigation.navigate(routes.USER_ORDER)}} />
+                                   label='cmd articles' onPress={() => {props.navigation.navigate(routes.USER_ORDER)}} />
                    </View>
 
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge badgeCount={locationCompter}
+                           <AppIconWithBadge badgeCount={userData.locationCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                <MaterialIcons name="store" size={size} color={color}/>
                            </AppIconWithBadge> }
-                                   label='Mes locations' onPress={() => {props.navigation.navigate('UserLocation')}} />
+                                   label='cmd locations' onPress={() => {props.navigation.navigate('UserLocation')}} />
                    </View>
 
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge badgeCount={serviceCompter}
+                           <AppIconWithBadge badgeCount={userData.serviceCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}
                                              name="carryout" size={size} color={color}>
                            </AppIconWithBadge> }
-                                   label='Mes Services' onPress={() => {props.navigation.navigate(routes.USER_SERVICE)}} />
+                                   label='cmd services' onPress={() => {props.navigation.navigate(routes.USER_SERVICE)}} />
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
@@ -146,7 +139,7 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge
+                           <AppIconWithBadge badgeCount={userData.parrainageCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                <MaterialCommunityIcons name="bus-stop-covered" size={size} color={color} />
                            </AppIconWithBadge> }
@@ -154,7 +147,7 @@ function DrawerContent(props) {
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge badgeCount={prositionCompter}
+                           <AppIconWithBadge badgeCount={userData.propositionCompter}
                                              notifStyle={{backgroundColor: Color.rougeBordeau, borderRadius: 10}} style={{width: 30}}>
                                <Fontisto name="suitcase-alt" size={size} color={color} />
                            </AppIconWithBadge> }

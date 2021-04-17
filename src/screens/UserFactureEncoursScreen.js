@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {FlatList,View} from "react-native";
 import FactureListItem from "../components/list/FactureListItem";
 import {getTrancheShown} from "../store/slices/factureSlice";
@@ -16,6 +16,7 @@ function UserFactureEncoursScreen({navigation}) {
 
     const encoursList = useSelector(state => state.entities.facture.encoursList)
     const loading = useSelector(state => state.entities.facture.loading)
+    const tranches = useSelector(state => state.entities.tranche.list)
 
     if(encoursList.length === 0){
         return (
@@ -41,11 +42,12 @@ function UserFactureEncoursScreen({navigation}) {
                                        okPayement={item.montant === item.solde} progress={Number(item.ratio)}
                                        showTranches={item.showTranche}  getDetails={() => dispatch(getTrancheShown(item.id))} montant={item.montant}
                                        dateEmission={item.dateEmission} dateEcheance={item.dateFin}
-                                       tranches={item.Tranches} payTranche={(tranche)=> payFactureTranche(tranche)}
+                                       tranches={tranches.filter(tranche => tranche.FactureId === item.id)} payTranche={(tranche)=> payFactureTranche(tranche)}
                                        getLink={() => navigation.navigate(routes.ORDER_DETAILS, item.Commande)}
                                        modePayement={getModePayement(item.CommandeId)}
                                        solde={item.solde} endFacture={item.montant === item.solde}
-                                       goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}/>
+                                       goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}
+                                       waitingTranchePayed={item.Tranches.some(tranche => tranche.payedState === 'pending')}/>
                   } />
              </View>
                   </>

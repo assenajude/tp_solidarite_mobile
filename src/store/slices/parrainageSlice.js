@@ -37,9 +37,8 @@ const parrainageSlice = createSlice({
             let newCompte = action.payload
             const soldeCpte = newCompte.initial + newCompte.gain - newCompte.depense-newCompte.quotite
             newCompte.solde = soldeCpte
-            const currentParrainsComptes = state.comptes
-            currentParrainsComptes.push(newCompte)
-            state.comptes = currentParrainsComptes
+            state.comptes.push(newCompte)
+            state.searchCompteList.push(newCompte)
         },
         parrainageRequestFailed: (state, action) => {
             state.error = action.payload
@@ -310,10 +309,6 @@ export const getManageParrainage = (data) =>apiRequest({
 
 export const getCompteParrainReset = () => dispatch => {
     dispatch(resetParrainCompte())
-}
-
-export const getParrainCompteDetails = (compte) => dispatch => {
-    dispatch(showParrainDetials(compte))
 }
 
 export const getSearchCompteParrain = (compteInfos) => dispatch => {

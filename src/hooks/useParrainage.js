@@ -13,7 +13,8 @@ export default useParrainage = () => {
     const getParrainageGain = (order) => {
         const parrainageAmount = order.OrderParrain.action
         const percent = getParrainagePercent(order.montant, parrainageAmount)
-        const gain = percent * order.interet / 100
+        const result = percent * order.interet / 100
+        const gain = Math.round(result)
         return gain || 0
 
     }
@@ -40,7 +41,7 @@ export default useParrainage = () => {
         let actuGain = 0
         const endedOrder = parrainageOrders.filter(order => order.OrderParrain.ended === true)
         endedOrder.forEach(order => {
-            restituteQuotite += order.action
+            restituteQuotite += order.OrderParrain.action
             const gain = getParrainageGain(order)
             actuGain += gain
         })

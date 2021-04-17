@@ -48,6 +48,7 @@ import ServiceDetailScreen from "../screens/ServiceDetailScreen";
 import EditUserImagesScreen from "../screens/EditUserImagesScreen";
 import ParrainageNavigator from "./ParrainageNavigator";
 import OrderParrainageScreen from "../screens/OrderParrainageScreen";
+import InitInfoScreen from "../screens/InitInfoScreen";
 
 const ArticleStackNavigator = createStackNavigator();
 
@@ -110,8 +111,9 @@ const navigation = useNavigation()
               options={{title: 'Panier' }}/>
             <ArticleStackNavigator.Screen name='RegisterScreen' component={RegisterScreen} options={{title: 'Compte utilisateur'}}/>
             <ArticleStackNavigator.Screen name='LoginScreen' component={LoginScreen} options={{title: 'Compte utilisateur'}}/>
+            <ArticleStackNavigator.Screen name='InitInfoScreen' component={InitInfoScreen} options={{title: 'Réinitialisation'}}/>
             <ArticleStackNavigator.Screen name='OrderPayementScreen' component={OrderPayementScreen} options={{title: 'Payement de la commande'}}/>
-            <ArticleStackNavigator.Screen name='OrderLivraisonScreen' component={OrderLivraisonScreen} options={{title: 'Livraison de la commande'}}/>
+            <ArticleStackNavigator.Screen name='OrderLivraisonScreen' component={OrderLivraisonScreen} options={{title: 'Adresse de livraison'}}/>
             <ArticleStackNavigator.Screen name='UserOrderScreen' component={UserOrderNavigator} options={{
                 title: 'Vos commandes',
                 headerLeft:(props) => <HeaderBackButton {...props} onPress={() => {

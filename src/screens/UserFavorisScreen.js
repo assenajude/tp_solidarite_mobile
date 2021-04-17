@@ -1,6 +1,6 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {View, FlatList, Image, TouchableOpacity} from 'react-native'
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
@@ -8,10 +8,14 @@ import {getToggleFavorite, getUserFavoris} from "../store/slices/userFavoriteSli
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppButton from "../components/AppButton";
 import routes from "../navigation/routes";
+import {getUserCompterReset} from "../store/slices/userProfileSlice";
 
 function UserFavorisScreen({navigation}) {
     const dispatch = useDispatch()
+    const store = useStore()
 
+    const connectedUser = useSelector(state => state.profile.connectedUser)
+    const error = useSelector(state => state.entities.userFavorite.error)
     const useFavorites = useSelector(state => {
         const formatedFav = []
         const articleFav = state.entities.userFavorite.articleFavoris
@@ -30,7 +34,6 @@ function UserFavorisScreen({navigation}) {
         })
         return formatedFav
     })
-    const favCompter = useSelector(state => state.entities.userFavorite.favoriteCompter)
     const loading = useSelector(state => state.entities.userFavorite.loading)
 
 
@@ -47,10 +50,18 @@ function UserFavorisScreen({navigation}) {
 
     }
 
-    useEffect(() => {
-        if(favCompter > 0) {
-            dispatch(getUserFavoris())
+    const getStarted = useCallback(async () => {
+        if(connectedUser.favoriteCompter > 0) {
+            await dispatch(getUserFavoris())
+            const error = store.getState().entities.userFavorite.error
+            if(error !== null) return;
+            const user = store.getState().auth.user
+            dispatch(getUserCompterReset({userId: user.id, favoriteCompter: true}))
         }
+    }, [])
+
+    useEffect(() => {
+        getStarted()
     }, [])
 
     if(!loading && useFavorites.length === 0) {
@@ -63,11 +74,20 @@ function UserFavorisScreen({navigation}) {
         </View>
     }
 
-    if(loading) {
-        return <AppActivityIndicator visible={loading}/>
+    if(!loading && error !== null) {
+        return <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}>
+            <AppText>Impossible de consulter vos favoris, une erreur est apparue</AppText>
+            <AppButton title='recharger' onPress={getStarted}/>
+        </View>
     }
 
     return (
+        <>
+            <AppActivityIndicator visible={loading}/>
         <FlatList data={useFavorites} keyExtractor={(item, index) => index.toString()}
                  renderItem={({item}) => <View style={{margin: 10, backgroundColor: colors.blanc}}>
                      <View style={{
@@ -98,6 +118,7 @@ function UserFavorisScreen({navigation}) {
                      <AppButton style={{alignSelf: 'flex-end', margin: 10}} title='commander' onPress={() => handleOrderFav(item)}/>
                  </View>
                  }/>
+                 </>
     );
 }
 

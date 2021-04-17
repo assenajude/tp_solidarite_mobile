@@ -14,6 +14,7 @@ function UserFactureOkScreen({navigation}) {
 
     const soldeList = useSelector(state => state.entities.facture.soldeList)
     const isLoading = useSelector(state => state.entities.facture.loading)
+    const listTranches = useSelector(state => state.entities.tranche.list)
 
     if(soldeList.length === 0) {
         return (
@@ -38,11 +39,12 @@ function UserFactureOkScreen({navigation}) {
                                        okPayement={item.montant === item.solde} progress={Number(item.ratio)}
                                        showTranches={item.showTranche}  getDetails={() => dispatch(getTrancheShown(item.id))} montant={item.montant}
                                        dateEmission={item.dateEmission} dateEcheance={item.dateFin}
-                                       tranches={item.Tranches}
+                                       tranches={listTranches.filter(tranche => tranche.FactureId === item.id)}
                                        getLink={() => navigation.navigate(routes.ORDER_DETAILS, item.Commande)}
                                        modePayement={getModePayement(item.CommandeId)}
                                        solde={item.solde} endFacture={item.montant === item.solde}
-                                       goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}/>
+                                       goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}
+                                       waitingTranchePayed={item.Tranches.some(tranche => tranche.payedState === 'pending')}/>
                   } />
                   </>
     );

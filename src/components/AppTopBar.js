@@ -39,8 +39,15 @@ function AppTopBar({style, leaveInput, changeSearchValue, searchValue, handleSea
                       }
 
                   {espace === 'home' && <Modal visible={homeModalVisible} animationType='slide' transparent>
+                      <View style={{
+                          height: '100%',
+                          marginTop: '15%',
+                          backgroundColor: Color.dark,
+                          opacity: 0.2
+                      }}>
+                      </View>
                        <View style={styles.modalStyle}>
-                           <View style={{alignSelf: 'flex-end', margin: 20}}>
+                           <View style={{alignSelf: 'flex-end',marginRight: 20, marginTop: 20}}>
                                <TouchableOpacity onPress={closeHomeModal}>
                                    <AntDesign name="closecircle" size={30} color={Color.rougeBordeau} />
                                </TouchableOpacity>
@@ -111,9 +118,11 @@ const styles = StyleSheet.create({
     },
     modalStyle:{
         backgroundColor: Color.blanc,
-        marginTop: '15%',
-        height: '100%',
+        height: '70%',
+        width: '100%',
         alignItems: 'flex-start',
+        position: 'absolute',
+        top: 60
 
     },
     modalContainer:{

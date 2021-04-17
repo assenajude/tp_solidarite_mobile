@@ -13,19 +13,20 @@ import ListItemHeader from "./ListItemHeader";
 import TrancheItem from "../TrancheItem";
 import AppLabelWithValue from "../AppLabelWithValue";
 import AppModePayement from "../AppModePayement";
+import useManageUserOrder from "../../hooks/useManageUserOrder";
 
 function FactureListItem({numero,okPayement,orderItems, deleteItem,goToItemDetails,
                              showProgress, progress,payTranche,getLink,modePayement,
                              getDetails, montant,tranches,solde,endFacture=true,
-                             showTranches,dateEmission,dateEcheance
+                             showTranches,dateEmission,dateEcheance,waitingTranchePayed
                           }) {
-
+    const {payFactureTranche} = useManageUserOrder()
 
     return (
           <>
               <View style={styles.mainContainer}>
                       <AppModePayement modePayement={modePayement}/>
-                  {showProgress &&  <View style={{marginTop: 10, marginLeft: 10, alignSelf: 'center'}}>
+                  {showProgress  &&  <View style={{marginTop: 10, marginLeft: 10, alignSelf: 'center'}}>
                       <Progress.Bar progress={progress}  width={200} color={progress<0.5?colors.rougeBordeau:0.5<progress<1?'orange':colors.vert}/>
                   </View>}
                   {orderItems && <ScrollView horizontal>
@@ -60,7 +61,8 @@ function FactureListItem({numero,okPayement,orderItems, deleteItem,goToItemDetai
                           {tranches.map((tranche, i) =>
                               <TrancheItem key={tranche.id.toString()} trancheIndex={i+1} isTranchePayed={tranche.payed} trancheMontant={tranche.montant}
                                            tranchePayedDate={tranche.updatedAt} trancheDateEcheance={tranche.dateEcheance}
-                                           payTranche={() => payTranche(tranche)}/>
+                                           payTranche={() => payTranche(tranche)} payedState={tranche?.payedState}
+                                           validatePayement={() => payFactureTranche({...tranche, validation: true})}/>
                           )}
                       </View>}
                   </View>}
@@ -70,8 +72,12 @@ function FactureListItem({numero,okPayement,orderItems, deleteItem,goToItemDetai
                   top: 30,
                   right: 20
               }}>
-                  {okPayement && <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={false} source={require('../../assets/animations/done')}/>}
-                  {!okPayement && <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={true} source={require('../../assets/animations/money')}/>}
+                  {okPayement && !waitingTranchePayed && <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={false} source={require('../../assets/animations/done')}/>}
+                  { waitingTranchePayed && <View>
+                  <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={true} source={require('../../assets/animations/money_pending')}/>
+                  </View>
+                  }
+                  {!okPayement && !waitingTranchePayed && <LottieView style={{height: 50, width: 50}} autoPlay={true} loop={true} source={require('../../assets/animations/money')}/>}
               </View>
               {endFacture &&  <View style={styles.deleteIcon}>
                   <ItemIconButton otherStyle={{marginTop: 10}} iconSize={24} iconName='delete' color={colors.rougeBordeau} onPress={deleteItem}/>

@@ -10,9 +10,9 @@
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./src/assets/splashscreen.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#fff"
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

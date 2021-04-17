@@ -69,7 +69,7 @@ function OrderDetailsScreen({route, navigation}) {
                         marginTop: 30,
                         marginBottom: 10
                     }}>
-                     <AppDetailCarousel carouselItems={commande.CartItems} typeFacture={commande.typeCmde === 'e-commerce'?'Commade ':''} detailLabel='Commande n°: ' labelValue={commande.numero}/>
+                     <AppDetailCarousel carouselItems={commande.CartItems} typeFacture={commande.typeCmde === 'e-commerce'?'Commade ':''} detailLabel='cmd n°: ' labelValue={commande.numero}/>
 
                     </View>
                     <View style={styles.contentStyle}>

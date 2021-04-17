@@ -17,6 +17,7 @@ export default Object.freeze({
     ARTICLE: 'ArticleScreen',
     CART: 'ShoppingCartScreen',
     LOGIN: 'LoginScreen',
+    INIT_INFO: 'InitInfoScreen',
     REGISTER: 'RegisterScreen',
     USER_INFO: 'UserInfoScreen',
     ORDER: 'OrderScreen',

@@ -64,6 +64,10 @@ const authSlice = createSlice({
             state.loading = false
             const pieceArray = action.payload
             state.user.pieceIdentite = pieceArray
+        },
+        resetCodeSent: (state) => {
+            state.error = null
+            state.loading = false
         }
 
     }
@@ -71,13 +75,15 @@ const authSlice = createSlice({
 
 export default authSlice.reducer
 const {authFailed, authRequested, authSuccess, autoLogin, logout, changeAvatar, profileAvatar,
-    registerSucccess, resetLogin, pieceUpdated} = authSlice.actions
+    registerSucccess, resetLogin, pieceUpdated, resetCodeSent} = authSlice.actions
 
 
  //action creators
 
 const signupUrl = '/auth/signup';
 const loginUrl = '/auth/signin'
+const resetMailUrl = '/auth/resetMail'
+const modifyInfosUrl= '/auth/modifyInfos'
 
 
 
@@ -123,7 +129,24 @@ export const getUserProfileAvatar = () => apiRequest({
     onStart: authRequested.type,
     onSuccess: profileAvatar.type,
     onError: authFailed.type
+})
 
+export const sendResetMail = (data) => apiRequest({
+    url: resetMailUrl,
+    data,
+    method: 'patch',
+    onStart: authRequested.type,
+    onSuccess: resetCodeSent.type,
+    onError: authFailed.type
+})
+
+export const modifyUserInfos = (data) => apiRequest({
+    url: modifyInfosUrl,
+    data,
+    method: 'patch',
+    onStart: authRequested.type,
+    onSuccess: resetCodeSent.type,
+    onError: authFailed.type
 })
 
 export const getUserPieceUpdate = (data) =>apiRequest({

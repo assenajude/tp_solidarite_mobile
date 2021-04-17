@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 let useOrderInfos;
 export default useOrderInfos = () => {
     const store = useStore()
-    const user = useSelector(state => state.auth.user)
     const listOrder = useSelector(state => state.entities.order.currentUserOrders)
     const listPayement = useSelector(state => state.entities.payement.list)
     const listRelais = useSelector(state => state.entities.pointRelais.list)
@@ -62,7 +61,7 @@ export default useOrderInfos = () => {
         const orderFacture = allFactures.find(fac => fac.CommandeId === order.id)
         let formatedEcheance;
         if(orderFacture) {
-        const echeance = orderFacture.dateCloture
+        const echeance = orderFacture.dateFin
         formatedEcheance = dayjs(echeance).format('DD/MM/YYYY HH:mm:ss')
         }
         return formatedEcheance || ""

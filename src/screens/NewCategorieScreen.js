@@ -36,6 +36,20 @@ function NewCategorieScreen({navigation}) {
     const [uploadModal, setUploadModal] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
 
+    const addNew = async (categorie, imagesTab) => {
+        const categorieData = {
+            libelle: categorie.libelle,
+            description: categorie.description,
+            categImagesLinks: imagesTab,
+            idEspace: selectedEspace
+        }
+        await dispatch(addCategorie(categorieData))
+        const error = store.getState().entities.categorie.error
+        if(error !== null){
+            alert('Impossible de faire lajour')
+        } else navigation.goBack()
+    }
+
     const AddNewCategorie = async (categorie) => {
         const images = categorie.images
         const transformedArray = dataTransformer(images)
@@ -48,19 +62,9 @@ function NewCategorieScreen({navigation}) {
         if(uploadResult) {
             let signedUrl = store.getState().s3_upload.signedRequestArray
             const imagesUrls = signedUrl.map(item => item.url)
-            const categorieData = {
-                libelle: categorie.libelle,
-                description: categorie.description,
-                categImagesLinks: imagesUrls,
-                idEspace: selectedEspace
-            }
-          await dispatch(addCategorie(categorieData))
-            const error = store.getState().entities.categorie.error
-            if(error !== null){
-                alert('Impossible de faire lajour')
-            } else navigation.goBack()
+           await addNew(categorie, imagesUrls)
         } else {
-            console.log('ajout sans images...')
+            await addNew(categorie, [])
         }
     }
 

@@ -38,7 +38,7 @@ function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername,
                 </View>}
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 10}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Avatar avatarUrl={avatarUrl} ownerUserAvatar={ownerUserAvatar} onPress={getUserProfile}/>
+                        <Avatar showNottif={false} avatarUrl={avatarUrl} ownerUserAvatar={ownerUserAvatar} onPress={getUserProfile}/>
                         <View style={{alignItems: 'flex-start'}}>
                             <AppText style={{fontWeight: 'bold'}}>{parrainUsername}</AppText>
                             <AppText>{parrainEmail}</AppText>

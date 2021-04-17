@@ -4,6 +4,7 @@ import {addFacture, getFacturesByUser} from "../store/slices/factureSlice";
 import {addTranche} from "../store/slices/trancheSlice";
 import {createOrderContrat} from "../store/slices/orderSlice";
 import useOrderInfos from "./useOrderInfos";
+import {getConnectedUserData} from "../store/slices/userProfileSlice";
 
 let useCreateOrderContrat;
 export default useCreateOrderContrat = () => {
@@ -78,6 +79,7 @@ export default useCreateOrderContrat = () => {
             }
             dispatch(createOrderContrat(contratData))
             dispatch(getFacturesByUser())
+            dispatch(getConnectedUserData())
         }
     }
     return {createContrat}

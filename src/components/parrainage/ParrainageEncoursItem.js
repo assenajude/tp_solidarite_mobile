@@ -59,7 +59,7 @@ function ParrainageEncoursItem({ownerUserAvatar,sponsorDetails,openSponsorDetail
                                 <AppText style={{marginLeft: 10}}>{formatPrice(item.montant)}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
-                                <AppText style={{fontWeight: 'bold'}}>Montant parrainé ({getParrainagePercent(item.montant, item.OrderParrain.action)}%):</AppText>
+                                <AppText style={{fontWeight: 'bold'}}>Montant parrainé ({getParrainagePercent((item.montant-item.interet), item.OrderParrain.action)}%):</AppText>
                                 <AppText style={{marginLeft: 10}}>{formatPrice(item.OrderParrain.action)}</AppText>
                                 </View>
                                 <View style={{flexDirection: 'row'}}>

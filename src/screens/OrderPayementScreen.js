@@ -189,7 +189,7 @@ function OrderPayementScreen({navigation}) {
                 <View style={styles.mainContainer}>
                 </View>
                 <View style={styles.optionContainer}>
-                    <View style={{alignSelf: 'flex-end', margin: 30}}>
+                    <View style={{alignSelf: 'flex-end', padding: 5}}>
                         <TouchableOpacity onPress={() => setCreditOptionModal(false)}>
                             <View style={{flexDirection: 'row', alignItems: 'center'}}>
                             <EvilIcons name="close" size={24} color={colors.rougeBordeau} />
@@ -210,7 +210,7 @@ function OrderPayementScreen({navigation}) {
                         }
                     }}>
 
-                    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
                         <View style={{height: 20,width: 20, borderWidth: 1, borderRadius: 10,
                             justifyContent: 'center', alignItems: 'center'}}>
                             {selectedOption.toLowerCase() === 'fidelityseuil' && <Octicons name="primitive-dot" size={24} color={colors.or} />}
@@ -219,7 +219,7 @@ function OrderPayementScreen({navigation}) {
                     </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => setSelectedOption('parrainage')}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 20}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 15}}>
                         <View style={{height: 20,width: 20, borderWidth: 1,
                             borderRadius: 10,
                             justifyContent: 'center',

@@ -1,6 +1,6 @@
 import React, {useCallback,useEffect} from 'react';
 import {View,FlatList} from "react-native";
-import {useSelector, useDispatch} from "react-redux";
+import {useSelector, useDispatch, useStore} from "react-redux";
 
 import {
     getTrancheShown,
@@ -14,13 +14,18 @@ import useManageUserOrder from "../hooks/useManageUserOrder";
 import useOrderInfos from "../hooks/useOrderInfos";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import useAuth from "../hooks/useAuth";
+import {getUserCompterReset} from "../store/slices/userProfileSlice";
+import {getTranches} from "../store/slices/trancheSlice";
 
 function UserFactureScreen({navigation}) {
     const dispatch = useDispatch()
+    const store = useStore()
     const {userRoleAdmin} = useAuth()
     const {payFactureTranche} = useManageUserOrder()
     const {getModePayement, getItems} = useOrderInfos()
     const user = useSelector(state => state.auth.user)
+    const connectedUser = useSelector(state => state.profile.connectedUser)
+    const tranchesList = useSelector(state => state.entities.tranche.list)
     const userFactures = useSelector(state => {
         let newFactures = []
         const user = state.auth.user
@@ -33,10 +38,15 @@ function UserFactureScreen({navigation}) {
         return newFactures
     })
     const isLoading = useSelector(state => state.entities.facture.loading)
-    const newCompter = useSelector(state => state.entities.facture.newFactureCompter)
 
     const getUserFactures = useCallback(async () => {
-        if(newCompter>0) await dispatch(getFacturesByUser())
+        if(connectedUser.factureCompter > 0) {
+            await dispatch(getFacturesByUser())
+            await dispatch(getTranches())
+            const error = store.getState().entities.facture.error
+            if(error !== null) return;
+            dispatch(getUserCompterReset({userId: user.id, factureCompter: true}))
+        }
 
     }, [])
 
@@ -49,6 +59,7 @@ function UserFactureScreen({navigation}) {
     }, [])
 
 
+
     if(user && userFactures.length >=1) {
        return (
            <>
@@ -57,15 +68,16 @@ function UserFactureScreen({navigation}) {
            <FlatList data={userFactures} keyExtractor={item => item.id.toString()}
                     renderItem={({item}) =>
                         <FactureListItem numero={item.numero}
-                                         orderItems={getItems(item.CommandeId)} showProgress={item.ratio < 1}
+                                         orderItems={getItems(item.CommandeId)} showProgress={item.ratio < 1 || item.Tranches.some(tranche => tranche.payedState === 'pending')}
                                          okPayement={item.montant === item.solde} progress={Number(item.ratio)}
                                          showTranches={item.showTranche}  getDetails={() => dispatch(getTrancheShown(item.id))} montant={item.montant}
                                          dateEmission={item.dateEmission} dateEcheance={item.dateFin}
-                                         tranches={item.Tranches} payTranche={(tranche)=> payFactureTranche(tranche)}
+                                         tranches={tranchesList.filter(tranche => tranche.FactureId === item.id)} payTranche={(tranche)=> payFactureTranche(tranche)}
                                          getLink={() => navigation.navigate(routes.ORDER_DETAILS, item.Commande)}
                                          modePayement={getModePayement(item.CommandeId)}
                                          solde={item.solde} endFacture={item.montant === item.solde}
-                                        goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}/>
+                                        goToItemDetails={() => navigation.navigate('AccueilNavigator', {screen :routes.FACTURE_DETAILS, params: item})}
+                                         waitingTranchePayed={item.Tranches.some(tranche => tranche.payedState === 'pending')}/>
                     } />
                </View>
                     </>

@@ -7,7 +7,6 @@ import {getQuotiteEditShown, getSelectedParrain} from "../store/slices/parrainag
 import {getAddOrderParrain} from "../store/slices/orderSlice";
 import colors from "../utilities/colors";
 import {AntDesign} from "@expo/vector-icons";
-import ItemSeparator from "../components/list/ItemSeparator";
 import ParrainageHeader from "../components/parrainage/ParrainageHeader";
 import AppButton from "../components/AppButton";
 import routes from "../navigation/routes";
@@ -65,7 +64,7 @@ function OrderParrainageScreen({navigation}) {
 
     return (
         <>
-
+            <ScrollView>
                 <View style={{flexDirection: 'row', alignItems: 'center',
                     padding: 20}}>
                     <AntDesign name="infocirlceo" size={20} color={colors.bleuFbi} />
@@ -81,45 +80,46 @@ function OrderParrainageScreen({navigation}) {
                     </View>
                 </View>
 
-                {listParrains.length>0 && <FlatList ItemSeparatorComponent={() =><ItemSeparator/>} data={listParrains} keyExtractor={item => item.id.toString()}
-                                                    renderItem={({item}) =><View style={{padding: 10, marginTop: 20, backgroundColor: colors.blanc}}>
-                                                        <TouchableOpacity onPress={() => selectItem(item)}>
-                                                            <View style={{flexDirection: 'row', justifyContent:'space-between', alignItems: 'center'}}>
-                                                                <View style={{flexDirection: 'row',justifyContent: 'flex-start', alignItems: 'center'}}>
-                                                                    <View style={styles.checkButton}>
-                                                                        {item.selected && <AntDesign name="check" size={24} color={colors.vert} />}
-                                                                    </View>
-                                                                    <ParrainageHeader ownerUserAvatar={item.User.avatar} ownerEmail={item.User.email}
-                                                                                      avatarUrl={{uri: item.User.avatar}} ownerUsername={item.User.username}/>
-                                                                </View>
+                {listParrains.length>0 && <ScrollView>
+                    {listParrains.map((item) => <View key={item.id.toString()} style={{padding: 10, marginTop: 20, backgroundColor: colors.blanc}}>
+                        <TouchableOpacity onPress={() => selectItem(item)}>
+                            <View style={{flexDirection: 'row', justifyContent:'space-between', alignItems: 'center'}}>
+                                <View style={{flexDirection: 'row',justifyContent: 'flex-start', alignItems: 'center'}}>
+                                    <View style={styles.checkButton}>
+                                        {item.selected && <AntDesign name="check" size={24} color={colors.vert} />}
+                                    </View>
+                                    <ParrainageHeader ownerUserAvatar={item.User.avatar} ownerEmail={item.User.email}
+                                                      avatarUrl={{uri: item.User.avatar}} ownerUsername={item.User.username}/>
+                                </View>
 
-                                                                { !item.showQuotiteEdit && item.selected && <TouchableOpacity
-                                                                    onPress={() => dispatch(getQuotiteEditShown({...item, parrainAction:item.parrainAction, showQuotiteEdit: true}))}>
-                                                                    <View style={{marginLeft: 50}}>
-                                                                        <AntDesign name="edit" color={colors.rougeBordeau} size={20}/>
-                                                                    </View>
-                                                                </TouchableOpacity>}
-                                                            </View>
-                                                            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                                                                <AppText style={{fontWeight: 'bold'}}>Quotite:</AppText>
-                                                                <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{item.resteQuotite>=0?item.resteQuotite:item.quotite}</AppText>
-                                                            </View>
-                                                        </TouchableOpacity>
-                                                        {item.showQuotiteEdit && <View style={styles.inputContainer}>
-                                                            <TextInput placeholder='0' keyboardType='numeric' onSubmitEditing={ (event) => handleQuotieValue(event.nativeEvent.text, item)}
-                                                                       style={styles.quotiteInput}/>
-                                                            <View style={{marginLeft: 30}}>
-                                                                <TouchableOpacity onPress={() => dispatch(getQuotiteEditShown({...item, parrainAction: item.parrainAction, showQuotiteEdit: false}))}>
-                                                                    <AntDesign name="close" size={24} color={colors.rougeBordeau} />
-                                                                </TouchableOpacity>
-                                                            </View>
-                                                        </View>}
-                                                        <View style={{position: 'absolute', right: '20%', top: 5}}>
-                                                            {Number(item.parrainAction)>0?<AppText style={{color: colors.rougeBordeau}}>{item.parrainAction}</AppText>:<AppText>''</AppText>}
+                                { !item.showQuotiteEdit && item.selected && <TouchableOpacity
+                                    onPress={() => dispatch(getQuotiteEditShown({...item, parrainAction:item.parrainAction, showQuotiteEdit: true}))}>
+                                    <View style={{marginLeft: 50}}>
+                                        <AntDesign name="edit" color={colors.rougeBordeau} size={20}/>
+                                    </View>
+                                </TouchableOpacity>}
+                            </View>
+                            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                                <AppText style={{fontWeight: 'bold'}}>Quotite:</AppText>
+                                <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{item.resteQuotite>=0?item.resteQuotite:item.quotite}</AppText>
+                            </View>
+                        </TouchableOpacity>
+                        {item.showQuotiteEdit && <View style={styles.inputContainer}>
+                            <TextInput placeholder='0' keyboardType='numeric' onSubmitEditing={ (event) => handleQuotieValue(event.nativeEvent.text, item)}
+                                       style={styles.quotiteInput}/>
+                            <View style={{marginLeft: 30}}>
+                                <TouchableOpacity onPress={() => dispatch(getQuotiteEditShown({...item, parrainAction: item.parrainAction, showQuotiteEdit: false}))}>
+                                    <AntDesign name="close" size={24} color={colors.rougeBordeau} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>}
+                        <View style={{position: 'absolute', right: '20%', top: 5}}>
+                            {Number(item.parrainAction)>0?<AppText style={{color: colors.rougeBordeau}}>{item.parrainAction}</AppText>:<AppText>{''}</AppText>}
 
-                                                        </View>
+                        </View>
 
-                                                    </View>}/>}
+                    </View>)}
+                </ScrollView>}
                     {totalParrains === (getTotal()-getPayementRate()) && <View style={{
                         alignItems: 'center',
                         margin: 50
@@ -135,6 +135,7 @@ function OrderParrainageScreen({navigation}) {
                     <AppText>Aucun parrain trouvé.</AppText>
                     <AppButton style={{paddingLeft: 10, paddingRight: 10, padding: 5}} title='Ajouter' onPress={() => navigation.navigate('Parrainage', {screen: 'ListeParrainScreen'})}/>
                 </View>}
+            </ScrollView>
         </>
     );
 }

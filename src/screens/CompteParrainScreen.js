@@ -7,10 +7,10 @@ import {useDispatch, useSelector, useStore} from "react-redux";
 import AppButton from "../components/AppButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {
-    createParrainageCompte,
+    createParrainageCompte, getAllParrains,
     getCompteParrainActivate,
     getEditQuotiteSave,
-    getInitialEdit, getStartInitialEdit, getStartQuotiteEdit, getUserParrains
+    getInitialEdit, getStartInitialEdit, getStartQuotiteEdit, getUserParrainageCompte, getUserParrains
 } from "../store/slices/parrainageSlice";
 import Avatar from "../components/user/Avatar";
 import colors from "../utilities/colors";
@@ -26,7 +26,6 @@ function CompteParrainScreen({navigation}) {
     const {userRoleAdmin} = useAuth()
 
     const user = useSelector(state => state.auth.user)
-    const connectedUserData = useSelector(state => state.profile.connectedUser)
     const comptesParrain = useSelector(state => state.entities.parrainage.comptes)
 
     const loading = useSelector(state => state.entities.parrainage.loading)
@@ -76,7 +75,11 @@ function CompteParrainScreen({navigation}) {
     }
 
     useEffect(() => {
-
+        if(Object.keys(user).length > 0) {
+            dispatch(getUserParrainageCompte({userId: user.id}))
+            dispatch(getUserParrains({userId: user.id}))
+        }
+            dispatch(getAllParrains({userId: user.id}))
     }, [])
 
     if(comptesParrain.length === 0) {
@@ -95,6 +98,10 @@ function CompteParrainScreen({navigation}) {
                       renderItem={({item}) =>
                           <View style={{paddingTop: 20, backgroundColor: colors.blanc}}>
                               {userRoleAdmin() && <View style={{alignSelf: 'flex-end', marginTop: 10, marginRight:20}}>
+                                  <TouchableOpacity onPress={handleCreateParrainCompte}>
+                                      <Entypo name="add-to-list" size={24} color={colors.bleuFbi} />
+                                  </TouchableOpacity>
+                                  <View style={{margin: 10}}></View>
                                   <TouchableOpacity onPress={() => handleActiveCompte(item)}>
                                       <MaterialCommunityIcons name="account-edit" size={30} color={colors.rougeBordeau} />
                                   </TouchableOpacity>

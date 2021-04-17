@@ -60,17 +60,17 @@ function CartItem({source, designation,icon=false, activeDecrement,deleteItem,ca
 
 const styles = StyleSheet.create({
     mainContainer: {
-        flex: 1,
         justifyContent: 'center',
         borderColor: Color.leger,
-        borderWidth: 2,
-        padding: 10
     },
     itemContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
-        padding: 10
+        padding: 20,
+        marginLeft: 10,
+        marginRight: 10
+
     },
 
     secondContainer: {
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     imageStyle: {
-        height: 80,
-        width: 80
+        height: 70,
+        width: 70
     },
     notInStock: {
         position: 'absolute',

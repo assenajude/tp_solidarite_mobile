@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     },
     checkStyle: {
         borderWidth: 0.5,
-        height: 30,
-        minWidth: 30,
+        height: 20,
+        minWidth: 20,
         minHeight: 20,
         margin: 5,
         right: 10,

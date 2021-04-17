@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, ScrollView} from "react-native";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
@@ -15,14 +15,10 @@ import {useSelector} from "react-redux";
 function FactureDetailsScreen({route}) {
     const {getItems, getModePayement} = useOrderInfos()
     const {payFactureTranche} = useManageUserOrder()
-    const listFacture = useSelector(state => state.entities.facture.userFactures)
+    const listFacture = useSelector(state => state.entities.facture.list)
     const facture = listFacture.find(item => item.id === route.params.id)
 
     const [factureItems, setFactureItems] = useState(getItems(facture.CommandeId))
-
-    useEffect(() => {
-    }, [])
-
 
     return (
         <ScrollView>

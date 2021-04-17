@@ -1,6 +1,6 @@
 import React from 'react';
 import {useSelector, useDispatch, useStore} from 'react-redux'
-import {View, Text, StyleSheet, Alert, ScrollView, Image} from 'react-native'
+import {View, Text, StyleSheet, Alert, ScrollView} from 'react-native'
 
 import Color  from '../utilities/colors'
 import FinalOrderItem from "../components/order/FinalOrderItem";
@@ -19,6 +19,7 @@ import usePlaceOrder from "../hooks/usePlaceOrder";
 import AppModePayement from "../components/AppModePayement";
 import ParrainageHeader from "../components/parrainage/ParrainageHeader";
 import useAuth from "../hooks/useAuth";
+import {getConnectedUserData} from "../store/slices/userProfileSlice";
 
 function OrderScreen({navigation}) {
     const store = useStore()
@@ -74,6 +75,7 @@ function OrderScreen({navigation}) {
                 dispatch(getAdresseReset())
                 dispatch(getResetPayement())
                 dispatch(getUserVilleReset())
+                dispatch(getConnectedUserData())
             navigation.navigate(routes.ORDER_SUCCESS)
         }
     }

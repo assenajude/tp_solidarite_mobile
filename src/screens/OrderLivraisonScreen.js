@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useSelector, useDispatch, useStore} from "react-redux";
-import {View, StyleSheet, ScrollView} from "react-native";
+import {View, StyleSheet, ScrollView, TouchableWithoutFeedback} from "react-native";
 
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
@@ -13,6 +13,8 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import usePlaceOrder from "../hooks/usePlaceOrder";
 import useAuth from "../hooks/useAuth";
+import {AntDesign} from "@expo/vector-icons";
+import ListFooter from "../components/list/ListFooter";
 
 function OrderLivraisonScreen({navigation}) {
     const dispatch = useDispatch()
@@ -22,8 +24,19 @@ function OrderLivraisonScreen({navigation}) {
     const loading = useSelector(state => state.entities.userAdresse.loading)
     const adresseByUser = useSelector(state => state.entities.userAdresse.list);
     const currentSelected = useSelector(state => state.entities.userAdresse.selectedAdresse)
-    const isAdresseNotEmpty = Object.keys(currentSelected).length>0
+    const [persoFees, setPersoFees]  = useState(false)
+    const isAdresseNotEmpty = Object.keys(currentSelected).length>0 || persoFees
 
+    const handleSelectItem = async (item) => {
+        await dispatch(getSelectedAdress(item.id))
+        const selectedAd = store.getState().entities.userAdresse.selectedAdresse
+        if(selectedAd.selected) {
+            dispatch(getSelectedLivraisonVille(item))
+            setPersoFees(false)
+        }else {
+            dispatch(getSelectedLivraisonVille({}))
+        }
+    }
 
     if (loading) {
         return (
@@ -31,17 +44,8 @@ function OrderLivraisonScreen({navigation}) {
         )
     }
 
-    if (!loading && adresseByUser.length === 0) {
-        return (
-            <View style={styles.emptyStyle}>
-                <AppText>Vous n'avez pas d'adresses de livraison. Veillez en ajouter pour continuer</AppText>
-                <AppButton title='Ajouter des adresses' onPress={() => navigation.navigate(routes.USER_ADDRESS)}/>
-            </View>
-        )
-    }
-
-
     return (
+        <>
         <View style={styles.container}>
             <View style={styles.summary}>
                 <View style={styles.itemLine}>
@@ -73,23 +77,37 @@ function OrderLivraisonScreen({navigation}) {
             </View>
                 <ScrollView>
                     <View style={{
+                        paddingLeft: 20,
+                        borderBottomWidth: 1,
+                        paddingBottom: 10
+                    }}>
+                        <TouchableWithoutFeedback onPress={async () => {
+                            if(Object.keys(currentSelected).length>0) {
+                                await handleSelectItem(currentSelected)
+                            }
+                            setPersoFees(!persoFees)
+                        }}>
+                            <View style={{flexDirection: 'row', alignItems: "center"}}>
+                            <View style={{
+                                height: 20,
+                                width: 20,
+                                borderWidth: 1,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                               {persoFees && <AntDesign name='check' size={24} color='green'/>}
+                            </View>
+                            <AppText style={{marginLeft: 20, fontWeight: 'bold'}}>Moyen personnel</AppText>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                    {adresseByUser.length> 0 && <View style={{
                         marginLeft: 20
                     }}>
-
-
                     {adresseByUser.map((item, index) => <PayementListItem libelle={item.nom}
                                                                           description={`${item.tel} --- ${item.adresse}`}
                                                                           key={index}
-                                                                          selectItem={async () => {
-                                                                              await dispatch(getSelectedAdress(item.id))
-                                                                              const selectedAd = store.getState().entities.userAdresse.selectedAdresse
-                                                                              if(selectedAd.selected) {
-                                                                                  dispatch(getSelectedLivraisonVille(item))
-                                                                              }else {
-                                                                                  dispatch(getSelectedLivraisonVille({}))
-                                                                              }
-                                                                          }
-                                                                          } checked={item.selected} showDelai={false} showDetail={item.showLivraisonDetail}
+                                                                          selectItem={() =>handleSelectItem(item)} checked={item.selected} showDelai={false} showDetail={item.showLivraisonDetail}
                                                                           getDetails={() => dispatch(getAdLivraisonDetail(item.id))} isAdLivraison={true}
                                                                           showDetailButton={false}>
                                                                             <AppLabelWithValue label='Tel: ' labelValue={item.tel}/>
@@ -98,13 +116,21 @@ function OrderLivraisonScreen({navigation}) {
 
                                                                             </PayementListItem>
                                                                           )}
+                    </View>}
+                    {adresseByUser.length === 0 && <View style={{justifyContent: 'center', marginTop: 50}}>
+                        <AppText>Vous n'avez pas d'adresse de livraison</AppText>
+                    </View>}
                         {isAdresseNotEmpty && <AppButton style={styles.buttonStyle} title='continuer' onPress={() => {navigation.navigate(routes.ORDER_PAYEMENT)}}/>}
-                    </View>
-
                 </ScrollView>
-
-
         </View>
+            <View style={{
+                position: 'absolute',
+                right: 20,
+                bottom: 20
+            }}>
+                <ListFooter onPress={() => navigation.navigate('AccueilNavigator', {screen: 'NewUserAdresseScreen', params:{mode:'addNew'}})}/>
+            </View>
+            </>
     );
 }
 

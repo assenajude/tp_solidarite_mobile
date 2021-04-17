@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {ScrollView, StyleSheet, Image} from 'react-native';
+import {ScrollView, StyleSheet, Image, View, TouchableWithoutFeedback} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient'
 import * as yup from 'yup'
 
@@ -112,7 +112,12 @@ function RegisterScreen({navigation}) {
 
                     <AppSubmitButton title='Inscrivez-vous' showLoading={loading}/>
                 </AppForm>
-                <AppText iconName='warning' style={{color:'black', fontSize: 12}} lineNumber={1}>Vous devez completer votre profil plutard</AppText>
+                <View>
+                    <AppText>Vous avez déjà un compte?</AppText>
+                    <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.LOGIN)}>
+                        <AppText style={{color: Color.bleuFbi}}>Connectez-vous</AppText>
+                    </TouchableWithoutFeedback>
+                </View>
 
             </ScrollView>
         </LinearGradient>

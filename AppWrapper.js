@@ -45,7 +45,7 @@ function AppWrapper(props) {
         return (
         <>
             <AppActivityIndicator visible={isReady === false}/>
-        <AppLoading autoHideSplash={false} startAsync={getStarted}  onFinish={() => setIsReady(true)} onError={(error) => errorOnStarting(error)}/>
+        <AppLoading startAsync={getStarted}  onFinish={() => setIsReady(true)} onError={(error) => errorOnStarting(error)}/>
         </>
         )
     }

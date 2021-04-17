@@ -222,10 +222,7 @@ function ShoppingCartScreen({navigation}) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        marginBottom: 30,
-        paddingTop: 20
+        padding: 10
     },
     emptyListStyle: {
         flex: 1,

@@ -51,7 +51,7 @@ function UserParrainageScreen({navigation}) {
                 <View style={{flexDirection: 'row'}}>
                 <View style={{width: '50%', marginTop: 20}}>
                     <View>
-                        <AppText>{getRestituteInvest().restituteQuotite} / {formatPrice(getInvestissement())}</AppText>
+                        <AppText>{Number(getRestituteInvest().restituteQuotite)} / {formatPrice(getInvestissement())}</AppText>
                     </View>
                     <View style={{backgroundColor: colors.bleuFbi, marginTop: 30}}>
                         <AppText style={{color: colors.blanc}}>Investissement</AppText>

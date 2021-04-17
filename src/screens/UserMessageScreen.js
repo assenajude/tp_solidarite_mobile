@@ -21,6 +21,7 @@ import ListItemActions from "../components/list/ListItemActions";
 import ItemSeparator from "../components/list/ItemSeparator";
 import AppText from "../components/AppText";
 import routes from "../navigation/routes";
+import {getUserCompterReset} from "../store/slices/userProfileSlice";
 
 const validMessage = Yup.object().shape({
     title:Yup.string(),
@@ -71,6 +72,17 @@ function UserMessageScreen({navigation}) {
 
     }
 
+    const handleReadingMessage = async (item) => {
+        dispatch(startReadingMessage(item))
+        if(!item.isRead && user.id === item.receiverId) {
+            await dispatch(getUserMessageUpdate({messageId:item.id,isRead: true}))
+            const error = store.getState().entities.message.error
+            if(error !== null) return;
+            dispatch(getUserCompterReset({userId: user.id, messageCompter: true}))
+
+        }
+    }
+
     const handleResponse = (response) => {
         const data = {...response,title:'resp: '+selectedMessage.msgHeader, messageId: selectedMessage.id}
         dispatch(sendResponseToMsg(data))
@@ -118,12 +130,7 @@ function UserMessageScreen({navigation}) {
             <AppActivityIndicator visible={messageLoading}/>
             <FlatList data={sortedMessages} keyExtractor={item => item.id.toString()} ItemSeparatorComponent={()=><ItemSeparator/> }
                   renderItem={({item}) => <MessageItem editMessage={() => handleEdit(item)} reSendMessage={() => handleSendMessage(item)} isReceived={user.id === item.receiverId} isRead={item.isRead} messageHeader={item.msgHeader} messageContent={item.content} getRead={item.getRead}
-                                                       startReading={() => {
-                                                           dispatch(startReadingMessage(item))
-                                                           if(!item.isRead && user.id === item.receiverId) {
-                                                           dispatch(getUserMessageUpdate({messageId:item.id,isRead: true}))
-                                                           }
-                                                       }}
+                                                       startReading={() => handleReadingMessage(item)}
                                                        renderRightActions={() =><ListItemActions onPress={() => handleDelete(item)}/>} swiping={isSwiping}
                                                        onSwipeableOpen={() => setIsSwiping(true)} onSwipeableClose={() => setIsSwiping(false)}
                                                        getRefence={() => navigation.navigate('AccueilNavigator', {screen: routes.ORDER_DETAILS, params:{numero: item.reference}})}
@@ -132,7 +139,10 @@ function UserMessageScreen({navigation}) {
                                                            setSelectedMessage(item)
                                                        }} responde={item.responde}
                                                        handleResponse={handleResponse} responses={selectedMsgResp} newResponses={item.MsgResponses?.filter(resp => resp.isRead === false).length}
-                                                       readResponse={() => dispatch(getResponseRead(item))} responseReading={item.readResponse}
+                                                       readResponse={() => {
+                                                           dispatch(getResponseRead(item))
+                                                           dispatch(getUserCompterReset({userId: user.id, messageCompter: true}))
+                                                       }} responseReading={item.readResponse}
                                                        allResponses={item.MsgResponses?.length} msgResponses={item.MsgResponses}/>} />
             <View style={styles.addNewButton}>
             <ListFooter onPress={() => setShowModal(true)}/>

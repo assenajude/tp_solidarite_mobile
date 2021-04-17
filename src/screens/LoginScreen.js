@@ -1,9 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {ScrollView, StyleSheet, Image, View} from 'react-native';
+import {ScrollView, StyleSheet, Image, View, TouchableWithoutFeedback, Alert, Keyboard} from 'react-native';
 import * as yup from 'yup'
 import {LinearGradient} from 'expo-linear-gradient'
-
 
 import Color from "../utilities/colors"
 import AppFormField from "../components/forms/AppFormField";
@@ -11,18 +10,14 @@ import AppSubmitButton from "../components/forms/AppSubmitButton";
 import AppForm from "../components/forms/AppForm";
 import AppText from "../components/AppText";
 import AppErrorMessage from "../components/forms/AppErrorMessage";
-import {signin, getUserProfileAvatar, getLoginReset} from '../store/slices/authSlice'
+import {signin, getLoginReset, sendResetMail} from '../store/slices/authSlice'
 import routes from '../navigation/routes'
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {getOrdersByUser} from "../store/slices/orderSlice";
-import {getFacturesByUser} from "../store/slices/factureSlice";
-import {getAdresse} from "../store/slices/userAdresseSlice";
-import {getUserFavoris} from "../store/slices/userFavoriteSlice";
-import {getConnectedUserData} from "../store/slices/userProfileSlice";
+
 import AppLabelLink from "../components/AppLabelLink";
-import {getCartItems} from "../store/slices/shoppingCartSlice";
 import useAuth from "../hooks/useAuth";
 import {getUserParrainageCompte} from "../store/slices/parrainageSlice";
+import ResetInfoModal from "../components/user/ResetInfoModal";
 
 const loginValidationSchema = yup.object().shape({
     username: yup.string().required("Veillez saisir un nom d'utilisateur"),
@@ -30,14 +25,15 @@ const loginValidationSchema = yup.object().shape({
 })
 
 function LoginScreen({navigation}) {
+    const store = useStore()
+    const dispatch = useDispatch();
+    const {initUserDatas} = useAuth()
 
     const isLoading = useSelector(state => state.auth.loading)
     const error = useSelector(state => state.auth.error)
-
-
-    const dispatch = useDispatch();
-    const store = useStore()
-    const {initUserDatas} = useAuth()
+    const [openResetModal, setOpenResetModal] = useState(false)
+    const [resetValue, setResetValue] = useState('')
+    const [showKeyboard, setShowKeyboad] = useState()
 
 
     const handleLogin = async (user) => {
@@ -50,9 +46,43 @@ function LoginScreen({navigation}) {
         navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
     }
 
+    const handleSendResetMail = async () => {
+        if(resetValue.length === 0) {
+            return alert("veuillez entrer un email")
+        }
+        await dispatch(sendResetMail({email: resetValue}))
+        const error = store.getState().auth.error
+        if(error !== null) {
+            setOpenResetModal(false)
+            return alert('Impossible de proceder à la reinitialisation de votre compte pour le moment, veuillez reessayer plutard.')
+        }
+        setOpenResetModal(false)
+        Alert.alert('Succès', "Un code vous a été envoyer par mail, veuillez l'utiliser pour reinitialiser votre mot de passe.",
+            [{text: 'ok', onPress: () => {
+                navigation.navigate(routes.INIT_INFO, resetValue)
+                    setResetValue('')
+                }}, {text: 'plutard', onPress: () => {
+                    setResetValue('')
+                    return;
+                }}])
+
+    }
+
+    const keyboardIsShown = () => {
+        setShowKeyboad(true)
+    }
+
+    const keyboardIsHide = () => {
+        setShowKeyboad(false)
+    }
+
     useEffect(() => {
+        Keyboard.addListener('keyboardDidShow', keyboardIsShown)
+        Keyboard.addListener('keyboardDidHide', keyboardIsHide)
         return () => {
             dispatch(getLoginReset())
+            Keyboard.removeListener('keyboardDidShow', keyboardIsShown)
+            Keyboard.removeListener('keyboardDidHide', keyboardIsHide)
         }
     }, [])
 
@@ -73,18 +103,26 @@ function LoginScreen({navigation}) {
                         <AppFormField title='Password' secureTextEntry iconName='lock'
                                       name='password' autoCapitalize='none'
                         />
+                        <View>
+                        <TouchableWithoutFeedback onPress={() => setOpenResetModal(true)}>
+                            <AppText style={{color: Color.bleuFbi}}>username/mot de passe oublié?</AppText>
+                        </TouchableWithoutFeedback>
+                        </View>
                         <AppSubmitButton  title='Connectez-vous'/>
                     </AppForm>
                      <View style={{
                          flexDirection: 'row',
+                         justifyContent: 'center',
                          marginTop: 20
                      }}>
-                         <AppText style={{color: Color.bleuFbi}}>Vous n'avez pas de compte?</AppText>
-                         <AppLabelLink content='créez un' otherTextStyle={{color: Color.or}}
+                         <AppText style={{color:Color.dark}}>Vous n'avez pas de compte?</AppText>
+                         <AppLabelLink content='créez un' otherTextStyle={{color: Color.bleuFbi}}
                                        handleLink={() => navigation.navigate('AccueilNavigator', {screen: routes.REGISTER})}/>
                      </View>
             </ScrollView>
              </LinearGradient>
+            <ResetInfoModal closeResetModal={() => setOpenResetModal(false)} isKeyboadShown={showKeyboard} resetModalVisible={openResetModal} resetValue={resetValue}
+                            onChangeResetValue={(val) => setResetValue(val)} sendResetMail={handleSendResetMail}/>
             </>
     );
 }

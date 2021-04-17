@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, TextInput, View, StyleSheet, Alert} from "react-native";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import { EvilIcons } from '@expo/vector-icons';
 
 import ListParrainItem from "../components/parrainage/ListParrainItem";
@@ -14,9 +14,11 @@ import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import routes from "../navigation/routes";
+import {getConnectedUserData} from "../store/slices/userProfileSlice";
 
 function ListeParrainScreen({navigation}) {
     const dispatch = useDispatch()
+    const store = useStore()
     const user = useSelector(state => state.auth.user)
     const loadingParrainage = useSelector(state => state.entities.parrainage.loading)
     const inSponsoringState = useSelector(state => state.entities.parrainage.inSponsoringState)
@@ -31,6 +33,25 @@ function ListeParrainScreen({navigation}) {
     })
 
     const handleSendMessageToParrain = (parrainCompte) => {
+        const userOk = Object.keys(user).length > 0
+        const compteParraingeOk = () => {
+            const allComptes = store.getState().entities.parrainage.comptes
+            const isUserCompteCreated = allComptes.some(cpt => cpt.UserId === user.id)
+            return isUserCompteCreated || false
+        }
+
+        if(!userOk) {
+            return Alert.alert("Alert", "Vous devez vous connecter pour demander un parrainage",
+                [{text: 'me connecter', onPress: () => {
+                    navigation.navigate(routes.LOGIN)
+                    }}, {text: 'retour', onPress: ()=> {return;}}])
+        }
+        if(!compteParraingeOk()) {
+            return Alert.alert("Alert", "Vous devez creer un compte de parrainge pour demander un parrainage",
+                [{text: 'creer', onPress: () => {
+                    navigation.navigate('Parrainage', {screen: 'CompteParrainScreen'})
+                    }}, {text: 'retour', onPress: ()=> {return;}}])
+        }
         const data = {...parrainCompte, idSender: user.id, idReceiver: parrainCompte.UserId}
         dispatch(getParrainageRequestSent(data))
 
@@ -64,6 +85,7 @@ function ListeParrainScreen({navigation}) {
     const handleSendParrainageResponse = (compte) => {
         dispatch(getParrainageResponseSend({...compte, currentUserId: user.id}))
         dispatch(getParrainageResponseEdit(compte))
+        dispatch(getConnectedUserData())
     }
 
     useEffect(() => {

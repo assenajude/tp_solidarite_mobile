@@ -7,7 +7,7 @@ function ParrainageHeader({ownerUserAvatar,avatarUrl, ownerUsername, ownerEmail,
     return (
         <View>
             <View style={styles.headerContainer}>
-                <Avatar onPress={getUserProfile} ownerUserAvatar={ownerUserAvatar} avatarUrl={avatarUrl}/>
+                <Avatar showNottif={false} onPress={getUserProfile} ownerUserAvatar={ownerUserAvatar} avatarUrl={avatarUrl}/>
                 <View style={{alignItems: 'flex-start'}}>
                     <AppText>{ownerUsername}</AppText>
                     <AppText>{ownerEmail}</AppText>

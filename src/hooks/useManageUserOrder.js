@@ -95,6 +95,9 @@ export default useManageUserOder = () => {
         if(error !== null) {
             return alert('Impossible de payer la tranche.Veuillez reessayer plutard')
         } else {
+            if(tranche.validation){
+                return alert("La tranche a été validée")
+            }
             const factureData = {
                 id: tranche.FactureId,
                 solde: tranche.montant
@@ -115,8 +118,7 @@ export default useManageUserOder = () => {
 
     const getOrderExpirationState = () => {
         const currentOrders = store.getState().entities.order.currentUserOrders
-        const selectedOrders = currentOrders.filter(order => order.isExpired === false)
-        console.log(selectedOrders);
+        const selectedOrders = currentOrders.filter(order => order.isExpired === false && order.Contrats.length === 0)
         if(selectedOrders.length === 0)return;
         selectedOrders.forEach(selected => {
         const date = dayjs(selected.updatedAt).get('day')
