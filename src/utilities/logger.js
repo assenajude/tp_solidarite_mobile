@@ -10,11 +10,14 @@ export default {log, start}*/
 import * as Sentry from 'sentry-expo'
 
 
-const initLogger = () =>
+const start = () => {
     Sentry.init({
-    dns:'https://c3fe12f3ae9544cfbc19ff27cd05dc48@o541240.ingest.sentry.io/5659863',
-    enableInExpoDevelopment: true,
-    debug: true
+        dsn: 'https://e7ac18cf32f14dada5b21cce057309c4@o541240.ingest.sentry.io/5659863',
+        enableInExpoDevelopment: true,
+        debug:__DEV__?true:false,
 })
+}
 
-export default {initLogger}
+
+
+export default {start}

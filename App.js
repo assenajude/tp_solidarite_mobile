@@ -8,8 +8,7 @@ import {SafeAreaProvider} from "react-native-safe-area-context";
 import AppWrapper from "./AppWrapper";
 import logger from './src/utilities/logger'
 
-    // logger.initLogger()
-
+logger.start()
 
 export default function App() {
     const store = configureStore();

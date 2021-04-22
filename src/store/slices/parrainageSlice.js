@@ -210,7 +210,7 @@ const parrainageSlice = createSlice({
 
 export default parrainageSlice.reducer
 const {parrainageRequested, parrainageRequestFailed, parrainCompteReceived,
-    allParrainageCompteReceived, resetParrainCompte, showParrainDetials,
+    allParrainageCompteReceived, resetParrainCompte,
     searchParrain, parrainsReceived, editInitial, editQuotite, compteParrainEdited,
     parrainCompteAdded, parrainageResponseEdited,showParrainOrderDetais,
     selectedParrain, showQuotiteEditer, showSponsorDetails, parrainageMessageEdited} = parrainageSlice.actions

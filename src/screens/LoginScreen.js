@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {ScrollView, StyleSheet, Image, View, TouchableWithoutFeedback, Alert, Keyboard} from 'react-native';
+import {ScrollView, StyleSheet, Image, View, TouchableWithoutFeedback, Alert, Keyboard, ToastAndroid} from 'react-native';
 import * as yup from 'yup'
 import {LinearGradient} from 'expo-linear-gradient'
 
@@ -34,7 +34,7 @@ function LoginScreen({navigation}) {
     const [openResetModal, setOpenResetModal] = useState(false)
     const [resetValue, setResetValue] = useState('')
     const [showKeyboard, setShowKeyboad] = useState()
-
+    const [isMailSent, setIsMailSent] = useState(false)
 
     const handleLogin = async (user) => {
         await dispatch(signin(user))
@@ -51,20 +51,13 @@ function LoginScreen({navigation}) {
             return alert("veuillez entrer un email")
         }
         await dispatch(sendResetMail({email: resetValue}))
+        setIsMailSent(true)
         const error = store.getState().auth.error
         if(error !== null) {
-            setOpenResetModal(false)
-            return alert('Impossible de proceder à la reinitialisation de votre compte pour le moment, veuillez reessayer plutard.')
+           return  ToastAndroid.showWithGravity('Une erreur est apparue', ToastAndroid.LONG, ToastAndroid.TOP)
         }
-        setOpenResetModal(false)
-        Alert.alert('Succès', "Un code vous a été envoyer par mail, veuillez l'utiliser pour reinitialiser votre mot de passe.",
-            [{text: 'ok', onPress: () => {
-                navigation.navigate(routes.INIT_INFO, resetValue)
-                    setResetValue('')
-                }}, {text: 'plutard', onPress: () => {
-                    setResetValue('')
-                    return;
-                }}])
+        setIsMailSent(true)
+        ToastAndroid.showWithGravity('Un code vous été envoyé', ToastAndroid.LONG, ToastAndroid.TOP)
 
     }
 
@@ -83,6 +76,7 @@ function LoginScreen({navigation}) {
             dispatch(getLoginReset())
             Keyboard.removeListener('keyboardDidShow', keyboardIsShown)
             Keyboard.removeListener('keyboardDidHide', keyboardIsHide)
+            setIsMailSent(false)
         }
     }, [])
 
@@ -121,7 +115,11 @@ function LoginScreen({navigation}) {
                      </View>
             </ScrollView>
              </LinearGradient>
-            <ResetInfoModal closeResetModal={() => setOpenResetModal(false)} isKeyboadShown={showKeyboard} resetModalVisible={openResetModal} resetValue={resetValue}
+            <ResetInfoModal goToResetSreen={() => {
+                setOpenResetModal(false)
+                navigation.navigate(routes.INIT_INFO, resetValue)
+                setResetValue('')
+            }} mailSent={isMailSent} closeResetModal={() => setOpenResetModal(false)} isKeyboadShown={showKeyboard} resetModalVisible={openResetModal} resetValue={resetValue}
                             onChangeResetValue={(val) => setResetValue(val)} sendResetMail={handleSendResetMail}/>
             </>
     );
