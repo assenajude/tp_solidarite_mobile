@@ -213,7 +213,8 @@ const styles = StyleSheet.create({
         width: '50%',
         height: 40,
         alignSelf: 'center',
-        margin: 40
+        margin: 40,
+        elevation: 20
     },
     totalFinal: {
         flexDirection: 'row',
