@@ -187,6 +187,25 @@ const shoppingCartSlice = createSlice({
             state.items[action.payload.id] = selectedItem
             state.itemsLenght--
             state.totalAmount-= action.payload.prix
+        },
+        resetCart: (state) => {
+            state.items =  {}
+            state.cartItems =  []
+            state.totalAmount =  0
+            state.itemsLenght =  0
+            state.type =  ''
+            state.cartMode =  ''
+            state.addToCartSuccess =  false
+            state.newAdded =  {}
+            state.loading =  false
+            state.error =  null
+            state.provenance =  ''
+            state.showModal =  false
+            state.ecommerceModal =  false
+            state.elocationModal =  false
+            state.eserviceModal =  false
+            state.commerceDetailModal =  false
+            state.locationDetailModal =  false
         }
     }
 });
@@ -194,7 +213,7 @@ const shoppingCartSlice = createSlice({
 export default shoppingCartSlice.reducer;
 const {clearCart, dismissItemModal, updateItem, deleteCartItem,cartItemsReceived,
        itemAddedToCart, shoppingCartRequested, shoppingCartRequestFailed,
-       setProvenance, incrementItemQty, decrementItemQty} = shoppingCartSlice.actions
+       setProvenance, incrementItemQty, decrementItemQty, resetCart} = shoppingCartSlice.actions
 //action creators
 
 const url = '/shoppingCarts'
@@ -262,3 +281,7 @@ export const getItemQtyDecrement = (item) => apiRequest({
     onSuccess: decrementItemQty.type,
     onError: shoppingCartRequestFailed.type
 })
+
+export const getShoppingCartReset = () => dispatch => {
+    dispatch(resetCart())
+}

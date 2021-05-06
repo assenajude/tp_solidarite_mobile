@@ -203,7 +203,7 @@ const parrainageSlice = createSlice({
             let selectedOrder = compteOrders.find(order => order.id === action.payload.id)
             selectedOrder.showDetails = !selectedOrder.showDetails
 
-        }
+        },
 
     }
 })

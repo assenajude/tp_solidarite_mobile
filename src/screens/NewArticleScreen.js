@@ -17,7 +17,6 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getHomeCounterIncrement} from "../store/slices/mainSlice";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
 import useDirectUpload from "../hooks/useDirectUpload";
-import {getSignedUrl} from "../store/slices/s3_directUploadSlice";
 import AppUploadProgress from "../components/AppUploadProgress";
 
 
@@ -37,12 +36,12 @@ function NewArticleScreen({route, navigation}) {
     const dispatch = useDispatch();
     const article = route.params
     const espaces = useSelector(state => state.entities.espace.list)
-    const [categorieId, setCategorieId] = useState(1)
     const loading = useSelector(state => state.entities.article.loading)
     const categories = useSelector(state => state.entities.categorie.espaceCategories);
     const [initValues, setInitValues] = useState({})
     const [editMode, setEditMode] = useState(false)
     const [espace, setEspace] = useState(1)
+    const [categorieId, setCategorieId] = useState(categories[0]?.id)
     const [upload, setUpload] = useState(false)
     const [progress, setProgress] = useState(0)
 
@@ -100,21 +99,21 @@ function NewArticleScreen({route, navigation}) {
        }
     }
     const handleAddArticle = async (newArticle) => {
-        const images = newArticle.images
-         const array = dataTransformer(images)
-        setProgress(0)
-        setUpload(true)
-       const uploadSucess =  await directUpload(array, images, (progress) => setProgress(progress))
-        setUpload(false)
-        if(uploadSucess) {
-            let urlDataArray = store.getState().s3_upload.signedRequestArray
-            const imagesUrl = urlDataArray.map(item => item.url)
-            await addArticle(newArticle, imagesUrl)
-        }else {
-            Alert.alert("Alert", "Les images n'ont pas été chargées voulez-vous continuer quand meme?",
-                [{text:'oui', onPress: async () => await addArticle(newArticle, [])},
-                    {text: 'non', onPress: () => {return;}}])
-        }
+         const images = newArticle.images
+          const array = dataTransformer(images)
+         setProgress(0)
+         setUpload(true)
+        const uploadSucess =  await directUpload(array, images, (progress) => setProgress(progress))
+         setUpload(false)
+         if(uploadSucess) {
+             let urlDataArray = store.getState().s3_upload.signedRequestArray
+             const imagesUrl = urlDataArray.map(item => item.url)
+             await addArticle(newArticle, imagesUrl)
+         }else {
+             Alert.alert("Alert", "Les images n'ont pas été chargées voulez-vous continuer quand meme?",
+                 [{text:'oui', onPress: async () => await addArticle(newArticle, [])},
+                     {text: 'non', onPress: () => {return;}}])
+         }
 
     }
 

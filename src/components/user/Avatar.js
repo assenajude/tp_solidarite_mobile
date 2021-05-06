@@ -1,9 +1,8 @@
-import React, {useEffect} from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from "react-native";
+import React from 'react';
+import {View, Image, StyleSheet, TouchableOpacity} from "react-native";
 import {useSelector} from "react-redux";
 import colors from "../../utilities/colors";
 import AppText from "../AppText";
-import {color} from "react-native-reanimated";
 
 
 function Avatar({otherImageStyle,onPress, avatarUrl, ownerUserAvatar, showNottif=true}) {

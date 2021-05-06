@@ -14,12 +14,13 @@ import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import routes from "../navigation/routes";
-import {getConnectedUserData} from "../store/slices/userProfileSlice";
+import {getConnectedUserData, getParrainCompterReset} from "../store/slices/userProfileSlice";
 
 function ListeParrainScreen({navigation}) {
     const dispatch = useDispatch()
     const store = useStore()
     const user = useSelector(state => state.auth.user)
+    const currentUser = useSelector(state => state.profile.connectedUser)
     const loadingParrainage = useSelector(state => state.entities.parrainage.loading)
     const inSponsoringState = useSelector(state => state.entities.parrainage.inSponsoringState)
     const respondMessageState = useSelector(state => state.entities.parrainage.respondMessageState)
@@ -89,6 +90,9 @@ function ListeParrainScreen({navigation}) {
     }
 
     useEffect(() => {
+        if(currentUser.parrainageCompter > 0) {
+            dispatch(getParrainCompterReset({currentUserId: user.id}))
+        }
     }, [])
 
     if(listeAllParrains.length === 0 && parrainageError === null) {

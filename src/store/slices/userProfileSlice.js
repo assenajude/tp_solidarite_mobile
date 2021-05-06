@@ -9,7 +9,6 @@ const profilSlice = createSlice({
         error: null,
         avatar: null,
         notifCompter: 0
-
     },
     reducers: {
         profileRequested: (state, action) => {
@@ -36,13 +35,18 @@ const profilSlice = createSlice({
             state.error = null
             state.avatar = null
             state.notifCompter = 0
+        },
+        resetParrainageCompter: (state, action) => {
+            state.loading = false
+            state.error = null
+            state.connectedUser.parrainageCompter = action.payload.parrainageCompter
         }
     }
 })
 
 export default profilSlice.reducer
 const {connectedUserData, profileRequested,
-    profileRequestFailed, saveInfoEdit, resetConnectedUser} = profilSlice.actions
+    profileRequestFailed, saveInfoEdit, resetConnectedUser, resetParrainageCompter} = profilSlice.actions
 
 
 const url = '/users/me'
@@ -74,6 +78,15 @@ export const getUserCompterReset = (data) => apiRequest({
     data,
     method: 'patch',
     onStart: profileRequested.type,
+    onSuccess: saveInfoEdit.type,
+    onError: profileRequestFailed.type
+})
+
+export const getParrainCompterReset = (data) => apiRequest({
+    url:url+'/resetParrainCompter',
+    data,
+    method: 'patch',
+    onStart: resetParrainageCompter.type,
     onSuccess: saveInfoEdit.type,
     onError: profileRequestFailed.type
 })

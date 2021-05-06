@@ -4,7 +4,6 @@ import * as ImagePicker from 'expo-image-picker'
 import {Entypo} from "@expo/vector-icons";
 
 import colors from "../utilities/colors";
-import logger from '../utilities/logger'
 
 function AppInputImage({imageUrl, changeImage}) {
 
@@ -26,7 +25,7 @@ function AppInputImage({imageUrl, changeImage}) {
                 changeImage({url: image.uri, base64Data:image.base64})
             }
         } catch (e) {
-            logger.log(e)
+            throw new Error(`erreur: ${e}`)
         }
     }
 

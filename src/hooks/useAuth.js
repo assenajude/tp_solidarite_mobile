@@ -4,7 +4,7 @@ import {getUserProfileAvatar} from "../store/slices/authSlice";
 import {getConnectedUserData, getConnectedUserReset} from "../store/slices/userProfileSlice";
 import {getConnectedFavoritesReset, getUserFavoris} from "../store/slices/userFavoriteSlice";
 import {getAdresse, getConnectedAdressesReset} from "../store/slices/userAdresseSlice";
-import {getCartItems} from "../store/slices/shoppingCartSlice";
+import {getCartItems, getShoppingCartReset} from "../store/slices/shoppingCartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {getConnectedMessagesReset, getUserMessages} from "../store/slices/messageSlice";
 import {
@@ -61,6 +61,7 @@ export default useAuth = () => {
         dispatch(getConnectedMessagesReset())
         dispatch(getConnectedUserReset())
         dispatch(getCompteParrainReset())
+        dispatch(getShoppingCartReset())
     }
 
     return {initUserDatas,userRoleAdmin, resetConnectedUserData, formatPrice}

@@ -41,15 +41,6 @@ export default useDirectUpload = () => {
             let uploadSuccess = false
         if(signedArray.length>0 && base64DataArray.length>0){
             for(let i=0; i<base64DataArray.length; i++) {
-                /*const response = await fetch(dataArray[i])
-                const blob = await response.blob()*/
-                /* const uploadResult = await fetch(signedArray[i].signedUrl,{
-                            method: 'PUT',
-                            body:blob
-                        })*/
-                /*   if(uploadResult.ok) {
-                       uploadSuccess = true
-                   } else uploadSuccess = false*/
                 const {fileType} = getFileNameAndType(imagesArray[i].url)
                 const byApiSauce = create({
                     baseURL: signedArray[i].signedUrl
@@ -68,7 +59,10 @@ export default useDirectUpload = () => {
 
                 })
                 if(result.ok) uploadSuccess = true
-                else uploadSuccess = false
+                else {
+                    throw new Error(`error: ${result.data}`)
+                    uploadSuccess = false
+                }
 
             }
         }

@@ -1,7 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 import jwtDecode from 'jwt-decode'
 import dayjs from "dayjs";
-import logger from '../utilities/logger'
 
 
 const tokenKey = 'authToken'
@@ -19,7 +18,7 @@ const storeToken  = async authToken => {
     try{
     await SecureStore.setItemAsync(tokenKey, authToken)
     } catch (e) {
-        logger.log('Impossible de persister le token', e)
+        throw new Error(`error: ${e}`)
     }
 }
 
@@ -29,7 +28,8 @@ const getStoredToken = async () => {
     try {
         return SecureStore.getItemAsync(tokenKey)
     } catch (e) {
-        logger.log(`Impossible d'obtenir le token,  ${e}`)
+        throw new Error(`error: ${e}`)
+
     }
 }
 
@@ -38,7 +38,7 @@ const removeToken = async () => {
     try{
         await SecureStore.deleteItemAsync(tokenKey)
     } catch (e) {
-        logger.log('Impossible de supprimer le token', e)
+        throw new Error(`error: ${e}`)
     }
 }
 
@@ -55,7 +55,7 @@ const getUser = async () => {
         return user
         //return token? jwtDecode(token): null
     } catch (e) {
-        logger.log(`Impossible d'avoir l'utilisateur`, e)
+        throw new Error(`error: ${e}`)
     }
 }
 
