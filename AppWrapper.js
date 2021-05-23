@@ -38,7 +38,7 @@ function AppWrapper(props) {
     }
 
     const errorOnStarting = (error) => {
-        console.log('error starting the app', error)
+        throw new Error('error starting app')
     }
 
     if(!isReady) {

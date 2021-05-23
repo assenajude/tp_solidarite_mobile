@@ -35,9 +35,7 @@ const trancheSlice = createSlice({
             state.loading = false
             state.error = null
             const trancheIndex = state.list.findIndex(tranche => tranche.id === action.payload.id)
-            if(trancheIndex) {
              state.list[trancheIndex] = action.payload
-            }
         }
     }
 })

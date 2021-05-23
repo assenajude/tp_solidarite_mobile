@@ -7,7 +7,6 @@ import {AntDesign} from "@expo/vector-icons";
 import AppButton from "./AppButton";
 import {View} from "react-native";
 import useAuth from "../hooks/useAuth";
-import useManageUserOrder from "../hooks/useManageUserOrder";
 
 function TrancheItem({trancheIndex, trancheMontant, isTranchePayed, tranchePayedDate, trancheDateEcheance,
                          payTranche, payedState, validatePayement}) {

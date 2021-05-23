@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "toutpromo",
-    "slug": "ecommerce-elocation-eservice",
+    "slug": "toopromo-3e",
+    "description": "La meilleure app 3 en 1. E-Commerce, E-Location, E-Service en une seule avec transaction à crédit.",
     "version": "1.0.0",
     "platforms": [
       "ios",
