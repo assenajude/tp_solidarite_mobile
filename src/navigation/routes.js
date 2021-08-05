@@ -49,6 +49,8 @@ export default Object.freeze({
     NEW_SERVICE: 'NewServiceScreen',
     USER_SERVICE: 'UserServiceScreen',
     PARRAINAGE: 'ParrainageScreen',
-    ORDER_PARRAINAGE: 'OrderParrainageScreen'
+    ORDER_PARRAINAGE: 'OrderParrainageScreen',
+    FACTURE_TRANCHE: 'FactureTranche',
+    HOME:'HomeScreen'
 
 })

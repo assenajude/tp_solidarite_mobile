@@ -31,7 +31,7 @@ function FactureDetailsScreen({route}) {
               {facture.montant === facture.solde &&  <AppLottieViewAnim lottieAutoPlay={true} lottieStyle={{height: 50, width: 50}}
                                    lottieSource={require('../assets/animations/done')} lottieLoop={false}/>}
                 {facture.montant !== facture.solde && <AppLottieViewAnim lottieAutoPlay={true} lottieStyle={{height: 50, width: 50}}
-                                   lottieSource={require('../assets/animations/money')} lottieLoop={true}/>}
+                                   lottieSource={require('../assets/animations/money_pending')} lottieLoop={true}/>}
                 <AppDetailCarousel detailLabel='Facture n°: ' labelValue={facture.numero} carouselItems={factureItems}
                                    typeFacture={facture.typeFacture === 'e-commerce'?'Commande':facture.typeFacture === 'e-location'?'Location':'Service'}/>
             </View>

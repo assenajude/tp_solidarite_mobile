@@ -13,9 +13,12 @@ function CartListFooter({totalAmount, getOrder, buttonIsDisabled, readyToGo}) {
                 <AppText style={{fontSize: 20, fontWeight: 'bold'}}>Montant total: </AppText>
                 <AppText style={{fontWeight: 'bold', color: Color.rougeBordeau, fontSize: 20}}>{formatPrice(totalAmount)}</AppText>
             </View>
-           {readyToGo && <View style={styles.orderButton}>
-                <AppButton disableButton={buttonIsDisabled} style={{padding: 15}} onPress={getOrder}  title='Continuer'/>
-            </View>}
+           {readyToGo &&
+                <AppButton style={{
+                    width: '80%',
+                    marginVertical: 50
+                }} disableButton={buttonIsDisabled} onPress={getOrder}  title='Continuer'/>
+       }
         </View>
     );
 }
@@ -25,7 +28,7 @@ const styles = StyleSheet.create( {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 10,
-        marginTop: 20,
+        marginTop: 80,
         borderColor: Color.leger,
         borderWidth: 2,
         borderRadius: 10,
@@ -35,10 +38,6 @@ const styles = StyleSheet.create( {
         alignItems: 'center'
 
     },
-    orderButton: {
-        width: '50%',
-        marginTop: 30
-    }
 })
 
 export default CartListFooter;

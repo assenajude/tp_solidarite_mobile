@@ -36,13 +36,17 @@ const trancheSlice = createSlice({
             state.error = null
             const trancheIndex = state.list.findIndex(tranche => tranche.id === action.payload.id)
              state.list[trancheIndex] = action.payload
+        },
+        showDetials: (state, action) => {
+            let selectedTranche = state.list.find(item => item.id === action.payload.id)
+            if(selectedTranche) selectedTranche.showDetails = !selectedTranche.showDetails
         }
     }
 })
 
 
 export default trancheSlice.reducer
-const {trancheAdded, trancheReceived, trancheRequested, trancheRequestFailed, payTranche} = trancheSlice.actions
+const {trancheAdded, trancheReceived, trancheRequested, trancheRequestFailed, payTranche, showDetials} = trancheSlice.actions
 
 // actions creator
 const url = '/tranches';
@@ -73,3 +77,7 @@ export const getTranchePayed = (tranche) =>apiRequest({
     onSuccess: payTranche.type,
     onError: trancheRequestFailed.type
 })
+
+export const showTrancheDetails = (tranche) => dispatch => {
+    dispatch(showDetials(tranche))
+}

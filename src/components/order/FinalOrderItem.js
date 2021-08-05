@@ -4,6 +4,7 @@ import AppText from "../AppText";
 import colors from "../../utilities/colors";
 import AppButton from "../AppButton";
 import useAuth from "../../hooks/useAuth";
+import AppIconButton from "../AppIconButton";
 
 function FinalOrderItem({header,label1,label1Value,changeLabel3, label2, label2Value, label3,label3Value,label4,label4Value,
                             detailsInfo, getOrderItemDetails, children}) {
@@ -29,7 +30,17 @@ function FinalOrderItem({header,label1,label1Value,changeLabel3, label2, label2V
            {label3Value && <View style={styles.label3}>
                     <AppText style={{fontWeight: 'bold', fontSize: 15}}>{label3}</AppText>
                     <AppText>{label3Value}</AppText>
-                    <AppButton title='changer' onPress={changeLabel3} style={styles.changeButton}/>
+                    <AppButton
+                        height={40}
+                        width={110}
+                        iconColor={colors.dark}
+                        color1={colors.leger}
+                        color2={colors.leger}
+                        color3={colors.leger}
+                        textStyle={{color: colors.dark}}
+                        iconName='back'
+                        title='changer'
+                        onPress={changeLabel3}/>
                 </View>}
             {label4Value &&   <View style={styles.label4}>
                     <AppText style={{fontWeight: 'bold', fontSize: 15}} lineNumber={1}>{label4}</AppText>
@@ -39,7 +50,7 @@ function FinalOrderItem({header,label1,label1Value,changeLabel3, label2, label2V
             {detailsInfo && <View>
                 {children}
             </View>}
-            <AppButton iconName={detailsInfo ?'caretup':'caretdown'} iconColor={colors.blanc} style={{width: 'auto', alignSelf: 'flex-start'}} textStyle={{marginLeft: 5}} title={detailsInfo?'Fermer':'Deplier'} onPress={getOrderItemDetails}/>
+            <AppIconButton iconName={detailsInfo ?'caretup':'caretdown'} iconColor={colors.dark} onPress={getOrderItemDetails}/>
         </View>
     );
 }
@@ -80,11 +91,6 @@ const styles = StyleSheet.create({
         width: 'auto',
         alignSelf: 'flex-start'
     },
-    changeButton: {
-        backgroundColor: 'green',
-        height: 'auto',
-        width: 'auto'
-    }
 
 })
 

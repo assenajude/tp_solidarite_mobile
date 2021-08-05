@@ -3,26 +3,30 @@ import {View, Modal, Animated, TouchableOpacity, StyleSheet} from "react-native"
 import {AntDesign} from "@expo/vector-icons";
 import colors from "../../utilities/colors";
 import AppLabelLink from "../AppLabelLink";
+import AppIconButton from "../AppIconButton";
 
 function UserImageModal({imageModalVisible, dismissImageModal, takePhoto, chooseImage, deleteImage}) {
     return (
         <Modal animated animationType='slide'  transparent visible={imageModalVisible}>
             <View style={styles.overlay}>
                 <Animated.View style={styles.modalContainer} >
-                    <View style={{
-                        alignSelf: 'flex-end'
-                    }}>
-                        <TouchableOpacity onPress={dismissImageModal}>
-                            <AntDesign name="closecircle" size={40} color={colors.rougeBordeau} />
-                        </TouchableOpacity>
-                    </View>
+                    <AppIconButton
+                        buttonContainer={{
+                            alignSelf: 'flex-end',
+                            marginRight: 10,
+                            marginTop: 5
+                        }}
+                        onPress={dismissImageModal}
+                        iconSize={35}
+                        iconColor={colors.rougeBordeau}
+                        iconName='close'/>
                     <View style={{
                         justifyContent: 'center',
                         alignItems: "center"
                     }}>
-                        <AppLabelLink content='prendre une photo'  handleLink={takePhoto}/>
-                        <AppLabelLink content='Choisir une image'  handleLink={chooseImage}/>
-                        <AppLabelLink content='Supprimer la photo' handleLink={deleteImage}/>
+                        <AppLabelLink content='prendre une photo' otherTextStyle={{fontSize: 18}}  handleLink={takePhoto}/>
+                        <AppLabelLink otherTextStyle={{fontSize: 18}} content='Choisir une image'  handleLink={chooseImage}/>
+                        <AppLabelLink otherTextStyle={{fontSize: 18}} content='Supprimer la photo' handleLink={deleteImage}/>
                     </View>
                 </Animated.View>
             </View>
@@ -39,7 +43,8 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         backgroundColor: colors.blanc,
-        paddingBottom: 20
+        paddingBottom: 20,
+        height: 250
     }
 })
 

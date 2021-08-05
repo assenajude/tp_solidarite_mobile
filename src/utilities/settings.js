@@ -2,8 +2,7 @@ import Constants from 'expo-constants'
 
 const settings = {
     dev: {
-        baseURL: "http://192.168.1.178:5000/api"
-        // baseURL: "https://toopromo-backend.herokuapp.com/api"
+        baseURL: "http://192.168.8.102:5000/api"
     },
     staging: {
         baseURL: "https://toopromo-backend.herokuapp.com/api"

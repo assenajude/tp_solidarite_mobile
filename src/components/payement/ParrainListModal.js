@@ -53,8 +53,6 @@ function ParrainListModal({parrainageModalVisible, dismissParrainModal}) {
 
     }
 
-    useEffect(() => {
-    }, [])
 
     return (
         <Modal visible={parrainageModalVisible} transparent>

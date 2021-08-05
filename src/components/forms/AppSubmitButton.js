@@ -4,14 +4,17 @@ import {useFormikContext} from 'formik'
 
 import AppButton from "../AppButton";
 import colors from '../../utilities/colors'
+import AppSmallButton from "../AppSmallButton";
 
-function AppSubmitButton({title, showLoading}) {
+function AppSubmitButton({title, showLoading, width=200}) {
     const {handleSubmit} = useFormikContext()
 
     return (
         <View style={styles.container}>
           {showLoading && <ActivityIndicator size='small' color={colors.blanc}/>}
-          <AppButton style={{width: '60%', padding: 10, marginTop: 10}} onPress={handleSubmit} title={title} />
+          <AppButton
+              width={width}
+              onPress={handleSubmit} title={title} />
         </View>
     );
 }

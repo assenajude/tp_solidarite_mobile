@@ -4,14 +4,15 @@ import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
 import {getColorSizes, getSelectOption} from "../store/slices/mainSlice";
 import useAddToCart from "../hooks/useAddToCart";
-import AppButton from "../components/AppButton";
 import colors from "../utilities/colors";
 import AppLabelLink from "../components/AppLabelLink";
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
-import {getModalDismiss, getProvenanceSet} from "../store/slices/shoppingCartSlice";
 import routes from "../navigation/routes";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import useAuth from "../hooks/useAuth";
+import AppLabelWithContent from "../components/AppLabelWithContent";
+import AppLabelWithValue from "../components/AppLabelWithValue";
+import AppSmallButton from "../components/AppSmallButton";
 
 function LocationDetailScreen({route, navigation}) {
     const dispatch = useDispatch()
@@ -24,8 +25,8 @@ function LocationDetailScreen({route, navigation}) {
         return selectedLocation
     })
 
-    const showItemModal = useSelector(state => state.entities.shoppingCart.locationDetailModal)
-    const addedItem = useSelector(state => state.entities.shoppingCart.newAdded)
+    const [showItemModal,  setShowModal] = useState(false)
+    const [addedItem, setAddedItem] = useState({})
     const isLoading = useSelector(state => state.entities.shoppingCart.loading)
     const locationOptions = useSelector(state => state.entities.main.selectedItemOptions)
     const locationOptionSises = useSelector(state => state.entities.main.selectedColorSizes)
@@ -34,45 +35,75 @@ function LocationDetailScreen({route, navigation}) {
     const [selectedColor, setSelectedColor] = useState('')
     const [selectedSize, setSelectedSize] = useState('')
     const [selectedQty, setSelectedQty] = useState(1)
-    const [selectedPrice, setSelectedPrice] = useState()
 
     const handleChangeImage = (image) => {
         setSelectedImage(image)
     }
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         const isLocationSelected = selectedColor !== '' && selectedSize !== ''
         if(item.ProductOptions.length>0 && !isLocationSelected) {
             return alert('Vous devez choisir une option pour valider.')
         }
     const itemData = {...item, couleur: selectedColor, prix: locSelectedOption.prix, taille: selectedSize, quantite: selectedQty}
-        dispatch(getProvenanceSet('locationDetail'))
-        addItemToCart(itemData)
+        const result = addItemToCart(itemData)
+        if(!result) return;
+        setAddedItem(item)
+        setShowModal(true)
     }
 
 
     if(showItemModal) {
-        return <AddToCartModal itemModalVisible={showItemModal} source={{uri: addedItem.imagesLocation[0]}} designation={addedItem.libelleLocation}
-                               goToHomeScreen={() => dispatch(getModalDismiss())}
-                               goToShoppingCart={() => {
-                                   dispatch(getModalDismiss())
-                                   navigation.navigate('AccueilNavigator', {screen: routes.CART})}} />
+        return <AddToCartModal
+            itemModalVisible={showItemModal}
+            source={{uri: addedItem.imagesLocation[0]}}
+            designation={addedItem.libelleLocation}
+            goToHomeScreen={() => setShowModal(false)}
+            goToShoppingCart={() => {
+                setShowModal(false)
+                navigation.navigate('AccueilNavigator', {screen: routes.CART})}}/>
     }
+
+    if(!item) {
+        return <View style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}>
+            <AppText>Cet article n'est plus en stock</AppText>
+        </View>
+    }
+
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-            <ScrollView style={{marginTop: 20}}>
+            <ScrollView contentContainerStyle={{
+                paddingBottom: 50
+            }}
+            >
                 {userRoleAdmin() &&  <View style={{
                     alignSelf: 'flex-end',
                     marginBottom: 20
                 }}>
                     <View>
-                        <AppButton title='Edit' iconName='edit' iconSize={15} iconColor={colors.blanc} onPress={() => navigation.navigate('E-location', {screen: 'NewLocationScreen', params: item})}/>
-                        <AppButton style={{marginTop: 10}}  title='Supprimer' iconName='delete' iconSize={15} iconColor={colors.blanc}/>
-                        <AppButton style={{marginTop: 10}} title='Add option' iconName='plus' iconSize={15} iconColor={colors.blanc} onPress={() => navigation.navigate('NewOptionScreen', item)}/>
+                            <AppSmallButton
+                                iconName='edit'
+                                title='Edit'
+                                width={120}
+                                onPress={() => navigation.navigate('E-location', {screen: 'NewLocationScreen', params: item})}
+                            />
+
+                        <AppSmallButton
+                            title='Supprimer'
+                            width={120}/>
+
+                            <AppSmallButton
+                                iconName='plus'
+                                onPress={() => navigation.navigate('NewOptionScreen', item)}
+                                width={120} title='Add option'/>
                     </View>
                 </View>}
-                <View style={{margin: 5}}>
+                <View>
                     <Image source={{uri: selectedImage}} style={styles.imageStyle}/>
                 </View>
                 <ScrollView horizontal>
@@ -99,25 +130,16 @@ function LocationDetailScreen({route, navigation}) {
                         <View style={{
                             alignSelf: 'flex-end'
                         }}>
-                            <AppButton style={{padding: 5}} title='Louer' onPress={handleAddToCart}/>
+                                <AppSmallButton
+                                    iconName='shoppingcart'
+                                    title='Louer'
+                                    onPress={handleAddToCart}/>
                         </View>
                     </View>
-                    <View style={{flexDirection: 'row', marginTop: 5}}>
-                        <AppText style={{fontWeight: 'bold'}}>Reste en stock: </AppText>
-                        <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{item.qteDispo}</AppText>
-                    </View>
-                    <View style={{flexDirection: 'row', marginTop: 5}}>
-                        <AppText style={{fontWeight: 'bold'}}>Adresse: </AppText>
-                        <AppText>{item.adresseLocation}</AppText>
-                    </View>
-                    <View style={{flexDirection: 'row', marginTop: 5}}>
-                        <AppText style={{fontWeight: 'bold'}}>Frequence: </AppText>
-                        <AppText>{item.frequenceLocation}</AppText>
-                    </View>
-                    <View style={{flexDirection: 'row', marginTop: 5}}>
-                        <AppText style={{fontWeight: 'bold'}}>Caution: </AppText>
-                        <AppText>{item.nombreCaution}</AppText>
-                    </View>
+                    <AppLabelWithValue label='Reste en stock:' labelValue={item.qteDispo}/>
+                    <AppLabelWithValue label='Situation geographique:' labelValue={item.adresseLocation}/>
+                    <AppLabelWithValue label='Frequence Payement:' labelValue={item.frequenceLocation}/>
+                    <AppLabelWithValue label='Caution:' labelValue={item.nombreCaution}/>
                     {locationOptions.length >= 1 && <View style={{flexDirection: 'row', justifyContent: 'space-between', borderWidth: 0.5}}>
                         <View style={{borderWidth: 1}}>
                             <View style={{backgroundColor: colors.rougeBordeau}}>
@@ -191,10 +213,9 @@ function LocationDetailScreen({route, navigation}) {
                             </View>
                         </View>
                     </View>}
-                    <View style={{flexDirection: 'row', marginTop: 5}}>
-                        <AppText style={{fontWeight: 'bold'}}>Description: </AppText>
-                        <AppText>{item.descripLocation}</AppText>
-                    </View>
+                    <AppLabelWithContent
+                        showSeparator={false}
+                        label="Description" content={item.descripLocation}/>
                 </View>
             </ScrollView>
 
@@ -207,9 +228,8 @@ function LocationDetailScreen({route, navigation}) {
 
 const styles = StyleSheet.create({
     imageStyle: {
-        height: 200,
+        height: 300,
         width: '100%',
-        padding: 10,
         overflow: 'hidden'
     },
     imagesContainer: {

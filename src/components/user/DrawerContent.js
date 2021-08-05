@@ -38,10 +38,14 @@ function DrawerContent(props) {
            <DrawerContentScrollView {...props}>
                <View style={styles.content}>
                    <View>
-
                        <View style={styles.avatar}>
                        <View style={{top: 20, marginBottom: 10}}>
-                           <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>props.navigation.navigate(routes.COMPTE, {...user, ...userData})}  otherImageStyle={{width: 80,height: 80, borderRadius: 40}}/>
+                           <Avatar
+                               loadingStyle={{height:80, width: 80, marginLeft: 10}}
+                               ownerUserAvatar={user.avatar}
+                               avatarUrl={{uri: user.avatar}}
+                               onPress={() =>props.navigation.navigate(routes.COMPTE, {...user, ...userData})}
+                               otherImageStyle={{width: 80,height: 80, borderRadius: 40}}/>
                        </View>
                            <View>
                                <TouchableOpacity onPress={() => props.navigation.navigate(routes.HELP)}>
@@ -64,7 +68,7 @@ function DrawerContent(props) {
                        </View>
                        </TouchableOpacity>}
                         {!isUser && <View style={styles.logStyle}>
-                        <AppButton title='Se connecter'  style={{fontSize: 10, marginRight: 5}} onPress={() => {
+                        <AppButton width={120} height={40} textStyle={{fontSize: 15}} title='Se connecter' onPress={() => {
                             props.navigation.navigate(routes.LOGIN)
                         }}/>
                         <Text>ou</Text>
@@ -78,13 +82,7 @@ function DrawerContent(props) {
                <View style={styles.mainContent}>
                    <View>
                        <DrawerItem icon={({size, color}) => <AntDesign name='home' size={size} color={color}/>}
-                                   label='Accueil' onPress={() => props.navigation.navigate(routes.ACCUEIL)} />
-                   </View>
-                   <View>
-                       <DrawerItem icon={({size, color}) =>
-                           <AppIconWithBadge name='message1' badgeCount={userData.messageCompter}
-                                             notifStyle={{backgroundColor: Color.rougeBordeau}} size={size} color={color} />}
-                           label='Messages' onPress={() => {props.navigation.navigate(routes.USER_MESSAGE)}} />
+                                   label='Accueil' onPress={() => props.navigation.navigate(routes.HOME)} />
                    </View>
                    <View>
                        <DrawerItem icon={({size, color}) =>
@@ -156,15 +154,25 @@ function DrawerContent(props) {
 
 
                    {userRoleAdmin() && <View>
-                       <DrawerItem icon={({size, color}) => <MaterialCommunityIcons name="dots-horizontal" size={size} color={color} />}
-                                   label='Gerer' onPress={() => {props.navigation.navigate('OtherMain')}} />
+                       <DrawerItem
+                           icon={({size, color}) => <MaterialCommunityIcons name="dots-horizontal" size={size} color={color} />}
+                           label='Gerer' onPress={() => {props.navigation.navigate('OtherMain')}} />
                    </View>}
                </View>
                </View>
            </DrawerContentScrollView>
             {isUser &&
-                <AppButton style={{padding: 5, borderRadius: 0, paddingTop: 10, paddingBottom: 10}}  iconName='logout' iconColor={Color.blanc} title='Se deconnecter'
-                           textStyle={{marginLeft: 10}} onPress={() => handleLogout()}/>}
+                <AppButton
+                    color2={Color.leger}
+                    color1={Color.leger}
+                    color3={Color.leger}
+                    width={'90%'}
+                    iconSize={30}
+                    textStyle={{marginLeft: 10, color: Color.rougeBordeau}}
+                    iconName='logout'
+                    iconColor={Color.rougeBordeau}
+                    title='Se deconnecter'
+                     onPress={() => handleLogout()}/>}
         </View>
     );
 }
@@ -172,11 +180,12 @@ function DrawerContent(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start'
     },
     logStyle: {
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     buttonStyle: {
         color: 'red'
@@ -200,11 +209,10 @@ const styles = StyleSheet.create({
     usernameStyle: {
         marginTop: 15,
         paddingBottom: 10,
+        marginHorizontal: 10
     },
     usernameContainer: {
         flexDirection: 'row',
-        marginLeft: 10,
-        marginRight: 10,
         justifyContent: 'space-between'
     },
     avatarImage: {

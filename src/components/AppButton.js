@@ -1,12 +1,16 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity,ActivityIndicator, View} from "react-native";
 import {AntDesign} from '@expo/vector-icons'
+import {LinearGradient} from "expo-linear-gradient";
 
 import colors from '../utilities/colors'
 
-function AppButton({title, buttonLoading, onPress, style, iconName, iconSize, iconColor, textStyle,disableButton, ...props }) {
+function AppButton({width='100%', height=50,color1='#4c669f',color2='#3b5998',color3='#192f6a',title, buttonLoading, onPress, style, iconName, iconSize=25, iconColor='white', textStyle,disableButton, ...props }) {
     return (
-        <TouchableOpacity disabled={disableButton} style={[styles.buttonColor, style]} onPress={onPress} {...props}>
+        <LinearGradient
+            colors={[`${color1}`,`${color2}`,`${color3}`]}
+            style={[styles.buttonStyle, {width:width, height: height}, style]}>
+        <TouchableOpacity disabled={disableButton} onPress={onPress} {...props}>
             <View style={styles.contentStyle}>
                 {buttonLoading && <ActivityIndicator size='small' color={colors.blanc}/>}
             {iconName && <AntDesign name={iconName} size={iconSize} color={iconColor} {...props}/>}
@@ -14,18 +18,17 @@ function AppButton({title, buttonLoading, onPress, style, iconName, iconSize, ic
             </View>
 
         </TouchableOpacity>
+        </LinearGradient>
     );
 }
 
 const styles = StyleSheet.create({
-    buttonColor: {
-        backgroundColor: colors.rougeBordeau,
+    buttonStyle: {
         alignItems: 'center',
-        borderRadius: 25,
-        width: 'auto',
-        paddingLeft: 5,
-        paddingRight: 5,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginVertical: 10,
+        borderRadius: 10,
+        marginHorizontal: 10
     },
     contentStyle: {
         flexDirection: 'row',
@@ -33,8 +36,51 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     textStyle: {
-        color: colors.blanc
+        color: colors.blanc,
+        fontSize: 18
     }
 })
 
 export default AppButton;
+/*
+import React from 'react';
+import {View, TouchableOpacity, Text, StyleSheet} from "react-native";
+import {MaterialCommunityIcons} from "@expo/vector-icons"
+import colors from "../utilities/colors";
+
+
+function AppButton({title,color1='#4c669f',color2='#3b5998',color3='#192f6a', otherButtonStyle, textStyle,iconName,iconSize=30,iconColor='white', onPress}) {
+    return (
+
+        <LinearGradient
+            colors={[`${color1}`,`${color2}`,`${color3}`]}
+            style={[styles.buttonStyle, otherButtonStyle]}>
+            <TouchableOpacity style={[styles.buttonStyle, otherButtonStyle]} onPress={onPress}>
+                <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                }}>
+                    {iconName && <MaterialCommunityIcons name={iconName} size={iconSize} color={iconColor}/>}
+                    <Text style={[styles.textStyle, textStyle]}>{title}</Text>
+                </View>
+            </TouchableOpacity>
+        </LinearGradient>
+    );
+}
+
+const styles = StyleSheet.create({
+    buttonStyle: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 50,
+        marginVertical: 10,
+        width: '100%',
+        borderRadius: 40
+    },
+    textStyle: {
+        color: colors.white,
+        fontSize: 20,
+        marginLeft: 5
+    }
+})
+export default AppButton;*/

@@ -104,23 +104,24 @@ function OrderLivraisonScreen({navigation}) {
                     {adresseByUser.length> 0 && <View style={{
                         marginLeft: 20
                     }}>
-                    {adresseByUser.map((item, index) => <PayementListItem libelle={item.nom}
-                                                                          description={`${item.tel} --- ${item.adresse}`}
-                                                                          key={index}
-                                                                          selectItem={() =>handleSelectItem(item)} checked={item.selected} showDelai={false} showDetail={item.showLivraisonDetail}
-                                                                          getDetails={() => dispatch(getAdLivraisonDetail(item.id))} isAdLivraison={true}
-                                                                          showDetailButton={false}>
-                                                                            <AppLabelWithValue label='Tel: ' labelValue={item.tel}/>
-                                                                            <AppLabelWithValue label='E-mail: ' labelValue={item.email}/>
-                                                                            <AppLabelWithValue label='Autres adresses: ' labelValue={item.adresse}/>
-
-                                                                            </PayementListItem>
-                                                                          )}
+                    {adresseByUser.map((item, index) =>
+                            <PayementListItem
+                                libelle={item.nom}
+                                description={`${item.tel} --- ${item.adresse}`}
+                                key={index}
+                                selectItem={() =>handleSelectItem(item)} checked={item.selected} showDelai={false} showDetail={item.showLivraisonDetail}
+                                getDetails={() => dispatch(getAdLivraisonDetail(item.id))} isAdLivraison={true}
+                                showDetailButton={false}>
+                                <AppLabelWithValue label='Tel: ' labelValue={item.tel}/>
+                                <AppLabelWithValue label='E-mail: ' labelValue={item.email}/>
+                                <AppLabelWithValue label='Autres adresses: ' labelValue={item.adresse}/>
+                            </PayementListItem>
+                    )}
                     </View>}
                     {adresseByUser.length === 0 && <View style={{justifyContent: 'center', marginTop: 50}}>
                         <AppText>Vous n'avez pas d'adresse de livraison</AppText>
                     </View>}
-                        {isAdresseNotEmpty && <AppButton style={styles.buttonStyle} title='continuer' onPress={() => {navigation.navigate(routes.ORDER_PAYEMENT)}}/>}
+                        {isAdresseNotEmpty && <AppButton  style={styles.buttonStyle} title='continuer' onPress={() => {navigation.navigate(routes.ORDER_PAYEMENT)}}/>}
                 </ScrollView>
         </View>
             <View style={{
@@ -153,10 +154,9 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     buttonStyle: {
-        height: 40,
-        width: '50%',
+        width: '70%',
         alignSelf: 'center',
-        marginTop: 30,
+        marginTop: 80,
         marginBottom: 30
     },
     emptyStyle: {

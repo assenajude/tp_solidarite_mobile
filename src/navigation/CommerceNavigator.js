@@ -54,13 +54,16 @@ function CommerceNavigator({navigation}) {
             headerRight: () => <CartIconRight cartLenght={cartItemsLenght} getToCartScreen={() => navigation.navigate('AccueilNavigator', {screen: routes.CART})}/>
         }}>
             <CommerceStackNav.Screen name='CommerceScreen' component={EcommerceScreen} options={{
-                headerTitle: () => <AppTopBar getAllCategories={() => {
-                    dispatch(getSelectedCategoryArticles('all'))
-                    setShowCommerceModal(false)
-                }} getSelectedCategory={handleCategorySelection} categoryList={commerceCategories} searchValue={searchValue} changeSearchValue={(val) => setSearchValue(val)}
-                                              handleSearch={handleCommerceSearch} showSpaceModal={() => setShowCommerceModal(true)}
-                                              closeSpaceModal={() => setShowCommerceModal(false)} spaceModalVisible={showCommerceModal}
-                                              searching={searchingInCommerce} startingSearch={() => setSearchingInCommerce(true)} leaveInput={() => setSearchingInCommerce(false)}/>,
+                headerTitle: () =>
+                    <AppTopBar
+                        getAllCategories={() => {
+                            dispatch(getSelectedCategoryArticles('all'))
+                            setShowCommerceModal(false)
+                        }}
+                        getSelectedCategory={handleCategorySelection} categoryList={commerceCategories} searchValue={searchValue} changeSearchValue={(val) => setSearchValue(val)}
+                        handleSearch={handleCommerceSearch} showSpaceModal={() => setShowCommerceModal(true)}
+                        closeSpaceModal={() => setShowCommerceModal(false)} spaceModalVisible={showCommerceModal}
+                        searching={searchingInCommerce} startingSearch={() => setSearchingInCommerce(true)} leaveInput={() => setSearchingInCommerce(false)}/>,
                 headerLeft: () => <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri: user.avatar}} onPress={() =>navigation.openDrawer()}/>
             }}/>
             <CommerceStackNav.Screen name='NewArticleScreen' component={NewArticleScreen} options={{

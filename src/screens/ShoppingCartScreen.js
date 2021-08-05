@@ -1,7 +1,7 @@
 
 import React, {useState} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {View, FlatList, StyleSheet, ScrollView} from 'react-native'
+import {View, FlatList, StyleSheet, ScrollView, Alert} from 'react-native'
 import CartListFooter from "../components/shoppingCart/CartListFooter";
 import dayjs from "dayjs";
 
@@ -22,6 +22,9 @@ import {
 } from "../store/slices/shoppingCartSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getPayementActive, getPayementDisabled} from "../store/slices/payementSlice";
+import ItemSeparator from "../components/list/ItemSeparator";
+import AppIconButton from "../components/AppIconButton";
+import colors from "../utilities/colors";
 
 function ShoppingCartScreen({navigation}) {
     const dispatch = useDispatch();
@@ -82,19 +85,26 @@ function ShoppingCartScreen({navigation}) {
     }
 
     const handleDeleteItem = (item) => {
-        const itemData = {
-            id: item.id,
-            libelle: item.libelle,
-            image: item.image,
-            prix: item.prix,
-            quantite: 1,
-            montant: item.prix,
-            couleur: item.couleur,
-            taille: item.taille,
-            typeCmde: item.typeCmde,
-            shoppingCartId: item.shoppingCartId,
-        }
-        dispatch(getCartItemDelete(itemData))
+        Alert.alert('Alert', "Voulez-vous supprimer cet article de votre panier?", [{
+            text: 'oui', onPress: () => {
+                const itemData = {
+                    id: item.id,
+                    libelle: item.libelle,
+                    image: item.image,
+                    prix: item.prix,
+                    quantite: 1,
+                    montant: item.prix,
+                    couleur: item.couleur,
+                    taille: item.taille,
+                    typeCmde: item.typeCmde,
+                    shoppingCartId: item.shoppingCartId,
+                }
+                dispatch(getCartItemDelete(itemData))
+            }
+        }, {
+            text: 'non', onPress: () => {return;}
+        }])
+
 
     }
 
@@ -157,25 +167,35 @@ function ShoppingCartScreen({navigation}) {
                 <AppActivityIndicator visible={isLoading}/>
             <ScrollView>
                 <CartListHeader min={true} max={true}/>
-               <CartItem showItemDetails={() => {
+               <CartItem  showItemDetails={() => {
                    navigation.navigate('ServiceDetailScreen', items[0])
                }} deleteItem={() => handleDeleteItem(items[0])} designation={items[0].libelle} source={{uri: items[0].image}}
                min={true} max={true} montantMin={items[0].montantMin} montantMax={items[0].montantMax} icon={true}/>
                 <View style={{
                     flexDirection: 'row',
                     justifyContent: 'space-around',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    marginHorizontal: 20
                 }}>
                     <AppText style={{fontSize: 18, fontWeight: 'bold'}}>Montant à payer: </AppText>
-                    <AppInput keyboardType='number-pad' value={serviceMontant} onChangeText={(newValue) => {
+                    <AppInput
+                        inputContainerStyle={{
+                        width: 120
+                    }}
+                        otherStyle={{
+                        height: 40
+                    }} placeholder='montant' keyboardType='number-pad' value={serviceMontant} onChangeText={(newValue) => {
                         setServiceMontant(newValue)
                     }
                     }/>
                     <View>
-                        <AppButton style={{padding: 5}} title='Appliquer' onPress={() => {
-                           const montant = Number(serviceMontant)
-                            handleUpdateMontant(items[0],montant)
-                        }}/>
+                        <AppIconButton
+                            onPress={() => {
+                                const montant = Number(serviceMontant)
+                                handleUpdateMontant(items[0],montant)
+                            }} iconSize={40}
+                            iconName='checkcircleo'
+                            iconColor={colors.bleuFbi}/>
                     </View>
                 </View>
                 <View style={{flexDirection: 'row',
@@ -190,7 +210,7 @@ function ShoppingCartScreen({navigation}) {
                         <AppText style={{fontSize: 18, fontWeight: 'bold'}}>{dayjs(selectedDate).format('DD/MM/YYYY HH:mm:ss')}</AppText>
                     </View>
                 </View>
-               <CartListFooter readyToGo={itemsLenght>=1 && totalAmount>0} getOrder={handleGetOrder} totalAmount={totalAmount}/>
+               <CartListFooter  readyToGo={itemsLenght>=1 && totalAmount>0} getOrder={handleGetOrder} totalAmount={totalAmount}/>
             </ScrollView>
                 </>
         )
@@ -201,6 +221,7 @@ function ShoppingCartScreen({navigation}) {
             <AppActivityIndicator visible={isLoading}/>
        <FlatList ListHeaderComponent={() => <CartListHeader prix={true} quantite={true} montant={true}/>}
                  data={items} keyExtractor={(item) => item.id.toString()}
+                 ItemSeparatorComponent={ItemSeparator}
                  renderItem={({item}) =>
                      <CartItem showItemDetails={() => {
                          item.typeCmde === 'article'?navigation.navigate({name:routes.ARTICLE_DETAIL, params: {...item, designArticle:item.libelle}}):navigation.navigate(routes.LOCATION_DETAIL, item)

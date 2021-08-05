@@ -15,6 +15,7 @@ import GetLogin from "../components/user/GetLogin";
 import routes from "../navigation/routes";
 import useOrderInfos from "../hooks/useOrderInfos";
 import initData from "../utilities/initData";
+import {getUserCompterReset} from "../store/slices/userProfileSlice";
 
 function UserServiceContratScreen({navigation}) {
     const dispatch = useDispatch()
@@ -35,6 +36,7 @@ function UserServiceContratScreen({navigation}) {
     useEffect(() => {
         if(serviceRefresh>0) {
             dispatch(getOrdersByUser())
+            dispatch(getUserCompterReset({userId: user.id, serviceCompter: true}))
         }
     }, [localServices])
 

@@ -8,10 +8,10 @@ import Avatar from "../user/Avatar";
 import AppButton from "../AppButton";
 
 
-function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername, parrainEmail,
-                             parrainPhone, parrainQuotite,remakeParrainage,getUserProfile,
+function ListParrainItem({avatarUrl,parrainUsername, parrainEmail,
+                             parrainQuotite,remakeParrainage,getUserProfile,
                              sendMessageToParrain, activeCompte, inSponsoring=false, ownerUserAvatar,
-                             compteDetailExist, isParrain, isFilleul,msgResponded=false, parrainageResponseEditing,
+                             isParrain, isFilleul,msgResponded=false, parrainageResponseEditing,
                              editParrainageResponse, sendParrainageResponse, stopParrainage}) {
     return (
         <>
@@ -83,16 +83,6 @@ function ListParrainItem({avatarUrl, parrainNom, parrainPrenom, parrainUsername,
                     <AppText style={{fontWeight: 'bold', fontSize: 18, color: colors.rougeBordeau}}>Quotité</AppText>
                     <AppText style={{marginLeft: 50, fontWeight: 'bold', fontSize: 18, color: colors.rougeBordeau}}>{parrainQuotite} fcfa</AppText>
                 </View>
-                {compteDetailExist && <View style={{alignItems: 'flex-start'}}>
-                 <View>
-                    <View style={{flexDirection: 'row'}}>
-                    <AppText style={{fontWeight: 'bold'}}>{parrainNom}</AppText>
-                    <AppText style={{fontWeight: 'bold'}}>{parrainPrenom}</AppText>
-                </View>
-                 <AppText>{parrainPhone}</AppText>
-                 </View>
-
-             </View>}
             {!activeCompte && <View style={styles.inactive}>
             </View>}
                 {!activeCompte && <View style={styles.inactifText}>

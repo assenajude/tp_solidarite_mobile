@@ -5,7 +5,7 @@ import colors from "../utilities/colors";
 import dayjs from "dayjs";
 import {AntDesign} from "@expo/vector-icons";
 import AppButton from "./AppButton";
-import {View} from "react-native";
+import {View, StyleSheet} from "react-native";
 import useAuth from "../hooks/useAuth";
 
 function TrancheItem({trancheIndex, trancheMontant, isTranchePayed, tranchePayedDate, trancheDateEcheance,
@@ -24,11 +24,30 @@ function TrancheItem({trancheIndex, trancheMontant, isTranchePayed, tranchePayed
             <AppText>{isTranchePayed?'payé le: ' + dayjs(tranchePayedDate).format('DD/MM/YYYY HH:mm:ss'):'avant le: ' + dayjs(trancheDateEcheance).format('DD/MM/YYYY HH:mm:ss')}</AppText>
             {isTranchePayed && payedState && payedState.toLowerCase() === 'confirmed' && <AntDesign name="check" size={24} color="green" />}
             {isTranchePayed && payedState && payedState.toLowerCase() === 'pending' && <AppText style={{color: colors.marronClair}}>en cours...</AppText>}
-            {!isTranchePayed && <AppButton onPress={payTranche} style={{backgroundColor: 'green', width: 'auto', height: 16, marginLeft: 5, paddingRight:5}} title='payer'/>}
-            {userRoleAdmin() && <AppButton title='validate' style={{color: colors.rougeBordeau}} onPress={validatePayement}/>}
+            {!isTranchePayed &&
+            <AppButton
+                width={100}
+                height={35}
+                onPress={payTranche}
+                title='payer'/>}
+            {userRoleAdmin() &&
+            <AppButton
+                width={100}
+                height={35}
+                title='validate'
+                style={{color: colors.rougeBordeau}}
+                onPress={validatePayement}/>}
         </View>
         </ScrollView>
     );
 }
 
+const styles = StyleSheet.create({
+    payStyle:{
+        backgroundColor: 'green',
+        width: 'auto',
+        height: 16,
+        marginLeft: 5,
+        paddingRight:5}
+})
 export default TrancheItem;

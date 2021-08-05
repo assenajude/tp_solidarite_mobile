@@ -7,7 +7,6 @@ function ListItem({imageUrl, propriety2, propriety3, propriety4}) {
         <TouchableOpacity>
         <View style={styles.container}>
             <Image source={imageUrl} style={styles.imageStyle}/>
-
             <AppText lineNumber={1} style={styles.info}>{propriety2}   {propriety3}   {propriety4}</AppText>
 
         </View>

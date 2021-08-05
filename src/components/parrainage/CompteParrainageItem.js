@@ -4,6 +4,7 @@ import AppText from "../AppText";
 import colors from "../../utilities/colors";
 import AppInput from "../AppInput";
 import AppButton from "../AppButton";
+import AppSmallButton from "../AppSmallButton";
 
 function CompteParrainageItem({fonds, fondsLabel,fondContainerStyle,
                                   editFundValue=false, annuleEdit,
@@ -19,8 +20,8 @@ function CompteParrainageItem({fonds, fondsLabel,fondContainerStyle,
             <AppText style={{fontWeight: 'bold'}}>{fonds} fcfa</AppText>
             </View>
             {editFundValue && <View>
-                <AppInput value={editValue} onChangeText={onEditValueChange} keyboardType='numeric'/>
-                <AppButton onPress={annuleEdit} title='fermer' style={{alignSelf: 'flex-end'}}/>
+                <AppInput inputMainContainer={{backgroundColor: colors.blanc}} value={editValue} onChangeText={onEditValueChange} keyboardType='numeric'/>
+                <AppSmallButton onPress={annuleEdit} title='fermer' style={{alignSelf: 'flex-end'}}/>
             </View>}
         </View>
     );

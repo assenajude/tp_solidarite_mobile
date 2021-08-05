@@ -1,15 +1,14 @@
 import React from 'react';
-import {View, TextInput,TouchableOpacity, StyleSheet, Modal, Image, FlatList} from 'react-native'
-import {EvilIcons, FontAwesome, MaterialCommunityIcons,AntDesign} from '@expo/vector-icons'
+import {View, TextInput,TouchableOpacity, StyleSheet, Modal,FlatList} from 'react-native'
+import {EvilIcons,AntDesign} from '@expo/vector-icons'
 import Color from '../utilities/colors'
 import AppText from "./AppText";
 import CategoryItem from "./list/CategoryItem";
 
 
 function AppTopBar({style, leaveInput, changeSearchValue, searchValue, handleSearch, searching,
-                       startingSearch, selectSpace, homeModalVisible, selectedSpace,
-                       availableSpace, showHomeModal, espace, showSpaceModal, spaceModalVisible,
-                       closeSpaceModal, closeHomeModal, categoryList, getSelectedCategory,getAllCategories}) {
+                       startingSearch, espace, showSpaceModal, spaceModalVisible,
+                       closeSpaceModal, categoryList, getSelectedCategory,getAllCategories}) {
 
 
 
@@ -24,46 +23,12 @@ function AppTopBar({style, leaveInput, changeSearchValue, searchValue, handleSea
                 </View>
             </TouchableOpacity>
                <View style={{marginLeft: 40}}>
-                   {espace==="home" && <TouchableOpacity onPress={showHomeModal}>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                       <AppText  style={{color: Color.blanc, marginRight: 5}}>{selectedSpace}</AppText>
-                       <FontAwesome name="caret-down" size={24} color="white" />
-                       </View>
-                       </TouchableOpacity>
-                       }
                       {espace !== 'home' && <TouchableOpacity onPress={showSpaceModal}>
                       <View>
-                           <MaterialCommunityIcons name="select-group" size={24} color="white" />
+                           <AntDesign name="appstore-o" size={25} color="white" />
                        </View>
                       </TouchableOpacity>
                       }
-
-                  {espace === 'home' && <Modal visible={homeModalVisible} animationType='slide' transparent>
-                      <View style={{
-                          height: '100%',
-                          marginTop: '15%',
-                          backgroundColor: Color.dark,
-                          opacity: 0.2
-                      }}>
-                      </View>
-                       <View style={styles.modalStyle}>
-                           <View style={{alignSelf: 'flex-end',marginRight: 20, marginTop: 20}}>
-                               <TouchableOpacity onPress={closeHomeModal}>
-                                   <AntDesign name="closecircle" size={30} color={Color.rougeBordeau} />
-                               </TouchableOpacity>
-                           </View>
-                       {availableSpace.map((item) => <View key={item} style={{width: '100%'}}>
-                               <TouchableOpacity onPress={() => selectSpace(item)}>
-                                   <View style={{flexDirection: 'row', margin:10}}>
-                                   <Image resizeMode='contain' source={item === 'e-commerce'?require('../assets/charrette.jpg'):item=== 'e-location'?require('../assets/location.jpg'):require('../assets/commerceLocation_1.png')}
-                                          style={{height:item==='tous'?120:80, width:item==='tous'?120:80}}/>
-                                   <AppText  style={{color: Color.rougeBordeau, fontWeight: 'bold', marginLeft: 20}}>{item}</AppText>
-                                   </View>
-                               </TouchableOpacity>
-                           </View>
-                           )}
-                       </View>
-                   </Modal>}
                   {espace !== 'home' && <Modal visible={spaceModalVisible} animation='slide' transparent>
                        <View style={styles.modalContainer}>
                            <View style={{alignSelf: 'flex-end', margin: 20}}>
@@ -74,7 +39,6 @@ function AppTopBar({style, leaveInput, changeSearchValue, searchValue, handleSea
                            <View style={styles.allCategoriesStyle}>
                                <TouchableOpacity onPress={getAllCategories}>
                                    <View style={{alignItems: 'center'}}>
-                                   <AntDesign name="appstore-o" size={24} color="white" />
                                    <AppText style={{color:Color.blanc}}>Tous</AppText>
                                    </View>
                                </TouchableOpacity>
@@ -118,15 +82,14 @@ const styles = StyleSheet.create({
     },
     modalStyle:{
         backgroundColor: Color.blanc,
-        height: '70%',
+        height: '55%',
         width: '100%',
         alignItems: 'flex-start',
         position: 'absolute',
-        top: 60
-
+        top: 180,
     },
     modalContainer:{
-        marginTop: '15%',
+        marginTop: '12%',
         backgroundColor: Color.blanc,
         height: '100%',
         alignItems: 'center',
@@ -136,9 +99,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         justifyContent: 'center',
         backgroundColor: Color.bleuFbi,
-        width: 60,
-        height: 60,
-        borderRadius: 30
+        width: 80,
+        height: 80,
+        borderRadius: 40
     }
 })
 

@@ -21,7 +21,6 @@ import userServiceSlice from './slices/userServiceSlice'
 import userFavoriteSlice from './slices/userFavoriteSlice'
 import propositionSlice from './slices/propositionSlice'
 import faqSlice from './slices/faqSlice'
-import messageSlice from './slices/messageSlice'
 import parrainageSlice from './slices/parrainageSlice'
 
 export default combineReducers({
@@ -46,7 +45,6 @@ export default combineReducers({
     userFavorite: userFavoriteSlice,
     proposition: propositionSlice,
     faq: faqSlice,
-    message: messageSlice,
     parrainage: parrainageSlice
 
 })

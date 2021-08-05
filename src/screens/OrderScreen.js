@@ -92,13 +92,16 @@ function OrderScreen({navigation}) {
             <AppActivityIndicator visible={loading}/>
         <View style={styles.container}>
                 <View style={styles.header}>
-                    <AppText style={{color: Color.blanc}}>Verifiez les details de votre commande puis finaliser</AppText>
+                    <View>
+                        <AppModePayement modePayement={selectedPayemet.mode}/>
+                    </View>
+                    <View style={{width: '90%'}}>
+                        <AppText style={{color: Color.blanc}}>Veuillez verifier les details de votre commande puis finaliser</AppText>
+                    </View>
                 </View>
             <ScrollView>
                 <View>
-                    <View style={{flexDirection: 'row', justifyContent: 'flex-end', margin: 20}}>
-                        <AppModePayement modePayement={selectedPayemet.mode}/>
-                    </View>
+
                     {selectedPayemet.mode.toLowerCase() === 'credit' && <View>
                         <View style={{backgroundColor: Color.rougeBordeau, alignSelf: 'center'}}>
                             <AppText style={{color: Color.blanc}}>Option de couverture</AppText>
@@ -153,7 +156,7 @@ function OrderScreen({navigation}) {
 
                         </FinalOrderItem>}
 
-                <FinalOrderItem  header='Payement' label1='Mode: ' label1Value={selectedPayemet.mode}
+                <FinalOrderItem  header='Mode de payement' label1='Mode: ' label1Value={selectedPayemet.mode}
                 label2={`Taux d'interet (${getTauxPercent()}%): `} label2Value={getPayementRate()} label3='Plan: '
                                 label3Value={currentPlan.libelle} changeLabel3={() => navigation.navigate(routes.ORDER_PAYEMENT)} label4='Description:' label4Value={currentPlan.descripPlan}
                                  detailsInfo={currentPlan.CurrentPlanDetail} isPayement={true} getOrderItemDetails={() => dispatch(getCurrentPlanDetail())}>
@@ -177,7 +180,7 @@ function OrderScreen({navigation}) {
                     <AppText style={{fontSize: 20, fontWeight: 'bold'}}>Montant total TTC: </AppText>
                     <AppText style={{color: Color.rougeBordeau, fontSize: 20, fontWeight: 'bold'}}>{formatPrice(getTotal())}</AppText>
                 </View>
-                 <AppButton onPress={saveOrder} textStyle={{fontWeight: 'bold', fontSize: 15}} style={styles.finalButton}
+                 <AppButton onPress={saveOrder} textStyle={{fontWeight: 'bold', fontSize: 18}} style={styles.finalButton}
                             title='Finaliser votre demande'/>
             </ScrollView>
              </View>
@@ -189,7 +192,6 @@ function OrderScreen({navigation}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        top: 20,
         marginBottom: 40,
     },
     emptyStyle: {
@@ -206,12 +208,16 @@ const styles = StyleSheet.create({
 
     },
     header: {
-        backgroundColor: Color.rougeBordeau
+        alignItems: 'center',
+        backgroundColor: Color.rougeBordeau,
+        flexDirection: 'row',
+        height: 80,
+        paddingRight: 20
     },
     finalButton: {
         backgroundColor: Color.rougeBordeau,
-        width: '50%',
-        height: 40,
+        width: '70%',
+        height: 50,
         alignSelf: 'center',
         margin: 40,
         elevation: 20
@@ -246,8 +252,5 @@ const styles = StyleSheet.create({
     modalHeader: {
         alignSelf: 'flex-start'
     },
-    modalMainContainer: {
-
-    }
 })
 export default OrderScreen;

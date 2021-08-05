@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, StyleSheet,ScrollView, TextInput, TouchableOpacity, View} from "react-native";
+import {StyleSheet,ScrollView, TextInput, TouchableOpacity, View} from "react-native";
 import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
 import usePlaceOrder from "../hooks/usePlaceOrder";
@@ -73,9 +73,8 @@ function OrderParrainageScreen({navigation}) {
                 <View style={{ borderWidth: 1, width: '90%',borderRadius: 20,
                     justifyContent: 'center', alignItems: 'center', margin: 10}}>
                     <View style={{flexDirection: 'row'}}>
-                    <AppText style={{fontWeight: 'bold'}}>Couverture parrains: </AppText>
                     <AppText style={{color: colors.rougeBordeau}}> {formatPrice(totalParrains)}</AppText>
-                    <AppText>/</AppText>
+                    <AppText style={{color: colors.dark}}>/</AppText>
                     <AppText>{formatPrice(getTotal()-getPayementRate())}</AppText>
                     </View>
                 </View>
@@ -133,7 +132,7 @@ function OrderParrainageScreen({navigation}) {
 
                 }}>
                     <AppText>Aucun parrain trouvé.</AppText>
-                    <AppButton style={{paddingLeft: 10, paddingRight: 10, padding: 5}} title='Ajouter' onPress={() => navigation.navigate('Parrainage', {screen: 'ListeParrainScreen'})}/>
+                    <AppButton width={200} style={{marginVertical: 50}} title='Ajouter' onPress={() => navigation.navigate('Parrainage', {screen: 'ListeParrainScreen'})}/>
                 </View>}
             </ScrollView>
         </>

@@ -18,6 +18,8 @@ import routes from "../navigation/routes";
 import CompteParrainageItem from "../components/parrainage/CompteParrainageItem";
 import useAuth from "../hooks/useAuth";
 import ItemSeparator from "../components/list/ItemSeparator";
+import AppIconButton from "../components/AppIconButton";
+import AppSmallButton from "../components/AppSmallButton";
 
 function CompteParrainScreen({navigation}) {
 
@@ -86,8 +88,12 @@ function CompteParrainScreen({navigation}) {
         return (
             <View style={styles.noCompteStyle}>
                 <AppText>Vous n'avez pas de compte de parrainage</AppText>
-                <AppButton title='Créer' style={{padding: 5, paddingLeft: 15, paddingRight: 15}}
-                           onPress={handleCreateParrainCompte}/>
+                <AppButton
+                    textStyle={{marginLeft: 5}}
+                    iconName='adduser'
+                    width={120}
+                    title='Créer'
+                    onPress={handleCreateParrainCompte}/>
             </View>
         )
     }
@@ -97,14 +103,17 @@ function CompteParrainScreen({navigation}) {
             <FlatList ItemSeparatorComponent={()=><ItemSeparator/>} data={comptesParrain} keyExtractor={item => item.id.toString()}
                       renderItem={({item}) =>
                           <View style={{paddingTop: 20, backgroundColor: colors.blanc}}>
-                              {userRoleAdmin() && <View style={{alignSelf: 'flex-end', marginTop: 10, marginRight:20}}>
-                                  <TouchableOpacity onPress={handleCreateParrainCompte}>
-                                      <Entypo name="add-to-list" size={24} color={colors.bleuFbi} />
-                                  </TouchableOpacity>
-                                  <View style={{margin: 10}}></View>
-                                  <TouchableOpacity onPress={() => handleActiveCompte(item)}>
-                                      <MaterialCommunityIcons name="account-edit" size={30} color={colors.rougeBordeau} />
-                                  </TouchableOpacity>
+                              {userRoleAdmin() && <View style={{alignSelf: 'flex-end', marginRight:20}}>
+                                  <AppIconButton
+                                      buttonContainer={styles.iconButtonStyle}
+                                      iconColor={colors.bleuFbi}
+                                      onPress={handleCreateParrainCompte}
+                                      iconName='addusergroup'/>
+                                  <AppIconButton
+                                      buttonContainer={[styles.iconButtonStyle, {marginTop: 10}]}
+                                      iconColor={colors.vert}
+                                      onPress={() => handleActiveCompte(item)}
+                                      iconName='edit'/>
                               </View>}
                               {!item.active && <View style={styles.inactive}>
                                   <Entypo name="warning" size={24} color={colors.or} />
@@ -126,7 +135,7 @@ function CompteParrainScreen({navigation}) {
                                   <View>
                                       <View style={{flexDirection: 'row'}}>
                                           <AppText style={{fontWeight: 'bold'}}>{item.User.nom?item.User.nom:"pas de nom"}</AppText>
-                                          {!item.User.nom && <TouchableOpacity onPress={() => navigation.navigate(routes.Compte, item.User)}>
+                                          {!item.User.nom && <TouchableOpacity onPress={() => navigation.navigate(routes.COMPTE, item.User)}>
                                               <AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}>Ajouter</AppText>
                                           </TouchableOpacity>}
                                       </View>
@@ -139,40 +148,57 @@ function CompteParrainScreen({navigation}) {
                                   </View>
                               </View>
                               <View style={styles.compteParrain}>
-                                  <CompteParrainageItem fondContainerStyle={{borderTopWidth: 1}} fondsLabel='Fonds initial' fonds={item.initial} editFundValue={item.editInitial}
-                                                        annuleEdit={() => {
-                                                            setEditInitialValue('')
-                                                            dispatch(getStartInitialEdit(item))
-                                                        }} editValue={editInitialValue}
-                                                        onEditValueChange={val => setEditInitialValue(String(val))}>
-                                      {item.editInitial && <AppButton title='Valider' iconName='save' iconColor={colors.blanc} style={{margin: 10}}
-                                                                 textStyle={{marginLeft: 5}} onPress={()=> handleSaveInitialEdit(item)}/>}
-                                      {!item.editInitial && <AppButton title='editer' iconName='edit' iconColor={colors.blanc}
-                                                                  style={{margin: 10}} textStyle={{marginLeft: 5}} onPress={() => {
-                                                                      dispatch(getStartInitialEdit(item))
-                                                                  }}/>}
+                                  <CompteParrainageItem
+                                      fondContainerStyle={{backgroundColor: colors.lightGrey}}
+                                      fondsLabel='Fonds initial'
+                                      fonds={item.initial}
+                                      editFundValue={item.editInitial}
+                                      annuleEdit={() => {
+                                          setEditInitialValue('')
+                                          dispatch(getStartInitialEdit(item))
+                                      }} editValue={editInitialValue}
+                                      onEditValueChange={val => setEditInitialValue(String(val))}>
+                                      {item.editInitial &&
+                                          <AppSmallButton
+                                              title='Valider'
+                                              iconName='save'
+                                              onPress={()=> handleSaveInitialEdit(item)}
+                                          />}
+                                      {!item.editInitial &&
+                                      <AppSmallButton
+                                          title='editer'
+                                          iconName='edit'
+                                          onPress={() => {dispatch(getStartInitialEdit(item))
+                                          }}/>}
                                   </CompteParrainageItem>
-                                  <CompteParrainageItem fonds={item.gain} fondsLabel='Gain' labelStyle={{color: colors.vert}}
-                                                        fondContainerStyle={{ borderTopWidth: 1}}>
+                                  <CompteParrainageItem
+                                      fonds={item.gain} fondsLabel='Gain' labelStyle={{color: colors.vert}}
+                                      fondContainerStyle={{ backgroundColor: colors.lightGrey}}>
                                       <MaterialCommunityIcons name="credit-card-plus" size={24} color={colors.vert} />
                                   </CompteParrainageItem>
-                                  <CompteParrainageItem fondContainerStyle={{borderTopWidth: 1}} fondsLabel='Depenses' fonds={item.depense} labelStyle={{color: colors.rougeBordeau}}>
+                                  <CompteParrainageItem
+                                      fondContainerStyle={{backgroundColor: colors.lightGrey}}
+                                      fondsLabel='Depenses'
+                                      fonds={item.depense}
+                                      labelStyle={{color: colors.rougeBordeau}}>
                                       <MaterialCommunityIcons name="credit-card-minus" size={24} color={colors.rougeBordeau} />
                                   </CompteParrainageItem>
-                                  <CompteParrainageItem fondContainerStyle={{borderTopWidth: 1, borderBottomWidth: 1}} fondsLabel='Quotité' fonds={item.quotite}
-                                                        editFundValue={item.editQuotite}
-                                                        annuleEdit={() => {
-                                                            dispatch(getStartQuotiteEdit(item))
-                                                            setEditQuotiteValue('')
-                                                        }} editValue={editQuotiteValue}
-                                                        onEditValueChange={(val) => setEditQuotiteValue(String(val))}>
-                                      {!item.editQuotite && <AppButton title='editer' iconName='edit' iconColor={colors.blanc}
-                                                                  style={{margin: 10}} textStyle={{marginLeft: 5}}
-                                                                  onPress={() => dispatch(getStartQuotiteEdit(item))}/>}
-                                      {item.editQuotite && <AppButton title='Valider' iconName='save' iconColor={colors.blanc}
-                                                                 style={{margin: 10}} textStyle={{marginLeft: 5}}
-                                                                 onPress={()=>handleSaveEditQuotite(item)}/>}
-
+                                  <CompteParrainageItem
+                                      fondContainerStyle={{backgroundColor: colors.lightGrey}} fondsLabel='Quotité' fonds={item.quotite}
+                                      editFundValue={item.editQuotite}
+                                      annuleEdit={() => {
+                                          dispatch(getStartQuotiteEdit(item))
+                                          setEditQuotiteValue('')
+                                      }} editValue={editQuotiteValue}
+                                      onEditValueChange={(val) => setEditQuotiteValue(String(val))}>
+                                      {!item.editQuotite &&
+                                      <AppSmallButton
+                                          title='editer' iconName='edit'
+                                          onPress={() => dispatch(getStartQuotiteEdit(item))}/>}
+                                      {item.editQuotite &&
+                                      <AppSmallButton
+                                          title='Valider' iconName='save'
+                                          onPress={()=>handleSaveEditQuotite(item)}/>}
                                   </CompteParrainageItem>
                                   <View style={styles.soldeContainer}>
                                       <View style={{flexDirection: 'row'}}>
@@ -206,15 +232,22 @@ const styles = StyleSheet.create({
     },
     soldeContainer: {
         flexDirection: 'row',
-        backgroundColor: colors.blanc,
+        backgroundColor: colors.leger,
         justifyContent: 'space-around',
         padding: 40,
-        marginTop: 20,
-        marginBottom: 20,
+        marginVertical: 20,
+        marginHorizontal: 25,
+        borderRadius: 20
     },
     inactive: {
         flexDirection: 'row',
         alignSelf: 'center'
+    },
+    iconButtonStyle: {
+        height: 60,
+        width: 60,
+        borderRadius: 30,
+        backgroundColor: colors.leger
     }
 })
 export default CompteParrainScreen;

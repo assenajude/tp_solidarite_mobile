@@ -10,7 +10,12 @@ function AppFormField({name, title, ...props}) {
 
     return (
         <>
-            <AppInput title={title} value={values[name]}
+            <AppInput
+                inputMainContainer={{
+                    borderWidth: 0.5,
+                    borderRadius:10
+                }}
+                title={title} value={values[name]}
                 onBlur={() => setFieldTouched(name) }
                 onChangeText={handleChange(name)} {...props}
             />

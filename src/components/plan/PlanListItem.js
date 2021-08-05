@@ -1,18 +1,38 @@
-import React from 'react';
-import {View, TouchableOpacity, StyleSheet, Image} from 'react-native'
+import React, {useState} from 'react';
+import {View, TouchableWithoutFeedback, StyleSheet, Image} from 'react-native'
 import colors from "../../utilities/colors";
 import AppText from "../AppText";
-import AppButton from "../AppButton";
+import AppSmallButton from "../AppSmallButton";
+import AppLottieViewAnim from "../AppLottieViewAnim";
+import LottieView from 'lottie-react-native'
 
 function PlanListItem({onPress, planImage, imageStyle, imageDispo, label, description, getPlanDetail}) {
+
+    const [imageLoading, setImageLoading] = useState(true)
+
     return (
-        <TouchableOpacity onPress={onPress}>
+        <TouchableWithoutFeedback onPress={onPress}>
           <View style={styles.container}>
-            {imageDispo && <>
-                   <Image source={planImage} style={[styles.planImageStyle, imageStyle]}/>
+            {imageDispo && <View style={{width: '100%'}}>
+                <View>
+                   <Image onLoadEnd={() => setImageLoading(false)}
+                       source={planImage}
+                       style={[styles.planImageStyle, imageStyle]}/>
+                   {imageLoading && <View style={styles.loadingContainer}>
+                   <LottieView
+                       style={{
+                           width: 200,
+                           height: 200,
+                       }}
+                       source={require('../../assets/animations/image-loading')}
+                       loop={true}
+                       autoPlay={true}/>
+
+                   </View>}
+                </View>
                     <AppText style={{color: colors.rougeBordeau, fontSize: 25, fontWeight:'bold'}}>{label}</AppText>
                     <AppText>{description}</AppText>
-                </>}
+                </View>}
               {!imageDispo && <View>
                   <View style={{height: 200, justifyContent: 'center', alignItems: 'center'}}>
                     <AppText style={{color: colors.rougeBordeau, fontSize: 25, fontWeight: 'bold'}}>{label}</AppText>
@@ -20,9 +40,10 @@ function PlanListItem({onPress, planImage, imageStyle, imageDispo, label, descri
                   <AppText>{description}</AppText>
               </View>}
 
-              <AppButton title='+ Details' onPress={getPlanDetail}/>
+              <AppSmallButton
+                  title='+ Details' onPress={getPlanDetail}/>
           </View>
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
     );
 }
 
@@ -31,13 +52,19 @@ const styles = StyleSheet.create({
       backgroundColor: colors.blanc,
         justifyContent: 'center',
         alignItems: "center",
-        padding: 5,
-        marginBottom: 20,
-        marginTop: 20
+        marginVertical: 20,
     },
     planImageStyle: {
+        height: 250,
+        width: '100%'
+    },
+    loadingContainer: {
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
-        height: 200
+        backgroundColor: colors.leger,
+        height: 250
     }
 })
 

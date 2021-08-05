@@ -18,12 +18,6 @@ const Drawer = createDrawerNavigator();
 
 
 function UserCompteNavigation(props) {
-    const dispatch = useDispatch()
-
-
-
-
-
     return (
                 <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props}/>}
                                   drawerContentOptions={{
@@ -31,7 +25,7 @@ function UserCompteNavigation(props) {
                                       activeBackgroundColor:Color.rougeBordeau
                                   }
                                   }>
-                    <Drawer.Screen name='AccueilScreen' component={TabNavigation}/>
+                    <Drawer.Screen name='BottomTabNavigator' component={TabNavigation}/>
                     <Drawer.Screen name='OtherMain' component={OtherFileNavigator}/>
                     <Drawer.Screen name='OrderSuccessScreen' component={OrderSuccessScreen}/>
                     <Drawer.Screen name='Location' component={LocationNavigator}/>

@@ -6,13 +6,13 @@ import {getConnectedFavoritesReset, getUserFavoris} from "../store/slices/userFa
 import {getAdresse, getConnectedAdressesReset} from "../store/slices/userAdresseSlice";
 import {getCartItems, getShoppingCartReset} from "../store/slices/shoppingCartSlice";
 import {useDispatch, useSelector} from "react-redux";
-import {getConnectedMessagesReset, getUserMessages} from "../store/slices/messageSlice";
 import {
     getAllParrains,
     getCompteParrainReset,
     getUserParrainageCompte,
     getUserParrains
 } from "../store/slices/parrainageSlice";
+import dayjs from "dayjs";
 
 let useAuth;
 export default useAuth = () => {
@@ -21,10 +21,18 @@ export default useAuth = () => {
     const isUser = Object.keys(user).length>0
 
     const formatPrice = (price) => {
-        const formated = price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+        let formated = 0;
+        if(price) {
+            formated = price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+        }
         return `${formated} XOF`
     }
 
+    const formatDate = (date) => {
+        let formated = 'no date found'
+        if(date) formated = dayjs(date).format('DD/MM/YYYY HH:mm:ss')
+        return formated
+    }
     const userRoleAdmin = () => {
         if (Object.entries(user).length > 0){
             const adminIndex = user.roles.indexOf('ROLE_ADMIN')
@@ -35,7 +43,7 @@ export default useAuth = () => {
         return false
     }
 
-    const initUserDatas = () => {
+    const initUserDatas =  () => {
         dispatch(getUserProfileAvatar())
         dispatch(getConnectedUserData())
         dispatch(getOrdersByUser())
@@ -43,7 +51,6 @@ export default useAuth = () => {
         dispatch(getUserFavoris())
         dispatch(getAdresse())
         dispatch(getCartItems())
-        dispatch(getUserMessages())
         if(isUser) {
         dispatch(getAllParrains({userId: user.id}))
         dispatch(getUserParrainageCompte({userId: user.id}))
@@ -58,11 +65,22 @@ export default useAuth = () => {
         dispatch(getConnectedFacturesReset())
         dispatch(getConnectedFavoritesReset())
         dispatch(getConnectedAdressesReset())
-        dispatch(getConnectedMessagesReset())
         dispatch(getConnectedUserReset())
         dispatch(getCompteParrainReset())
         dispatch(getShoppingCartReset())
     }
 
-    return {initUserDatas,userRoleAdmin, resetConnectedUserData, formatPrice}
+    const dataSorter = (data) => {
+        let sorTable = data
+        if (data && data.length >0) {
+            sorTable.sort((a, b) => {
+                if(a.createdAt > b.createdAt) return -1
+                if(a.createdAt < b.createdAt) return 1
+                return 0
+            })
+        }
+        return sorTable
+    }
+
+    return {initUserDatas,userRoleAdmin, resetConnectedUserData, formatPrice, formatDate, dataSorter}
 }

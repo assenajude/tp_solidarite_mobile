@@ -2,7 +2,6 @@ import * as SecureStore from "expo-secure-store";
 import jwtDecode from 'jwt-decode'
 import dayjs from "dayjs";
 
-
 const tokenKey = 'authToken'
 
 const expireIn = (user) => {
@@ -48,7 +47,6 @@ const getUser = async () => {
         if(!token) return null
         const user = jwtDecode(token)
         if(expireIn(user)) {
-            logger.log('token is expired...')
             await removeToken()
             return null
         }

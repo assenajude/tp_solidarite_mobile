@@ -1,6 +1,5 @@
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity, ScrollView, Image} from "react-native";
-import dayjs from "dayjs";
 import AppText from "../AppText";
 import colors from "../../utilities/colors";
 import ContratWatch from "../order/ContratWatch";
@@ -9,25 +8,42 @@ import AppLabelWithValue from "../AppLabelWithValue";
 import AppModePayement from "../AppModePayement";
 import StatusPicker from "../order/StatusPicker";
 import FactureItemLabel from "./FactureItemLabel";
-import AppButton from "../AppButton";
-import ItemIconButton from "./ItemIconButton";
 import {MaterialIcons, Entypo} from '@expo/vector-icons'
+import AppIconButton from "../AppIconButton";
+import AppSmallButton from "../AppSmallButton";
+import useAuth from "../../hooks/useAuth";
+import useOrderInfos from "../../hooks/useOrderInfos";
+import initData from "../../utilities/initData";
+import useManageUserOrder from "../../hooks/useManageUserOrder";
+import routes from "../../navigation/routes";
+import {useNavigation} from '@react-navigation/native'
+import {getItemDetail} from "../../store/slices/orderSlice";
 
-function UserOrderItem({
-                           numero,header,showDetail,orderItems, datePrevue, contrats,contratStatus,isDemande,isContrat,isHistorique,contratStatusStyle,
-                           deleteItem,changeLivraisonValue,livraisonValue,goToItemDetails,
-                           fraisLivraison,tauxInteret,statusAccordValue,isExpired,expireIn,
-                           changeAccordEditValue,leaveItemToContract,moveItemToHistory, getLink,modePayement,
-                           getDetails,montant,dateCmde, dateLivraison, typeCmde,
-                           loopItemWatch, playItemWatch,solde,showDeleteIcon=true,
-                           accordStyle,accordInitData,livraisonStyle,livraisonInitData
+function UserOrderItem({order, header,isDemande,
+                           isContrat,isHistorique
                        }) {
+    const navigation = useNavigation()
+    const {formatDate} = useAuth()
+    const {getModePayement} = useOrderInfos()
+    const {saveAccordEdit,saveLivraisonEdit, createOrderContrat, moveOrderToHistory, deleteOrder} = useManageUserOrder()
+    const modePayement = getModePayement(order.id)
+    const statusAccordValue = order.statusAccord
+    const accordInitData = initData.accordData
+    const orderItems = order.CartItems
+    const showDetail = order.showDetails
+    const isExpired = order.isExpired
+    const playItemWatch = order.Contrats[0]?.status.toLowerCase() === 'en cours'
+    const loopItemWatch = order.Contrats[0]?.status.toLowerCase() === 'en cours'
+    const livraisonValue = order.statusLivraison
+    const typeCmde = order.typeCmde
+    const showDeleteIcon = order.montant === order.Facture?.solde
+    const contrats= order.Contrats
 
     return (
         <>
             <View style={styles.mainContainer}>
                {isDemande && statusAccordValue.toLowerCase() === 'accepté' && <View>
-                   {isExpired?<AppText style={{color:colors.rougeBordeau, fontWeight: 'bold'}}>0j 00h00m 00s</AppText>:<AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}>{expireIn}</AppText>}
+                   {isExpired?<AppText style={{color:colors.rougeBordeau, fontWeight: 'bold'}}>0j 00h00m 00s</AppText>:<AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}>{order.expireIn}</AppText>}
                </View>}
                 <AppModePayement modePayement={modePayement}/>
                 <View style={{flexDirection: 'row',
@@ -35,7 +51,7 @@ function UserOrderItem({
                     justifyContent: 'center'
                 }}>
                     <ListItemHeader headerTitle={header}/>
-                    <AppText style={{fontWeight: 'bold', fontSize: 20, color: colors.or}}>{numero}</AppText>
+                    <AppText style={{fontWeight: 'bold', fontSize: 20, color: colors.or}}>{order.numero}</AppText>
                 </View>
                 <View>
                 {orderItems && <ScrollView horizontal>
@@ -49,40 +65,67 @@ function UserOrderItem({
                     left: '25%',
                     bottom: -20
                 }}>
-                    <AppText style={{fontWeight: 'bold', fontSize: 18}}>{typeCmde === 'location'?orderItems[0].OrderItem.libelle:'Achats divers'}</AppText>
+                    <AppText style={{fontWeight: 'bold', fontSize: 18}}>{typeCmde === 'location'?orderItems[0]?.OrderItem.libelle:'Achats divers'}</AppText>
                 </View>
                 </View>
 
                 <View style={{marginTop: 20}}>
-                    <AppLabelWithValue label='Montant:' labelValue={montant}/>
-                    {!isDemande && <AppLabelWithValue label='Déjà payé: ' labelValue={solde || 0}/>}
-                    {!isContrat &&  <StatusPicker labelStatus='Accord' statusValue={statusAccordValue} statusData={accordInitData}
-                                                  changeStatusValue={changeAccordEditValue} otherStatusStyle={accordStyle}/>}
+                    <AppLabelWithValue label='Montant:' labelValue={order.montant}/>
+                    {!isDemande && <AppLabelWithValue label='Déjà payé: ' labelValue={order.Facture?.solde || 0}/>}
+                    {!isContrat &&
+                    <StatusPicker
+                        labelStatus='Accord' statusValue={statusAccordValue} statusData={accordInitData}
+                        changeStatusValue={(value) => saveAccordEdit({orderId:order.id, statusAccord: value})}
+                        otherStatusStyle={{color: order.statusAccord.toLowerCase() === 'accepté'?colors.vert:order.statusAccord.toLowerCase() === 'refusé'?'red':'grey', fontWeight: 'bold'}}/>}
                     {!isDemande &&
-                    <StatusPicker labelStatus='Livraison' statusValue={livraisonValue} otherStatusStyle={livraisonStyle} statusData={livraisonInitData}
-                                  changeStatusValue={changeLivraisonValue}/>
+                    <StatusPicker
+                        labelStatus='Livraison'
+                        statusValue={order.statusLivraison}
+                        otherStatusStyle={{color: order.statusLivraison.toLowerCase() === 'livré'?colors.vert:order.statusLivraison.toLowerCase() === 'partiel'?'orange':'grey',fontWeight: 'bold'}}
+                        statusData={initData.livraisonData}
+                        changeStatusValue={(value) => saveLivraisonEdit({orderId: order.id, statusLivraison: value})}/>
                     }
-                    {contrats && contrats.length >=1 && <FactureItemLabel labelStyle={{fontSize: 15, fontWeight: 'bold'}} labelValueStyle={contratStatusStyle} itemLabel='Contrat: ' labelValue={contratStatus}/>}
+                    {contrats && contrats.length >=1 &&
+                    <FactureItemLabel
+                        labelStyle={{fontSize: 15, fontWeight: 'bold'}}
+                        labelValueStyle={{fontSize: 15, color:order.Contrats[0]?.status.toLowerCase() === 'en cours'?'grey':order.Contrats[0]?.status.toLowerCase() === 'terminé'? colors.vert:'orange', fontWeight: 'bold'}}
+                        itemLabel='Contrat: '
+                        labelValue={order.Contrats[0]?.status}/>}
                     <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
-                        marginTop: 10,
+                        alignItems: 'center',
                         marginBottom: 10
                     }}>
-                        <AppButton iconName={showDetail?'caretup':'caretdown'} iconColor={colors.blanc} style={{width: 'auto', padding: 5}} textStyle={{marginLeft: 5}} title={showDetail? 'Fermer':'Deplier'} onPress={getDetails}/>
-                        <AppButton iconName='plus' iconColor={colors.blanc} style={{width: 'auto', padding: 5, marginLeft: 20 }} textStyle={{marginLeft: 5}} title='Details' onPress={goToItemDetails}/>
-                        {!isDemande &&  <AppButton style={{marginLeft: 20}} title='Voir la facture' onPress={getLink}/>}
+                        <AppIconButton iconColor={colors.dark}
+                            onPress={() => dispatch(getItemDetail(order))}
+                            buttonContainer={styles.accordIcon}
+                            iconName={showDetail?'caretup':'caretdown'}/>
                     </View>
                     {showDetail && orderItems && <View style={{ minWidth: '90%', backgroundColor: colors.blanc, marginTop: 5}}>
                         {orderItems.map((order, index) =>
                                 <AppLabelWithValue key={index.toString()} label={order.OrderItem.quantite} labelValue={order.OrderItem.libelle} secondLabel={order.OrderItem.montant} secondLabelValue='fcfa'/>
                         )}
-                        <AppLabelWithValue label='Frais livraison: ' labelValue={fraisLivraison} secondLabel='fcfa'/>
-                        <AppLabelWithValue label="Taux d'interêt: " labelValue={tauxInteret} secondLabel='fcfa'/>
-                        <AppLabelWithValue label="Date commande: " labelValue={dayjs(dateCmde).format('DD/MM/YYYY HH:mm:ss')}/>
-                        <AppLabelWithValue label='Livraison prevue le: ' labelValue={dayjs(datePrevue).format('DD/MM/YYYY HH:mm:ss')}/>
-                        {!isDemande && livraisonValue.toLowerCase() === 'livré' && <AppLabelWithValue label='Livré le: ' labelValue={dayjs(dateLivraison).format('DD/MM/YYYY HH:mm:ss')}/>}
-
+                        <AppLabelWithValue label='Frais livraison: ' labelValue={order.fraisTransport} secondLabel='fcfa'/>
+                        <AppLabelWithValue label="Taux d'interêt: " labelValue={order.interet} secondLabel='fcfa'/>
+                        <AppLabelWithValue label="Date commande: " labelValue={formatDate(order.dateCmde)}/>
+                        <AppLabelWithValue label='Livraison prevue le: ' labelValue={formatDate(order.dateLivraisonDepart)}/>
+                        {!isDemande && livraisonValue.toLowerCase() === 'livré' && <AppLabelWithValue label='Livré le: ' labelValue={formatDate(order.dateLivraisonFinal)}/>}
+                        <View style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                                <AppSmallButton
+                                    iconName='plus'
+                                    onPress={() =>navigation.navigate('AccueilNavigator', {screen: routes.ORDER_DETAILS, params: order})}
+                                    title='Details'/>
+                            {!isDemande &&
+                            <AppSmallButton
+                                width={160}
+                                iconName='back'
+                                title='Voir la facture'
+                                onPress={() => navigation.navigate(routes.FACTURE_DETAILS, order.Facture)}/>
+                            }
+                        </View>
                     </View>}
                 </View>
             </View>
@@ -100,20 +143,40 @@ function UserOrderItem({
                 top: 40
             }}>
                 {statusAccordValue && statusAccordValue.toLowerCase() === 'refusé' &&
-                <ItemIconButton iconName='dislike1' iconSize={40} color='red' otherStyle={{borderRadius: 20}}/>}
+                    <AppIconButton
+                        iconName="dislike1"
+                        iconColor={colors.rougeBordeau}
+                        buttonContainer={styles.accordIcon}
+                        iconSize={40}/>
+                }
                 {statusAccordValue && statusAccordValue.toLowerCase() === 'accepté' &&
-                <ItemIconButton iconName='like1' iconSize={40} color='green' otherStyle={{borderRadius: 20}}
-                                onPress={leaveItemToContract}/>}
+                    <AppIconButton
+                        onPress={() => createOrderContrat(order)}
+                        iconSize={40}
+                        buttonContainer={styles.accordIcon}
+                        iconColor={colors.vert}
+                        iconName="like1"/>
+                }
             </View>}
-            <View style={{position: 'absolute',right:10,top: 210, alignItems: 'center'}}>
+            <View style={{position: 'absolute',right:20,top: 210, alignItems: 'center'}}>
                 {!isHistorique &&
-                <TouchableOpacity onPress={moveItemToHistory}>
-                    <MaterialIcons name="history" size={25} color={colors.dark} />
+                <TouchableOpacity style={styles.iconStyle} onPress={() =>moveOrderToHistory(order)}>
+                    <MaterialIcons name="history" size={30} color={colors.dark} />
                 </TouchableOpacity>}
-                {isHistorique && <TouchableOpacity>
-                    <Entypo name='reply' color={colors.dark} size={25}/>
+                {isHistorique &&
+                <TouchableOpacity style={styles.iconStyle}>
+                    <Entypo name='reply' color={colors.dark} size={30}/>
                 </TouchableOpacity>}
-                {showDeleteIcon && <ItemIconButton otherStyle={{marginTop: 10}} iconSize={24} iconName='delete' color={colors.rougeBordeau} onPress={deleteItem}/>}
+                {showDeleteIcon &&
+                    <AppIconButton
+                        iconColor={colors.rougeBordeau}
+                        onPress={() => deleteOrder(order)}
+                        buttonContainer={{
+                        backgroundColor: colors.lightGrey,
+                            marginVertical: 10
+                        }}
+                        iconName='delete'/>
+                }
             </View>
          {isExpired &&
          <View style={styles.expired}>
@@ -122,8 +185,15 @@ function UserOrderItem({
 
            {isExpired && <View style={styles.orderAgain}>
                 <AppText style={{color: colors.rougeBordeau, fontWeight: 'bold'}}>expiré</AppText>
-               <AppButton title='supprimer' iconName='delete' iconSize={17} iconColor={colors.blanc} textStyle={{marginLeft: 5}}
-                          onPress={deleteItem}/>
+               <AppIconButton
+                   onPress={() => deleteOrder(order)}
+                   buttonContainer={{
+                       backgroundColor: colors.rougeBordeau,
+                       height: 80,
+                       width: 80,
+                       borderRadius: 40
+                   }}
+                   iconName='delete'/>
             </View>}
 
         </>
@@ -131,10 +201,16 @@ function UserOrderItem({
 }
 
 const styles = StyleSheet.create({
+    accordIcon: {
+        backgroundColor: colors.lightGrey,
+        height: 60,
+        width: 60,
+        borderRadius: 30
+    },
     mainContainer: {
         backgroundColor: colors.blanc,
         marginTop: 30,
-        padding: 5
+        padding: 10
     },
     expired: {
         position: 'absolute',
@@ -152,6 +228,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         height: '100%'
+    },
+    iconStyle: {
+        backgroundColor: colors.lightGrey,
+        height: 40,
+        width: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 
 })

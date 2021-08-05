@@ -75,7 +75,7 @@ function RegisterScreen({navigation}) {
                     getUserData()
                 }
             }
-       navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
+       navigation.navigate('AccueilNavigator', {screen: routes.HOME})
     }
 
 

@@ -125,21 +125,22 @@ function ListeParrainScreen({navigation}) {
                 <EvilIcons name="search" size={30} color="black" style={{marginLeft: -25, fontWeight: 'bold'}}/>
             </View>
           <FlatList data={listeAllParrains} keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => <ListParrainItem avatarUrl={{uri: item.User.avatar}} ownerUserAvatar={item.User.avatar} parrainNom={item.User.nom}
-                                                   parrainPrenom={item.User.prenom} parrainUsername={item.User.username}
-                                                   parrainEmail={item.User.email} parrainPhone={item.User.phone}
-                                                   parrainQuotite={item.quotite}
-                                                   sendMessageToParrain={() => handleSendMessageToParrain(item)}
-                                                   activeCompte={item.active}
-                                                   isParrain={userParrains.some(cpte => cpte.id === item.id)}
-                                                   isFilleul={userFilleuls.some(filleul => filleul.id === item.id)}
-                                                   compteDetailExist={item.User.nom || item.User.prenom || item.User.phone}
-                                                   msgResponded={respondMessageState.some(cpt => cpt.id === item.UserId)}
-                                                   inSponsoring={inSponsoringState.some(cpt => cpt.id === item.UserId)}
-                                                   parrainageResponseEditing={item.editResponse} editParrainageResponse={() => dispatch(getParrainageResponseEdit(item))}
-                                                   sendParrainageResponse={()=> handleSendParrainageResponse(item)} stopParrainage={() => handleStopParrainage(item)}
-                                                   remakeParrainage={() => handleRepriseParrainage(item)}
-                                                   getUserProfile={() => navigation.navigate(routes.COMPTE, item.User)}/>}/>
+          renderItem={({item}) => <ListParrainItem
+              avatarUrl={{uri: item.User.avatar}}
+              ownerUserAvatar={item.User.avatar}
+              parrainUsername={item.User.username}
+              parrainEmail={item.User?.email?item.User.email : item.User.tel}
+              parrainQuotite={item.quotite}
+              sendMessageToParrain={() => handleSendMessageToParrain(item)}
+              activeCompte={item.active}
+              isParrain={userParrains.some(cpte => cpte.id === item.id)}
+              isFilleul={userFilleuls.some(filleul => filleul.id === item.id)}
+              msgResponded={respondMessageState.some(cpt => cpt.id === item.UserId)}
+              inSponsoring={inSponsoringState.some(cpt => cpt.id === item.UserId)}
+              parrainageResponseEditing={item.editResponse} editParrainageResponse={() => dispatch(getParrainageResponseEdit(item))}
+              sendParrainageResponse={()=> handleSendParrainageResponse(item)} stopParrainage={() => handleStopParrainage(item)}
+              remakeParrainage={() => handleRepriseParrainage(item)}
+              getUserProfile={() => navigation.navigate(routes.COMPTE, item.User)}/>}/>
         </>
     );
 }

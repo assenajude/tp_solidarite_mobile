@@ -1,74 +1,70 @@
 import React from 'react';
-import {View, StyleSheet, TouchableOpacity} from "react-native";
+import {View, StyleSheet} from "react-native";
 import AppText from "../AppText";
 import colors from "../../utilities/colors";
-import AppLabelWithValue from "../AppLabelWithValue";
-import { AntDesign } from '@expo/vector-icons';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-
+import LottieView from 'lottie-react-native'
+import AppIconButton from "../AppIconButton";
 
 function UserAdresseItem({adresseName, villeName, telephone, otherAdresse,
-                             email, getAdresseEdit,renderAdresseRightActions}) {
+                             email, editAddress,deleteAddress}) {
     return (
-        <Swipeable renderRightActions={renderAdresseRightActions} >
         <View style={styles.container}>
             <View style={styles.welcome}>
-                <AppText style={{
-                    color: colors.vert,
-                    fontWeight: 'bold',
-                    fontSize: 20,
-                    marginRight: 5
-
-                }}>Bienvenue</AppText>
-                <AppText>à</AppText>
-                <AppText style={{fontWeight: 'bold'}}>{villeName}</AppText>
+            <LottieView style={{height: 50, width: '100%'}}
+                source={require('../../assets/animations/welcome')}
+                loop={true} autoPlay={true}/>
+                <View>
+                <AppText style={{fontSize: 30, fontWeight: 'bold'}}>{villeName}</AppText>
+                <AppText style={{marginTop: -15, fontSize: 15}}>{otherAdresse}</AppText>
+                </View>
             </View>
+            <AppText style={{fontSize: 25, fontWeight: 'bold', color: colors.or}}>{adresseName}</AppText>
+            <AppText iconName='phone' style={{marginLeft: 20}}>{telephone}</AppText>
+            <AppText iconName='mail' style={{marginLeft: 20}}>{email}</AppText>
             <View style={{
-                padding: 10
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginVertical: 20
             }}>
-                <AppText style={{
-                    color: colors.or,
-                    fontWeight: 'bold',
-                    fontSize: 15
-                }}>{adresseName}</AppText>
-                <AppLabelWithValue  labelValue={telephone}/>
-                <AppLabelWithValue labelValue={email}/>
-                <AppLabelWithValue labelValue={otherAdresse}/>
+                <AppIconButton
+                    onPress={editAddress}
+                    iconName='edit'
+                    iconColor={colors.bleuFbi}
+                    buttonContainer={styles.icon}
+                />
+                <AppIconButton
+                    onPress={deleteAddress}
+                    iconName='delete'
+                    iconColor={colors.rougeBordeau}
+                    buttonContainer={[styles.icon, {marginLeft: 30}]}
+                />
             </View>
-            <View style={styles.editButton}>
-                <TouchableOpacity onPress={getAdresseEdit}>
-                    <AntDesign name="edit" size={20} color="black" />
-                </TouchableOpacity>
-            </View>
-
         </View>
-        </Swipeable>
-
     );
 
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'flex-start',
         width: '100%',
+        marginVertical: 20,
         backgroundColor: colors.blanc,
-        margin:5,
-        marginTop: 20,
-        padding: 10
     },
     welcome: {
-        backgroundColor: colors.blanc,
-        height: 100,
-        width: 130,
-        borderWidth: 1
+        alignItems: 'center',
+        backgroundColor: colors.leger,
+        height: 120,
+        width: '80%'
     },
-    editButton: {
-        position: 'absolute',
-        top: 10,
-        right: 10
-    }
+   icon: {
+       backgroundColor: colors.leger,
+       height: 60,
+       width: 60,
+       borderRadius: 30
+   }
+
 })
 
 export default UserAdresseItem;

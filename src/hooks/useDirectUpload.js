@@ -35,43 +35,47 @@ export default useDirectUpload = () => {
 
 
     const directUpload = async (transformedArray, imagesArray, getUploadProgress) => {
-        const base64DataArray = imagesArray.map(image => image.base64Data)
-        await dispatch(getSignedUrl({dataArray: transformedArray}))
-        const signedArray = store.getState().s3_upload.signedRequestArray
+        try {
+            const base64DataArray = imagesArray.map(image => image.base64Data)
+            await dispatch(getSignedUrl({dataArray: transformedArray}))
+            const signedArray = store.getState().s3_upload.signedRequestArray
             let uploadSuccess = false
-        if(signedArray.length>0 && base64DataArray.length>0){
-            for(let i=0; i<base64DataArray.length; i++) {
-                const {fileType} = getFileNameAndType(imagesArray[i].url)
-                const byApiSauce = create({
-                    baseURL: signedArray[i].signedUrl
-                })
+            if(signedArray.length>0 && base64DataArray.length>0){
+                for(let i=0; i<base64DataArray.length; i++) {
+                    const {fileType} = getFileNameAndType(imagesArray[i].url)
+                    const byApiSauce = create({
+                        baseURL: signedArray[i].signedUrl
+                    })
 
 
-                const bufferData = new Buffer(base64DataArray[i], 'base64')
+                    const bufferData = new Buffer(base64DataArray[i], 'base64')
 
-               const result  = await  byApiSauce.put('',bufferData, {
-                    headers: {
-                        'x-amz-acl' : 'public-read',
-                        'Content-Encoding': 'base64',
-                        'Content-Type': fileType
-                    },
-                    onUploadProgress: (progress) => getUploadProgress(progress.loaded/progress.total*100)
+                    const result  = await  byApiSauce.put('',bufferData, {
+                        headers: {
+                            'x-amz-acl' : 'public-read',
+                            'Content-Encoding': 'base64',
+                            'Content-Type': fileType
+                        },
+                        onUploadProgress: (progress) => getUploadProgress(progress.loaded/progress.total*100)
 
-                })
-                if(result.ok) uploadSuccess = true
-                else {
-                    throw new Error(`error: ${result.data}`)
-                    uploadSuccess = false
+                    })
+                    if(result.ok) uploadSuccess = true
+                    else {
+                        uploadSuccess = false
+                    }
+
                 }
-
             }
+            if(uploadSuccess) {
+                alert('upload success..')
+            } else {
+                alert("can't upload now..try later")
+            }
+            return uploadSuccess
+        }catch (e) {
+            throw new Error(`error: ${e}`)
         }
-        if(uploadSuccess) {
-            alert('upload success..')
-        } else {
-            alert("can't upload now..try later")
-        }
-        return uploadSuccess
+
     }
 
 return {dataTransformer,directUpload}

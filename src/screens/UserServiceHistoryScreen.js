@@ -22,11 +22,6 @@ function UserServiceHistoryScreen({navigation}) {
     const localHistoriqueServices = userServicesData.filter(item => item.historique === true)
 
 
-    useEffect(() => {
-
-    }, [localHistoriqueServices])
-
-
     if(!user) {
         return <GetLogin message='Connectez vous pour voir votre historique..'/>
     }

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector, useStore} from 'react-redux'
-import {ScrollView, StyleSheet, Image, View, TouchableWithoutFeedback, Alert, Keyboard, ToastAndroid} from 'react-native';
+import {ScrollView, StyleSheet, Image, View, TouchableWithoutFeedback,Keyboard, ToastAndroid} from 'react-native';
 import * as yup from 'yup'
 import {LinearGradient} from 'expo-linear-gradient'
 
@@ -43,7 +43,7 @@ function LoginScreen({navigation}) {
         if(error !== null) return;
         dispatch(getUserParrainageCompte({userId: loggedInUser.id}))
         initUserDatas()
-        navigation.navigate('AccueilNavigator', {screen: routes.ACCUEIL})
+        navigation.navigate('AccueilNavigator', {screen: routes.HOME})
     }
 
     const handleSendResetMail = async () => {

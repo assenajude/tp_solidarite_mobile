@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {FlatList, View, StyleSheet} from "react-native";
+import React from 'react';
+import {View, StyleSheet, ScrollView} from "react-native";
 import {useDispatch, useSelector} from "react-redux";
 import ParrainageEncoursItem from "../components/parrainage/ParrainageEncoursItem";
 import {getOrderParrainDetails, getSponsorDetails} from "../store/slices/parrainageSlice";
@@ -28,10 +28,6 @@ function UserParrainageScreen({navigation}) {
     }
 
 
-    useEffect(() => {
-    }, [])
-
-
     if(userActiveParrainage.length === 0){
         return <View style={{
             flex: 1,
@@ -43,46 +39,79 @@ function UserParrainageScreen({navigation}) {
     }
 
     return (
-        <>
-                <View style={{backgroundColor: colors.rougeBordeau, alignSelf: 'center', marginTop: 20}}>
-                    <AppText style={{color: colors.blanc}}>Mon portefeuille</AppText>
-                </View>
-            <View style={{borderWidth: 1, padding: 10}}>
-                <View style={{flexDirection: 'row'}}>
-                <View style={{width: '50%', marginTop: 20}}>
-                    <View>
-                        <AppText>{Number(getRestituteInvest().restituteQuotite)} / {formatPrice(getInvestissement())}</AppText>
-                    </View>
-                    <View style={{backgroundColor: colors.bleuFbi, marginTop: 30}}>
-                        <AppText style={{color: colors.blanc}}>Investissement</AppText>
-                    </View>
-                </View>
-                    <View style={{borderWidth: 1, marginLeft: 5, marginRight: 5, marginBottom: 30}}>
-
-                    </View>
-                <View style={{width: '50%', marginTop: 20}}>
-                    <AppText>{getRestituteInvest().actuGain} / {formatPrice(getTotalGain())}</AppText>
-                    <View style={{backgroundColor: colors.bleuFbi, marginTop: 30}}>
-                        <AppText style={{color: colors.blanc}}>Bénéfice</AppText>
-                    </View>
-                </View>
+        <ScrollView contentContainerStyle={{
+            alignItems: 'center',
+            paddingVertical: 30
+        }}>
+            <View style={styles.fundContainer}>
+                <AppText style={{fontWeight: 'bold'}}>Total investissement</AppText>
+                <View style={styles.fundContent}>
+                    <AppText style={{fontSize: 20, fontWeight: 'bold'}}>{formatPrice(getInvestissement())}</AppText>
                 </View>
             </View>
-            <FlatList data={userActiveParrainage} keyExtractor={item => item.id.toString()}
-                      renderItem={({item}) => <ParrainageEncoursItem ownerUserAvatar={item.User.avatar} avatarUrl={{uri:item.User.avatar}}
-                                                                     ownerUsername={item.User.username} ownerEmail={item.User.email}
-                                                                     sponsorDetails={item.sponsorDetails}
-                                                                     getUserProfile={() => navigation.navigate(routes.COMPTE, item.User)}
-                                                                     openSponsorDetails={() => dispatch(getSponsorDetails(item))}
-                                                                     parrainageOrders={getUserParrainageOrders(item)}
-                                                                     getParrainOrderDetails={(order) => handleGetOrderDetails(order) }
-                                                                     orderProgress={getLastCompteFactureProgress(item)>0?getLastCompteFactureProgress(item): 0}
-                                                                     showProgress={getLastCompteFactureProgress(item)?getLastCompteFactureProgress(item)>0:false}/> } />
-        </>
+            <View style={styles.fundContainer}>
+                <AppText style={{fontWeight: 'bold'}}>Total remboursé</AppText>
+                <View style={styles.fundContent}>
+                    <AppText style={{fontSize: 20, fontWeight: 'bold'}}>{formatPrice(getRestituteInvest().restituteQuotite)}</AppText>
+                </View>
+            </View>
+            <View style={styles.fundContainer}>
+                <AppText style={{fontWeight: 'bold'}}>Total gain</AppText>
+                <View style={styles.fundContent}>
+                    <AppText style={{fontSize: 15, fontWeight: 'bold', color: colors.vert}}>{formatPrice(getRestituteInvest().actuGain)} / {formatPrice(getTotalGain())}</AppText>
+                </View>
+            </View>
+            <View>
+                {userActiveParrainage.map((parrain) =>
+                    <ParrainageEncoursItem
+                       key={parrain.id.toString()}
+                        ownerUserAvatar={parrain.User.avatar}
+                       avatarUrl={{uri:parrain.User.avatar}}
+                       ownerUsername={parrain.User.username}
+                       ownerEmail={parrain.User.email}
+                       sponsorDetails={parrain.sponsorDetails}
+                       getUserProfile={() => navigation.navigate(routes.COMPTE, parrain.User)}
+                       openSponsorDetails={() => dispatch(getSponsorDetails(parrain))}
+                       parrainageOrders={getUserParrainageOrders(parrain)}
+                       getParrainOrderDetails={(order) => handleGetOrderDetails(order) }
+                       orderProgress={getLastCompteFactureProgress(parrain)>0?getLastCompteFactureProgress(parrain): 0}
+                       showProgress={getLastCompteFactureProgress(parrain)?getLastCompteFactureProgress(parrain)>0:false}
+                    />)}
+            </View>
+            {/*<FlatList
+                data={userActiveParrainage} keyExtractor={item => item.id.toString()}
+                renderItem={({item}) =>
+                    <ParrainageEncoursItem
+                        ownerUserAvatar={item.User.avatar} avatarUrl={{uri:item.User.avatar}}
+                        ownerUsername={item.User.username} ownerEmail={item.User.email}
+                        sponsorDetails={item.sponsorDetails}
+                        getUserProfile={() => navigation.navigate(routes.COMPTE, item.User)}
+                        openSponsorDetails={() => dispatch(getSponsorDetails(item))}
+                        parrainageOrders={getUserParrainageOrders(item)}
+                        getParrainOrderDetails={(order) => handleGetOrderDetails(order) }
+                        orderProgress={getLastCompteFactureProgress(item)>0?getLastCompteFactureProgress(item): 0}
+                        showProgress={getLastCompteFactureProgress(item)?getLastCompteFactureProgress(item)>0:false}/> } />*/}
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    fundContainer: {
+        backgroundColor: colors.leger,
+        width: '90%',
+        height: 150,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'flex-start'
+    },
+    fundContent: {
+        backgroundColor: colors.blanc,
+        height: 100,
+        width: '85%',
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center'
+    }
 
 })
 export default UserParrainageScreen;

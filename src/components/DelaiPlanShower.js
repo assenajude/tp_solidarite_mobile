@@ -7,7 +7,7 @@ function DelaiPlanShower({delai, otherContainerStyle}) {
     return (
         <View style={[styles.container, otherContainerStyle]}>
             <View style={styles.delaiStyle}>
-                <AppText style={{color: colors.or, fontWeight: 'bold'}}>{delai}</AppText>
+                <AppText style={{color: colors.or, fontWeight: 'bold', fontSize: 15}}>{delai}</AppText>
             </View>
             <View style={styles.delaiBrancheStyle} />
         </View>

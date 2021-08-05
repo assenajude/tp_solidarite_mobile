@@ -98,7 +98,7 @@ function EditUserImagesScreen(props) {
     }
 
     const handleSavePiece = async () => {
-        if(Object.keys(setSelectedRecto).length === 0 || Object.keys(selectedVerso).length === 0) {
+        if(Object.keys(selectedRecto).length === 0 || Object.keys(selectedVerso).length === 0) {
             return alert("Veuillez choisir les 2 cotés de votre pièces avant de sauvegarder.")
         }
         let dataArray = []
@@ -116,46 +116,87 @@ function EditUserImagesScreen(props) {
             if(error !== null) {
                 alert('Impossible de mettre à jour votre pièce')
             } else {
-                alert('Votre piece a été mis à jour avec succès')
+                alert('Votre piece a été mise à jour avec succès')
             }
         }
     }
     return (
         <>
-            <AppUploadProgress startProgress={uploadModal} progress={uploadProgress}
-                               dismissUploadModal={() => setUploadModal(false)}/>
+            <AppUploadProgress
+                startProgress={uploadModal} progress={uploadProgress}
+                dismissUploadModal={() => setUploadModal(false)}/>
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.mainContainer}>
                 <View style={styles.avatarContainer}>
                     <View style={styles.profileText}>
                         <AppText style={{color: colors.blanc}}>Image de profile</AppText>
                     </View>
-                    <ProfileImagePicker imageLabel='aucune image de profile' imageModalVisible={avatarModal} imageUrl={{uri:selectedAvatar.url?selectedAvatar.url:user.avatar}}
-                                        showImageModal={() => setAvatarModal(true)} dismissImageModal={() => setAvatarModal(false)}
-                                        deleteImage={deleteAvatar} onChangePhoto={(avatar)=>setSelectedAvatar(avatar)}
-                                        onChangeImage={(avatar) =>setSelectedAvatar(avatar)}
-                                        deleteExistImage={deleteAvatar} otherImageStyle={{borderRadius: 40}}/>
-                         <AppButton title='valider avatar' style={{margin: 10, padding: 5}} onPress={handleSaveAvatar}/>
+                    <ProfileImagePicker
+                        imageLabel='aucune image de profile'
+                        imageModalVisible={avatarModal} imageUrl={{uri:selectedAvatar.url?selectedAvatar.url:user.avatar}}
+                        showImageModal={() => setAvatarModal(true)}
+                        dismissImageModal={() => setAvatarModal(false)}
+                        deleteImage={deleteAvatar} onChangePhoto={(avatar)=>{
+                            setSelectedAvatar(avatar)
+                        setAvatarModal(false)
+                    }}
+                        onChangeImage={(avatar) => {
+                            setSelectedAvatar(avatar)
+                            setAvatarModal(false)
+                        }}
+                        deleteExistImage={deleteAvatar}
+                        otherImageStyle={{borderRadius: 40}}/>
+                         <AppButton
+                             height={40}
+                             width={130}
+                             title='valider avatar'
+                             style={{marginVertical: 20}}
+                             onPress={handleSaveAvatar}/>
                 </View>
                 <View>
                 </View>
-                <View style={{width: '90%', marginTop: 40, borderWidth: 1}}>
+                <View style={styles.pieceContainer}>
                     <View style={{backgroundColor: colors.rougeBordeau}}>
                         <AppText style={{color: colors.blanc}}>Piece identité</AppText>
                     </View>
                     <View  style={{flexDirection: "row", justifyContent: 'center', alignItems: 'center', marginTop: 10}}>
-                     <ProfileImagePicker imageModalVisible={rectoModal} showImageModal={() => setRectoModal(true)}
-                                         imageLabel='piece recto' dismissImageModal={() =>setRectoModal(false)}
-                                         imageUrl={{uri: selectedRecto.url?selectedRecto.url: connectedUserInfo.pieceIdentite?connectedUserInfo.pieceIdentite[0]:undefined}}
-                                         onChangePhoto={(recto) => setSelectedRecto(recto) }
-                                         onChangeImage={(recto) => setSelectedRecto(recto)} deleteImage={deletePiece} deleteExistImage={deleteRecto}/>
+                     <ProfileImagePicker
+                         imageModalVisible={rectoModal}
+                         showImageModal={() => setRectoModal(true)}
+                         imageLabel='piece recto'
+                         dismissImageModal={() =>setRectoModal(false)}
+                         imageUrl={{uri: selectedRecto.url?selectedRecto.url: connectedUserInfo.pieceIdentite?connectedUserInfo.pieceIdentite[0]:undefined}}
+                         onChangePhoto={(recto) => {
+                             setSelectedRecto(recto)
+                             setRectoModal(false)
+                         } }
+                         onChangeImage={(recto) => {
+                             setSelectedRecto(recto)
+                             setRectoModal(false)
+                         }}
+                         deleteImage={deletePiece}
+                         deleteExistImage={deleteRecto}/>
 
-                    <ProfileImagePicker imageModalVisible={versoModal} imageUrl={{uri: selectedVerso.url?selectedVerso.url:connectedUserInfo.pieceIdentite?connectedUserInfo.pieceIdentite[1]:undefined}}
-                                        onChangeImage={(verso) => setSelectedVerso(verso)} onChangePhoto={(verso) => setSelectedVerso(verso)}
-                                        showImageModal={() => setVersoModal(true)} dismissImageModal={() => setVersoModal(false)}
-                                        imageLabel='piece verso' deleteExistImage={deleteVerso} deleteImage={deletePiece}/>
+                    <ProfileImagePicker
+                        imageModalVisible={versoModal}
+                        imageUrl={{uri: selectedVerso.url?selectedVerso.url:connectedUserInfo.pieceIdentite?connectedUserInfo.pieceIdentite[1]:undefined}}
+                        onChangeImage={(verso) => {
+                            setSelectedVerso(verso)
+                            setVersoModal(false)
+                        }} onChangePhoto={(verso) => {
+                            setSelectedVerso(verso)
+                        setVersoModal(false)
+                    }}
+                        showImageModal={() => setVersoModal(true)} dismissImageModal={() => setVersoModal(false)}
+                        imageLabel='piece verso' deleteExistImage={deleteVerso} deleteImage={deletePiece}/>
                     </View>
-                    <AppButton title='Valider la pièce' style={{padding: 5, margin: 20}} onPress={handleSavePiece}/>
+                    <AppButton
+                        height={40}
+                        width={150}
+                        title='Valider la pièce'
+                        style={{
+                            marginVertical: 20
+                        }} onPress={handleSavePiece}/>
                 </View>
             </View>
         </ScrollView>
@@ -181,7 +222,16 @@ const styles = StyleSheet.create({
     },
     avatarContainer: {
         width: '50%',
-        borderWidth:1,
-    }
+        backgroundColor: colors.leger,
+        borderRadius: 20,
+        alignItems: 'center'
+    },
+    pieceContainer: {
+        backgroundColor: colors.leger,
+        alignItems: 'center',
+        width: '90%',
+        marginVertical: 40,
+        borderRadius: 20
+        }
 })
 export default EditUserImagesScreen;

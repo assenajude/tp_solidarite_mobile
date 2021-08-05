@@ -37,10 +37,12 @@ function PlanScreen({navigation}) {
 
 
             <FlatList data={plansOfPayement} keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => <PlanListItem planImage={{uri: item.imagesPlan[0]}} imageDispo={item.imagesPlan.length>0}
-                                                  label={item.libelle} description={item.descripPlan}
-                                                  getPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: item})}
-                                                  onPress={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: item})}/>}
+            renderItem={({item}) =>
+                <PlanListItem
+                    planImage={{uri: item.imagesPlan[0]}} imageDispo={item.imagesPlan.length>0}
+                    label={item.libelle} description={item.descripPlan}
+                    getPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: item})}
+                    onPress={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: item})}/>}
             />
             {plansOfPayement.length === 0 && <View style={styles.emptyPlans}><AppText>Aucun plan trouvé</AppText></View>}
 
@@ -62,8 +64,8 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         alignSelf: 'flex-end',
-        bottom: 60,
-        right: 50
+        bottom: 15,
+        right: 15
     },
     emptyPlans: {
       flex: 1,
@@ -72,7 +74,8 @@ const styles = StyleSheet.create({
     },
     payementStyle: {
         flexDirection: 'row',
-        top: 20
+        top: 20,
+        marginVertical: 20
     }
 
 })

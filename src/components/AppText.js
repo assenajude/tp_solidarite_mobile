@@ -3,10 +3,10 @@ import {View, Text, StyleSheet} from "react-native";
 import {AntDesign} from '@expo/vector-icons'
 import Color from '../utilities/colors'
 
-function AppText({children,iconName, style, lineNumber,...props}) {
+function AppText({children,iconName,iconColor='black',iconSize=25, style, lineNumber,...props}) {
     return (
         <View style={styles.container}>
-            {iconName && <AntDesign name={iconName} color={Color.or} size={24}/>}
+            {iconName && <AntDesign name={iconName} color={iconColor} size={iconSize}/>}
             <Text {...props} style={[styles.contentStyle, style]} numberOfLines={lineNumber}>{children}</Text>
         </View>
     );
@@ -20,7 +20,8 @@ const styles = StyleSheet.create({
         width: 'auto',
     },
     contentStyle: {
-        padding: 5
+        padding: 5,
+        fontSize: 18
     }
 })
 export default AppText;

@@ -1,57 +1,95 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View,ScrollView, Image, StyleSheet} from "react-native";
 import AppText from "../components/AppText";
-import AppButton from "../components/AppButton";
 import colors from "../utilities/colors";
 import { useSelector} from "react-redux";
 import useAuth from "../hooks/useAuth";
+import AppLabelWithContent from "../components/AppLabelWithContent";
+import AppSmallButton from "../components/AppSmallButton";
+import useAddToCart from "../hooks/useAddToCart";
+import AddToCartModal from "../components/shoppingCart/AddToCartModal";
+import routes from "../navigation/routes";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
-function ServiceDetailScreen({route}) {
-    const {userRoleAdmin} = useAuth()
+function ServiceDetailScreen({route, navigation}) {
+    const {userRoleAdmin, formatPrice} = useAuth()
+    const {addItemToCart} = useAddToCart()
+
+    const [showModal, setShowModal] = useState(false)
+
+    const isLoading = useSelector(state => state.entities.shoppingCart.loading)
     const service = useSelector(state => {
         const list = state.entities.service.list
         const currentService = list.find(item => item.id === Number(route.params.id))
         return currentService
     })
 
+    const handleAddToCart = async () => {
+        const result = await addItemToCart(service)
+        if(!result) return;
+        setShowModal(true)
+    }
+
+    if(showModal) {
+        return (
+            <AddToCartModal
+                source={{uri: service.imagesService[0]}}
+                designation={service.libelle}
+                itemModalVisible={showModal}
+                goToHomeScreen={() => setShowModal(false)}
+                goToShoppingCart={() => {
+                    setShowModal(false)
+                    navigation.navigate('AccueilNavigator', {screen: routes.CART})}}
+            />
+        )
+    }
+
     return (
         <>
-        <ScrollView>
+            <AppActivityIndicator visible={isLoading}/>
+            <ScrollView contentContainerStyle={{
+            paddingBottom: 50,
+        }}>
                {userRoleAdmin() && <View style={{alignSelf: 'flex-end', margin: 20}}>
-                    <AppButton title='edit' iconColor={colors.blanc} iconSize={15} iconName='edit'/>
-                    <AppButton style={{marginTop: 10, marginBottom: 10}} title='add option' iconSize={15} iconColor={colors.blanc} iconName='plus'/>
-                    <AppButton title='delete' iconColor={colors.blanc} iconSize={15} iconName='delete'/>
+                        <AppSmallButton
+                            iconName='edit'
+                            title='Edit'
+                            width={120}/>
+                        <AppSmallButton
+                            iconName='plus'
+                            title='add option'
+                            width={120}/>
+                        <AppSmallButton
+                            iconName='delete'
+                            title='Supprimer'
+                            width={120}/>
                 </View>}
                 <View>
-                <Image source={{uri: service.imagesService[0]}} style={{width: '100%', height: 200}}/>
+                <Image source={{uri: service.imagesService[0]}} style={{width: '100%', height: 300}}/>
                <View style={{marginTop: 5}}>
                    <AppText style={{fontWeight: 'bold'}}>{service.libelle}</AppText>
                </View>
                 </View>
                 <View>
-                    <View style={{alignSelf: 'flex-end',margin: 10}}>
-                        <AppButton title='Utiliser'/>
+                    <View style={{alignSelf: 'flex-end'}}>
+                            <AppSmallButton
+                                onPress={handleAddToCart}
+                                title='Utiliser'
+                                iconName='shoppingcart'
+                            />
                     </View>
-                    <View style={{
-                        flexDirection: 'row'
-                    }}>
-                        <AppText style={{fontWeight: 'bold'}}>Montant minimum autorisé: </AppText>
-                        <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{service.montantMin}</AppText>
-                        <AppText> fcfa</AppText>
+                    <View>
+                        <AppLabelWithContent content={formatPrice(service.montantMin)}
+                            label="Montant minimum autorisé"/>
+
+                        <AppLabelWithContent
+                            content={formatPrice(service.montantMax)}
+                            label="Montant maximum autorisé"/>
                     </View>
-                    <View style={{
-                        flexDirection: 'row'
-                    }}>
-                        <AppText style={{fontWeight: 'bold'}}>Montant maximum autorisé: </AppText>
-                        <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{service.montantMax}</AppText>
-                        <AppText> fcfa</AppText>
-                    </View>
-                    <View style={{
-                        flexDirection: 'row'
-                    }}>
-                        <AppText style={{fontWeight: 'bold'}}>Description: </AppText>
-                        <AppText>{service.description}</AppText>
-                    </View>
+                    <AppLabelWithContent
+                        showSeparator={false}
+                        content={service.description}
+                        label='Description'/>
                 </View>
         </ScrollView>
            {service.isDispo === false && <View style={styles.notDispo}>

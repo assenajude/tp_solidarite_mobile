@@ -8,7 +8,7 @@ import colors from "../../utilities/colors";
 function ConditionsModal({conditionModalVisible, dismissConditionModal}) {
     return (
         <Modal visible={conditionModalVisible} style={styles.modalStyle} transparent>
-            <View style={{height: "85%", backgroundColor: colors.blanc,
+            <View style={{height: "88%", backgroundColor: colors.blanc,
                 alignItems: 'center', justifyContent: 'center', top: 55}}>
                 <View style={{alignSelf: 'flex-end', margin: 10}}>
                     <TouchableOpacity onPress={dismissConditionModal}>

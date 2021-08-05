@@ -1,5 +1,5 @@
 import React, {useEffect, useCallback} from 'react';
-import {View, FlatList, Image, TouchableOpacity} from 'react-native'
+import {View, FlatList, Image, TouchableOpacity, StyleSheet} from 'react-native'
 import {useDispatch, useSelector, useStore} from "react-redux";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
@@ -89,7 +89,9 @@ function UserFavorisScreen({navigation}) {
         <>
             <AppActivityIndicator visible={loading}/>
         <FlatList data={useFavorites} keyExtractor={(item, index) => index.toString()}
-                 renderItem={({item}) => <View style={{margin: 10, backgroundColor: colors.blanc}}>
+                 renderItem={({item}) =>
+                     <View
+                         style={styles.favItem}>
                      <View style={{
                          overflow: 'hidden'
                      }}>
@@ -115,11 +117,28 @@ function UserFavorisScreen({navigation}) {
                          }}>{item.prixReel}</AppText>
                          <AppText> fcfa </AppText>
                      </View>
-                     <AppButton style={{alignSelf: 'flex-end', margin: 10}} title='commander' onPress={() => handleOrderFav(item)}/>
+                     <AppButton
+                         style={{alignSelf: 'center'}}
+                         iconColor={colors.dark}
+                         color1={colors.leger}
+                         color2={colors.leger}
+                         color3={colors.leger}
+                         textStyle={{color: colors.dark, marginLeft: 10}}
+                         iconName='shoppingcart'
+                         width={180}
+                         title='commander' onPress={() => handleOrderFav(item)}/>
                  </View>
                  }/>
                  </>
     );
 }
 
+const styles = StyleSheet.create({
+    favItem: {
+        marginVertical: 20,
+        marginHorizontal:10,
+        borderRadius:10,
+        backgroundColor: colors.blanc,
+        paddingVertical: 20}
+})
 export default UserFavorisScreen;

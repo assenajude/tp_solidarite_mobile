@@ -1,10 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux'
+import React from 'react';
+import {useSelector} from 'react-redux'
 import {useNavigation} from '@react-navigation/native'
 import {createStackNavigator, HeaderBackButton} from "@react-navigation/stack";
-import {Keyboard} from 'react-native'
-
-
 import AccueilScreen from "../screens/AccueilScreen";
 import Color from "../utilities/colors";
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
@@ -17,7 +14,6 @@ import OrderPayementScreen from "../screens/OrderPayementScreen";
 import OrderLivraisonScreen from "../screens/OrderLivraisonScreen";
 import UserFavorisScreen from "../screens/UserFavorisScreen";
 import CompteScreen from "../screens/CompteScreen";
-import UserMessageScreen from "../screens/UserMessageScreen";
 import ElocationScreen from "../screens/ElocationScreen";
 import UserAdresseScreen from "../screens/UserAdresseScreen";
 import OrderDetailsScreen from "../screens/OrderDetailsScreen";
@@ -29,7 +25,6 @@ import UserServiceNavigator from "./UserServiceNavigator";
 import UserOrderNavigator from "./UserOrderNavigator";
 import UserFactureNavigator from "./UserFactureNavigator";
 import routes from "./routes";
-import AppTopBar from "../components/AppTopBar";
 import EditUserInfoScreen from "../screens/EditUserInfoScreen";
 import LocationDetailScreen from "../screens/LocationDetailScreen";
 import NewOptionScreen from "../screens/NewOptionScreen";
@@ -39,7 +34,6 @@ import PlanPropositionScreen from "../screens/PlanPropositionScreen";
 import NewPropositionScreen from "../screens/NewPropositionScreen";
 import NewPlanScreen from "../screens/NewPlanScreen";
 import Avatar from "../components/user/Avatar";
-import {getContentBySpace, getSearchProduct} from "../store/slices/mainSlice";
 import HelpScreen from "../screens/HelpScreen";
 import FaqScreen from "../screens/FaqScreen";
 import QuestionScreen from "../screens/QuestionScreen";
@@ -49,41 +43,21 @@ import EditUserImagesScreen from "../screens/EditUserImagesScreen";
 import ParrainageNavigator from "./ParrainageNavigator";
 import OrderParrainageScreen from "../screens/OrderParrainageScreen";
 import InitInfoScreen from "../screens/InitInfoScreen";
+import FactureTrancheScreen from "../screens/FactureTrancheScreen";
+import HomeScreen from "../screens/HomeScreen";
 
 const ArticleStackNavigator = createStackNavigator();
 
 const AccueilNavigator = () => {
 const navigation = useNavigation()
-    const dispatch = useDispatch()
     const user = useSelector(state => state.auth.user)
     const cartItemLenght = useSelector(state => state.entities.shoppingCart.itemsLenght)
 
-    const availableSpace = ['tous', 'e-commerce', 'e-location']
-    const [seachValue, setSearchValue] = useState('')
-    const [searchState, setSearchState] = useState(false)
-    let [homeModalVisible, setHomeModalVisible] = useState(false)
-    const [selectedSpace, setSelectedSpace] = useState(availableSpace[0])
-
-
-    const handleSearch = () => {
-        dispatch(getSearchProduct(seachValue))
-    }
-
-    const hideKeyBoard = () => {
-        setSearchState(false)
-    }
-
-
-
-    useEffect(() => {
-        Keyboard.addListener('keyboardDidHide', hideKeyBoard)
-        return () => {
-            Keyboard.removeListener('keyboardDidHide', hideKeyBoard)
-        }
-    }, [])
 
     return (
-        <ArticleStackNavigator.Navigator screenOptions={({navigation}) => ({
+        <ArticleStackNavigator.Navigator
+            initialRouteName='HomeScreen'
+            screenOptions={({navigation}) => ({
             headerStyle: {backgroundColor: Color.rougeBordeau},
             headerTintColor: Color.blanc,
             headerRight: ({size, color}) => (
@@ -92,19 +66,9 @@ const navigation = useNavigation()
         })}>
             <ArticleStackNavigator.Screen name='AccueilScreen' component={AccueilScreen}
                options={({navigation}) => ({
-                   headerTitleAlign: 'center',
+                   headerShown: false,
                    headerLeft: () =>
                        <Avatar ownerUserAvatar={user.avatar} avatarUrl={{uri:user.avatar}} onPress={() =>navigation.openDrawer()}/>,
-                   headerTitle: () => <AppTopBar searchValue={seachValue} changeSearchValue={(val) => setSearchValue(val)}
-                                                 handleSearch={handleSearch} searching={searchState} selectedSpace={selectedSpace}
-                                                 homeModalVisible={homeModalVisible} availableSpace={availableSpace}
-                                                 startingSearch={() => setSearchState(true)} leaveInput={() => setSearchState(false)}
-                                                 selectSpace={(val) => {
-                                                     setSelectedSpace(val)
-                                                     setHomeModalVisible(false)
-                                                     dispatch(getContentBySpace(val))
-                                                 }
-                                                 } showHomeModal={() => setHomeModalVisible(!homeModalVisible)} espace='home' closeHomeModal={() => setHomeModalVisible(false)}/>,
                })}/>
 
               <ArticleStackNavigator.Screen name='ShoppingCartScreen' component={ShoppingCartScreen}
@@ -122,7 +86,6 @@ const navigation = useNavigation()
             <ArticleStackNavigator.Screen name='UserFavorisScreen' component={UserFavorisScreen} options={{title: 'Vos Favoris'}}/>
             <ArticleStackNavigator.Screen name='UserFactureScreen' component={UserFactureNavigator} options={{title: 'Vos Factures'}}/>
             <ArticleStackNavigator.Screen name='CompteScreen' component={CompteScreen} options={{title: 'Gerez votre compte'}}/>
-            <ArticleStackNavigator.Screen name='UserMessageScreen' component={UserMessageScreen} options={{title: 'Vos messages'}}/>
             <ArticleStackNavigator.Screen name='LocationScreen' component={ElocationScreen} options={{title: 'Vos Locations'}}/>
             <ArticleStackNavigator.Screen name='HelpScreen' component={HelpScreen} options={{title: "Besoin d'aide?"}}/>
             <ArticleStackNavigator.Screen name='OrderScreen' component={OrderScreen} options={{title: 'Resumé de votre commande'}}/>
@@ -131,6 +94,10 @@ const navigation = useNavigation()
             }/>
             <ArticleStackNavigator.Screen name='FactureDetailsScreen' component={FactureDetailsScreen} options={({route}) =>
                 ({title: 'Detail Facture'+' '+ route.params.numero })
+            }/>
+
+            <ArticleStackNavigator.Screen name='FactureTranche' component={FactureTrancheScreen} options={({route}) =>
+                ({title: 'Facture Tranches'})
             }/>
             <ArticleStackNavigator.Screen name='UserAdresseScreen' component={UserAdresseScreen} options={{
                 title: 'Vos adresses'
@@ -203,6 +170,13 @@ const navigation = useNavigation()
             })}/>
             <ArticleStackNavigator.Screen name='OrderParrainageScreen' component={OrderParrainageScreen} options={({route}) => ({
                 title: 'Parrainage commande'
+            })}/>
+
+            <ArticleStackNavigator.Screen
+                name='HomeScreen'
+                component={HomeScreen}
+                options={({route}) => ({
+                headerShown: false
             })}/>
 
         </ArticleStackNavigator.Navigator>

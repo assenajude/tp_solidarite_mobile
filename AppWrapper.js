@@ -37,24 +37,28 @@ function AppWrapper(props) {
     }, 3600000)
     }
 
-    const errorOnStarting = (error) => {
-        throw new Error('error starting app')
-    }
-
     if(!isReady) {
         return (
         <>
             <AppActivityIndicator visible={isReady === false}/>
-        <AppLoading startAsync={getStarted}  onFinish={() => setIsReady(true)} onError={(error) => errorOnStarting(error)}/>
+        <AppLoading startAsync={getStarted}  onFinish={() => setIsReady(true)} onError={(error) =>{
+            console.log(error);
+            throw new Error(error)
+        }}/>
         </>
         )
     }
 
     return (
+        <>
             <NavigationContainer>
                 <UserCompteNavigation/>
-                <OfflineNotice/>
             </NavigationContainer>
+                <OfflineNotice noInternetContainer={{
+                    position: 'absolute',
+                    bottom: 0
+                }}/>
+        </>
     );
 }
 

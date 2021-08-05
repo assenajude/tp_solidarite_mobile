@@ -8,7 +8,6 @@ const mainSlice = createSlice({
         searchList: [],
         loading: false,
         error: null,
-        refresh: false,
         homeCounter: 0,
         newOption: {},
         selectedItemOptions: [],
@@ -25,15 +24,12 @@ const mainSlice = createSlice({
         },
         mainReceived: (state, action) => {
             state.loading = false
-            state.refresh = false
             state.error = null
             state.homeCounter = 0
             state.list = action.payload
             state.searchList = action.payload
         },
-        startRefresh: (state, action) => {
-            state.refresh = true
-        },
+
         incrementHomeCounter: (state) => {
             state.homeCounter+=1
         },
@@ -74,43 +70,13 @@ const mainSlice = createSlice({
            } else {
             state.selectedOption = selectedOption.ArticleOption
            }
-        },
-        searchProduct: (state,action) => {
-            const searchTerme = action.payload
-            const currentList = state.list
-            if(searchTerme.length === 0) {
-                state.searchList = currentList
-            } else {
-            const filteredList = currentList.filter(product =>  {
-                const designation = product.Categorie.typeCateg === 'article'?product.designArticle:product.libelleLocation
-                const description = product.Categorie.typeCateg === 'article'?product.descripArticle:product.descripLocation
-                const designAndDescrip = designation +' ' + description
-                const expression = searchTerme.toLowerCase()
-                const searchResult = designAndDescrip.toLowerCase().search(expression)
-                if(searchResult !== -1) return true
-            })
-            state.searchList = filteredList
-            }
-        },
-        contentBySpace: (state, action) => {
-            const label = action.payload === 'e-commerce'?'article':action.payload === 'e-location'?'location':'tous'
-            let newList = []
-            if(label ==='article') {
-                newList = state.list.filter(item => item.Categorie.typeCateg === 'article')
-            } else if(label === 'location') {
-                newList = state.list.filter(item => item.Categorie.typeCateg === 'location')
-            } else {
-                newList = state.list
-            }
-            state.searchList = newList
         }
 
     }
 })
 
-const {mainReceived, mainRequested, mainRequestFailed, startRefresh, incrementHomeCounter,
-    colorSize, selectedOptions, optionAdded, selectOption, searchProduct, deleteItemSuccess,
-    contentBySpace} = mainSlice.actions
+const {mainReceived, mainRequested, mainRequestFailed, incrementHomeCounter,
+    colorSize, selectedOptions, optionAdded, selectOption,deleteItemSuccess} = mainSlice.actions
 export default mainSlice.reducer
 
 const url = '/mainDatas'
@@ -126,7 +92,7 @@ export const getAllMainData = () => apiRequest({
 export const getRefreshing = () => apiRequest( {
     url,
     method: 'get',
-    onStart: startRefresh.type,
+    onStart: mainRequested.type,
     onSuccess: mainReceived.type,
     onError: mainRequestFailed.type
 
@@ -158,9 +124,6 @@ export const getSelectOption = (data) => dispatch => {
     dispatch(selectOption(data))
 }
 
-export const getSearchProduct = (terme) => dispatch => {
-    dispatch(searchProduct(terme))
-}
 
 export const getItemDeleted = (item) => apiRequest({
     url:url+'/delete',
@@ -170,8 +133,3 @@ export const getItemDeleted = (item) => apiRequest({
     onSuccess: deleteItemSuccess.type,
     onError: mainRequestFailed.type
 })
-
-
-export const getContentBySpace = (space) => dispatch => {
-    dispatch(contentBySpace(space))
-}

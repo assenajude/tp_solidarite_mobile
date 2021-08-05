@@ -5,9 +5,9 @@ import colors from "../utilities/colors";
 import AppModePayement from "../components/AppModePayement";
 import {useStore, useDispatch, useSelector} from "react-redux";
 import AppLabelWithValue from "../components/AppLabelWithValue";
-import AppButton from "../components/AppButton";
 import {getSelectedPlan} from "../store/slices/payementSlice";
 import usePayementPlan from "../hooks/usePayementPlan";
+import AppSmallButton from "../components/AppSmallButton";
 
 function PlanDetailScreen({route, navigation}) {
     const selectedPlan = route.params
@@ -53,8 +53,11 @@ function PlanDetailScreen({route, navigation}) {
                 justifyContent: 'space-around',
                 margin: 40
             }}>
-                <AppButton title='retour' onPress={() => navigation.goBack()}/>
-              {isPlanDisabled(selectedPlan) === false  && Object.keys(currentOrder).length>0 &&  <AppButton title='je choisis' onPress={() => {
+                <AppSmallButton
+                    iconName='back'
+                    title='retour' onPress={() => navigation.goBack()}/>
+              {isPlanDisabled(selectedPlan) === false  && Object.keys(currentOrder).length>0 &&
+              <AppSmallButton title='je choisis' onPress={() => {
                     dispatch(getSelectedPlan(selectedPlan))
                     navigation.goBack()
                 }}/>}

@@ -9,7 +9,6 @@ import dayjs from "dayjs";
 import StatusPicker from "../components/order/StatusPicker";
 import initData from "../utilities/initData";
 import useManageUserOrder from "../hooks/useManageUserOrder";
-import AppButton from "../components/AppButton";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
 import {useSelector} from "react-redux";
@@ -123,15 +122,6 @@ function OrderDetailsScreen({route, navigation}) {
                         <StatusPicker labelStatus='Livraison' statusValue={commande.statusLivraison} statusData={initData.livraisonData}
                                       changeStatusValue={handleChangeLivraison}/>
                         <AppLabelWithValue label='Contrat:' labelValue={commande.Contrats.length>=1?commande.Contrats[0].status: 'Pas de contrats'}/>
-                        <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-around',
-                            alignItems: 'center',
-                            margin: 20
-                        }}>
-                            <AppButton title='retour' onPress={() => navigation.goBack()}/>
-                           {commande.Contrats.length>=1 && <AppButton title='consulter la facture'/>}
-                        </View>
                     </View>
             </View>
 

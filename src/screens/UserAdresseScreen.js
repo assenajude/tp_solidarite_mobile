@@ -9,7 +9,6 @@ import AppButton from "../components/AppButton";
 import UserAdresseItem from "../components/userAdresse/UserAdresseItem";
 import {getAdresseDeleted, getCurrentAdresseSelected} from "../store/slices/userAdresseSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import ListItemActions from "../components/list/ListItemActions";
 
 function UserAdresseScreen({navigation}) {
     const dispatch = useDispatch()
@@ -48,15 +47,22 @@ function UserAdresseScreen({navigation}) {
         <>
             <AppActivityIndicator visible={isLoading}/>
             { userAdresses.length>0 && <FlatList data={userAdresses} keyExtractor={(item, index) => index.toString()}
-                      renderItem={({item}) => <UserAdresseItem villeName={getAdresseVille(item)} adresseName={item.nom}
-                                                               telephone={item.tel} email={item.email} otherAdresse={item.adresse}
-                                                               getAdresseEdit={() => {
-                                                                   dispatch(getCurrentAdresseSelected(item))
-                                                                   navigation.navigate('AccueilNavigator', {screen: routes.NEW_USER_ADDRESS, params: {mode: 'edit'}})
-                                                               }}
-                                                               getAdresseDelete={() => handleDeleteAdresse(item)}
-                                                               renderAdresseRightActions={() =><ListItemActions onPress={() => handleDeleteAdresse(item)}/>}/>
-                      }/>}
+                      renderItem={({item}) =>
+                          <UserAdresseItem
+                              villeName={getAdresseVille(item)}
+                              adresseName={item.nom}
+                              telephone={item.tel}
+                              email={item.email}
+                              otherAdresse={item.adresse}
+                              editAddress={() => {
+                                  dispatch(getCurrentAdresseSelected(item))
+                                  navigation.navigate('AccueilNavigator', {screen: routes.NEW_USER_ADDRESS, params: {mode: 'edit'}})
+                              }}
+                              deleteAddress={() => handleDeleteAdresse(item)}
+                          />
+                      }
+            />
+            }
             {isUser && userAdresses.length === 0 && <View style={styles.container}>
                 <AppText>vous n'avez pas encore ajouté d'adresses.</AppText>
             </View>}
@@ -80,8 +86,8 @@ const styles = StyleSheet.create({
     },
     addNewButton: {
         position: 'absolute',
-        right: 20,
-        bottom: 50,
+        right: 5,
+        bottom: 5,
     }
 })
 export default UserAdresseScreen;

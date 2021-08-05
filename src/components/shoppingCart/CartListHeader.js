@@ -5,12 +5,12 @@ import AppText from "../AppText";
 function CartListHeader({prix, quantite, montant, min, max}) {
     return (
         <View style={styles.header}>
-            <AppText style={{fontWeight: 'bold',}}>Produit</AppText>
+            <AppText style={styles.textStyle}>Produit</AppText>
            {prix && <AppText style={{fontWeight: 'bold', marginLeft: 60}}>Prix</AppText>}
-            { quantite && <AppText style={{fontWeight: 'bold'}} >Quantité</AppText>}
-           {montant && <AppText style={{fontWeight: 'bold'}}>Montant</AppText>}
-            {min && <AppText style={{fontWeight: 'bold'}}>Montant minimum</AppText>}
-            {max && <AppText style={{fontWeight: 'bold'}}>Montant maximum</AppText>}
+            { quantite && <AppText style={styles.textStyle} >Quantité</AppText>}
+           {montant && <AppText style={styles.textStyle}>Montant</AppText>}
+            {min && <AppText style={styles.textStyle}>Montant minimum</AppText>}
+            {max && <AppText style={styles.textStyle}>Montant maximum</AppText>}
         </View>
     );
 };
@@ -21,6 +21,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         padding: 10
     },
+    textStyle: {
+        fontWeight: 'bold',
+        fontSize: 15
+    }
 })
 
 export default CartListHeader;

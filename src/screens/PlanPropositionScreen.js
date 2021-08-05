@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Image, TouchableOpacity, ScrollView} from "react-native";
+import {View, StyleSheet, Image, TouchableWithoutFeedback, ScrollView} from "react-native";
 import AppText from "../components/AppText";
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from "../utilities/colors";
@@ -7,7 +7,7 @@ import colors from "../utilities/colors";
 function PlanPropositionScreen({navigation}) {
     return (
         <ScrollView>
-            <TouchableOpacity onPress={() => navigation.navigate('AccueilNavigator',{screen:'PlanScreen'})}>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('AccueilNavigator',{screen:'PlanScreen'})}>
                 <View style={{
                     backgroundColor: colors.blanc,
                     marginTop: 20
@@ -35,8 +35,8 @@ function PlanPropositionScreen({navigation}) {
                     </View>
                 </View>
 
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('AccueilNavigator',{screen:'PropositionScreen'})}>
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('AccueilNavigator',{screen:'PropositionScreen'})}>
                 <View style={{
                     backgroundColor: colors.blanc,
                     marginTop: 40
@@ -63,7 +63,7 @@ function PlanPropositionScreen({navigation}) {
                         <AppText style={{color: colors.rougeBordeau, fontWeight: 'bold', fontSize: 20}}>Propositions</AppText>
                     </View>
                 </View>
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
         </ScrollView>
     );
 }

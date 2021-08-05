@@ -11,7 +11,6 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
 import ListFooter from "../components/list/ListFooter";
-import FormImageListPicker from "../components/forms/FormImageListPicker";
 
 const validEspace = Yup.object().shape({
     nom: Yup.string(),

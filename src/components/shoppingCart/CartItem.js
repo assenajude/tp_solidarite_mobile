@@ -7,6 +7,7 @@ import AppText from "../AppText";
 import AppButton from "../AppButton";
 import CartItemQuantite from "./CartItemQuantite";
 import useAuth from "../../hooks/useAuth";
+import AppIconButton from "../AppIconButton";
 
 
 function CartItem({source, designation,icon=false, activeDecrement,deleteItem,caution,frequence,
@@ -25,14 +26,14 @@ function CartItem({source, designation,icon=false, activeDecrement,deleteItem,ca
                     </View>
                     </TouchableOpacity>
                     <View style={styles.buttonContainer}>
-                        <AppButton onPress={showItemDetails} style={{backgroundColor: Color.lightGrey}} iconName='search1' iconSize={20} iconColor='black'/>
-                        <AppButton onPress={deleteItem} style={{backgroundColor: Color.lightGrey}} iconName='delete' iconSize={20} iconColor={Color.rougeBordeau}/>
+                        <AppIconButton iconName='search1' iconColor={Color.dark} onPress={showItemDetails}/>
+                        <AppIconButton iconColor={Color.rougeBordeau}  iconName='delete' onPress={deleteItem}/>
                     </View>
                 </View>
                 <View style={styles.secondContainer}>
-               {price && <AppText style={{marginLeft: 40, marginRight: 10}}>{formatPrice(itemPrice)}</AppText>}
+               {price && <AppText style={{fontSize: 15, marginLeft: 20}}>{formatPrice(itemPrice)}</AppText>}
                     {quantite && <CartItemQuantite disabledDecrement={disabledDecrement} disabledIncrement={disabledIncrement} minusActive={activeDecrement} plusActive={activeIncrement} quantite={itemQuantite} decrementQuantite={quantityDecrement} incrementQuantite={quantityIncrement} style={{marginRight: 15, marginLeft: 15}}/>}
-                {montant && <AppText>{formatPrice(itemAmount)}</AppText>}
+                {montant && <AppText style={{fontSize: 15}}>{formatPrice(itemAmount)}</AppText>}
 
                     {min && <AppText>{formatPrice(montantMin)}</AppText>}
                     {icon && <AntDesign name='minus' size={24} color='black'/>}
@@ -62,21 +63,20 @@ const styles = StyleSheet.create({
     mainContainer: {
         justifyContent: 'center',
         borderColor: Color.leger,
+        marginVertical: 10,
     },
     itemContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
-        padding: 20,
-        marginLeft: 10,
-        marginRight: 10
+        paddingHorizontal: 20,
+        marginHorizontal: 10
 
     },
-
     secondContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: -30
     },
     buttonContainer: {
         flexDirection: 'row',

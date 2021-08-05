@@ -9,6 +9,7 @@ import AppForm from "./AppForm";
 import AppFormField from "./AppFormField";
 import AppSubmitButton from "./AppSubmitButton";
 import colors from "../../utilities/colors";
+import AppSmallButton from "../AppSmallButton";
 
 const optionValideSchema = Yup.object().shape({
     libelle: Yup.string(),
@@ -29,7 +30,9 @@ function AppFormOption({name}) {
 
 
     return (
-        <View>
+        <View style={{
+            marginVertical: 20
+        }}>
             {optionsTab.map((item, index) =>
                 <AppInput key={index.toString()} deleteIcon={true} title={item.label} value={optionsTab[index].value} onChangeText={(val) => {
                     let selectedItem = values[name][index];
@@ -54,10 +57,16 @@ function AppFormOption({name}) {
                     <AppFormField title='Valeur' name='value'/>
                     <AppSubmitButton title="Ajouter l'option"/>
                 </AppForm>
-                    <AppButton title='annuler' style={{alignSelf: 'flex-start'}} onPress={() => setNewMode(!newMode)}/>
+                    <AppSmallButton
+                        title='annuler'
+                        style={{alignSelf: 'flex-start'}}
+                        onPress={() => setNewMode(!newMode)}/>
             </View>}
-            {!newMode && optionsTab.length < 5 && <AppButton textStyle={{marginLeft: 5}} iconColor={colors.blanc} iconName='plus' style={{margin: 10, alignSelf: "flex-end"}} title='option'
-                                                            onPress={() => setNewMode(!newMode)}/>}
+            {!newMode && optionsTab.length < 5 &&
+            <AppSmallButton
+                iconName='plus'
+                title='option'
+                onPress={() => setNewMode(!newMode)}/>}
         </View>
     );
 }

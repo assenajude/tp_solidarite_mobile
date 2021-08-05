@@ -30,7 +30,7 @@ function OtherFileNavigator({navigation}) {
                 title: 'Gestion des espaces'
             }}/>
             <StackOther.Screen name='CategorieScreen' component={CategorieScreen} options={{
-                title: 'Gestion des categories'
+                title: 'Toutes les categories'
             }}/>
             <StackOther.Screen name='NewCategorieScreen' component={NewCategorieScreen} options={{
                 title: 'Nouvelle categorie'

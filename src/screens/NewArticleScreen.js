@@ -18,6 +18,7 @@ import {getHomeCounterIncrement} from "../store/slices/mainSlice";
 import FormImageListPicker from "../components/forms/FormImageListPicker";
 import useDirectUpload from "../hooks/useDirectUpload";
 import AppUploadProgress from "../components/AppUploadProgress";
+import AppFormTimePicker from "../components/forms/AppFormTimePicker";
 
 
 const articleValidationSchema = Yup.object().shape({
@@ -25,6 +26,9 @@ const articleValidationSchema = Yup.object().shape({
     prixPromo: Yup.number(),
     quantite: Yup.number(),
     aide: Yup.boolean(),
+    flashPromo: Yup.boolean(),
+    debutPromo: Yup.date(),
+    finPromo: Yup.date(),
     designation: Yup.string(),
     description: Yup.string(),
     images: Yup.array().min(1, 'Veuillez choisir au moins une image')
@@ -61,6 +65,8 @@ function NewArticleScreen({route, navigation}) {
         )
     }
     const addArticle = async (newArticle, imagesUrl) => {
+        const flashDebut = newArticle.debutPromo.getTime()
+        const flashFin = newArticle.finPromo.getTime()
         if(!editMode) {
            const articleData = {
                categorieId,
@@ -69,6 +75,9 @@ function NewArticleScreen({route, navigation}) {
                prixReel: newArticle.prixReel,
                prixPromo: newArticle.prixPromo,
                aide: newArticle.aide,
+               flashPromo: newArticle.flashPromo,
+               debutPromo: flashDebut,
+               finPromo: flashFin,
                description: newArticle.description,
                articleImagesLinks: imagesUrl
            }
@@ -92,6 +101,9 @@ function NewArticleScreen({route, navigation}) {
                prixReel: newArticle.prixReel,
                prixPromo: newArticle.prixPromo,
                aide: newArticle.aide,
+               flashPromo: newArticle.flashPromo,
+               debutPromo: newArticle.debutPromo.getTime(),
+               finPromo: newArticle.finPromo.getTime(),
                description: newArticle.designation,
                articleImagesLinks: imagesUrl
            }
@@ -127,7 +139,10 @@ function NewArticleScreen({route, navigation}) {
               prixPromo: String(article.prixPromo),
               aide: article.aide,
               description: article.descripArticle,
-              images: article.imagesArticle
+              images: article.imagesArticle,
+              flashPromo: article.flashPromo,
+              debutPromo: new Date(article.debutPromo),
+              finPromo: new Date(article.finPromo),
           })
             setEditMode(true)
         } else {
@@ -137,6 +152,9 @@ function NewArticleScreen({route, navigation}) {
                 prixReel: '',
                 prixPromo: '',
                 aide: false,
+                flashPromo: false,
+                debutPromo: new Date(),
+                finPromo: new Date(),
                 description: '',
                 images: []
             })
@@ -176,7 +194,10 @@ function NewArticleScreen({route, navigation}) {
                         prixPromo: initValues.prixPromo,
                         aide: initValues.aide,
                         description: initValues.description,
-                        images: initValues.images
+                        images: initValues.images,
+                        flashPromo: initValues.flashPromo,
+                        debutPromo: initValues.debutPromo,
+                        finPromo: initValues.finPromo,
                     }}
                              validationSchema={articleValidationSchema}
                              onSubmit={handleAddArticle}>
@@ -187,6 +208,9 @@ function NewArticleScreen({route, navigation}) {
                         <AppFormField name='prixPromo' title='Prix promo'/>
                         <AppFormField name='description' title='Description'/>
                         <AppFormSwitch name='aide' title='Possibilité de vente à credit?'/>
+                        <AppFormSwitch name='flashPromo' title='cet article est en promo?'/>
+                        <AppFormTimePicker label='Debut flash promo' name='debutPromo'/>
+                        <AppFormTimePicker label='Fin flash promo' name='finPromo'/>
                         <AppSubmitButton  title='Ajouter'/>
                     </AppForm>
                 </View>

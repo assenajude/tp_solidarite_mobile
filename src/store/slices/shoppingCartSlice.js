@@ -13,14 +13,7 @@ const shoppingCartSlice = createSlice({
         addToCartSuccess: false,
         newAdded: {},
         loading: false,
-        error: null,
-        provenance: '',
-        showModal: false,
-        ecommerceModal: false,
-        elocationModal: false,
-        eserviceModal: false,
-        commerceDetailModal: false,
-        locationDetailModal: false
+        error: null
     },
     reducers: {
         shoppingCartRequested: (state) => {
@@ -31,11 +24,8 @@ const shoppingCartSlice = createSlice({
           state.loading = false
           state.error = action.payload
         },
-        setProvenance: (state, action) => {
-          state.provenance = action.payload
-        },
         itemAddedToCart: (state, action) => {
-          state.error = null
+            state.error = null
           state.addToCartSuccess = true
           state.newAdded = action.payload
             const newAddedItem = action.payload
@@ -62,25 +52,6 @@ const shoppingCartSlice = createSlice({
             }
 
             state.loading = false
-            switch (state.provenance) {
-             case "ecommerce":
-                 state.ecommerceModal = true
-                 break;
-             case "elocation":
-                 state.elocationModal = true
-                 break;
-             case "eservice":
-                 state.eserviceModal = true
-                 break;
-             case "commerceDetail":
-                 state.commerceDetailModal = true
-                 break;
-             case "locationDetail":
-                 state.locationDetailModal = true
-                 break;
-             default:
-                 state.showModal = true
-         }
 
         },
         clearCart: (state, action)=> {
@@ -88,17 +59,6 @@ const shoppingCartSlice = createSlice({
             state.totalAmount = 0
             state.itemsLenght = 0
             state.type=''
-        },
-        dismissItemModal: (state) => {
-            state.newAdded = {}
-            state.addToCartSuccess = false
-            state.showModal = false
-            state.ecommerceModal = false
-            state.elocationModal = false
-            state.eserviceModal = false
-            state.commerceDetailModal = false,
-            state.locationDetailModal = false
-            state.provenance = ''
         },
         updateItem: (state, action) => {
             state.loading = false
@@ -199,21 +159,14 @@ const shoppingCartSlice = createSlice({
             state.newAdded =  {}
             state.loading =  false
             state.error =  null
-            state.provenance =  ''
-            state.showModal =  false
-            state.ecommerceModal =  false
-            state.elocationModal =  false
-            state.eserviceModal =  false
-            state.commerceDetailModal =  false
-            state.locationDetailModal =  false
         }
     }
 });
 
 export default shoppingCartSlice.reducer;
-const {clearCart, dismissItemModal, updateItem, deleteCartItem,cartItemsReceived,
+const {clearCart, updateItem, deleteCartItem,cartItemsReceived,
        itemAddedToCart, shoppingCartRequested, shoppingCartRequestFailed,
-       setProvenance, incrementItemQty, decrementItemQty, resetCart} = shoppingCartSlice.actions
+       incrementItemQty, decrementItemQty, resetCart} = shoppingCartSlice.actions
 //action creators
 
 const url = '/shoppingCarts'
@@ -238,9 +191,6 @@ export const getCartClear = () => dispatch => {
     dispatch(clearCart())
 }
 
-export const getModalDismiss = () => dispatch => {
-    dispatch(dismissItemModal())
-}
 
 export const setItemServiceMontant = (data) => apiRequest({
     url:url+'/updateItem',
@@ -260,9 +210,6 @@ export const getCartItemDelete = (data) => apiRequest({
     onError: shoppingCartRequestFailed.type
 })
 
-export const getProvenanceSet = (label) => dispatch => {
-    dispatch(setProvenance(label))
-}
 
 export const getItemQtyIncrement = (item) => apiRequest({
     url:url+'/incrementQuantity',

@@ -9,7 +9,7 @@ function OrderItemDetails({imageSource, libelle, quantite, montant}) {
             <AppText>{quantite}</AppText>
             <View style={styles.imagesContainer}>
                 <Image source={imageSource} style={styles.imageStyle}/>
-                <AppText>{libelle}</AppText>
+                <AppText lineNumber={2} style={{width: 200}}>{libelle}</AppText>
             </View>
             <View style={{
                 flexDirection: 'row'

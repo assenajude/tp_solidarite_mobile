@@ -9,7 +9,6 @@ import {
 import useCreateOrderContrat from "./useCreateOrderContrat";
 import {getTranchePayed} from "../store/slices/trancheSlice";
 import {getFactureUpdated} from "../store/slices/factureSlice";
-import {getMsgCompterIncremented} from "../store/slices/messageSlice";
 import dayjs from "dayjs";
 
 let useManageUserOder;
@@ -30,12 +29,10 @@ export default useManageUserOder = () => {
 
     const saveAccordEdit = (data) => {
         dispatch(saveStatusEditing(data))
-        dispatch(getMsgCompterIncremented())
     };
 
     const saveLivraisonEdit = (data) => {
         dispatch(saveStatusEditing(data))
-        dispatch(getMsgCompterIncremented())
     };
 
 
@@ -112,8 +109,8 @@ export default useManageUserOder = () => {
                     dateCloture: Date.now()
                 }))
             }
+            ToastAndroid.showWithGravity("Tranche payée avec succès", ToastAndroid.LONG, ToastAndroid.CENTER)
         }
-        dispatch(getMsgCompterIncremented())
     }
 
     const getOrderExpirationState = () => {

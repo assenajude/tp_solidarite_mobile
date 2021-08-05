@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker'
 import colors from "../../utilities/colors";
 import AppText from "../AppText";
 import UserImageModal from "./UserImageModal";
+import AppIconButton from "../AppIconButton";
 
 
 function ProfileImagePicker({onChangeImage,onChangePhoto, imageUrl,showImageModal,
@@ -21,7 +22,7 @@ function ProfileImagePicker({onChangeImage,onChangePhoto, imageUrl,showImageModa
             alert("Vous devez accepter pour choisir l'image.")
             return ;
         }
-        const selectedImage = await ImagePicker.launchImageLibraryAsync({base64: true})
+        const selectedImage = await ImagePicker.launchImageLibraryAsync({base64: true, allowsEditing: true})
 
         if(selectedImage.cancelled) {
             return ;
@@ -29,7 +30,7 @@ function ProfileImagePicker({onChangeImage,onChangePhoto, imageUrl,showImageModa
 
         onChangeImage({url: selectedImage.uri, base64Data: selectedImage.base64})
         } catch (e) {
-           console.log(e)
+           throw new Error(e)
         }
 
     }
@@ -41,20 +42,21 @@ function ProfileImagePicker({onChangeImage,onChangePhoto, imageUrl,showImageModa
             alert('Vous devez accepter pour prendre la photo')
             return ;
         }
-        const photo = await ImagePicker.launchCameraAsync({base64: true})
+        const photo = await ImagePicker.launchCameraAsync({base64: true, allowsEditing:true})
         if(photo.cancelled) {
             return;
         }
         onChangePhoto({url: photo.uri, base64Data: photo.base64})
         } catch (e) {
-            console.log(e)
+          throw new Error(e)
         }
     }
 
     return (
         <>
-            <UserImageModal imageModalVisible={imageModalVisible} dismissImageModal={dismissImageModal}
-                            chooseImage={chooseImage} takePhoto={takePhoto} deleteImage={deleteImage}/>
+            <UserImageModal
+                imageModalVisible={imageModalVisible} dismissImageModal={dismissImageModal}
+                chooseImage={chooseImage} takePhoto={takePhoto} deleteImage={deleteImage}/>
             <View style={styles.container}>
                 <View>
                     {!imageUrl && <View style={styles.imageContainer}>
@@ -64,11 +66,15 @@ function ProfileImagePicker({onChangeImage,onChangePhoto, imageUrl,showImageModa
                      <Image source={imageUrl} style={[styles.imageStyle, otherImageStyle]}/>
                     </TouchableOpacity>}
                 </View>
-            <TouchableOpacity onPress={showImageModal}>
-                <View style={styles.cameraStyle}>
-                <Entypo name="camera" size={40} color="black" />
-                </View>
-            </TouchableOpacity>
+                <AppIconButton
+                    onPress={showImageModal}
+                    buttonContainer={{
+                    height: 60,
+                        width: 60
+                }}
+                    iconColor={colors.dark}
+                    iconSize={40}
+                    iconName="camera"/>
             </View>
             </>
     );

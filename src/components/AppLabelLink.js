@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
         margin: 5,
         minWidth:40,
         width: 'auto',
-        height: 30
+        marginVertical: 10
     }
 })
 export default AppLabelLink;

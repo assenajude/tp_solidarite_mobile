@@ -1,5 +1,5 @@
-import React, { useEffect} from 'react';
-import {useDispatch, useStore, useSelector} from "react-redux";
+import React from 'react';
+import {useDispatch,useSelector} from "react-redux";
 import {View, FlatList} from "react-native";
 import AppText from "../components/AppText";
 import UserServiceItem from "../components/order/UserServiceItem";
@@ -26,13 +26,6 @@ function UserServiceScreen({navigation}) {
     const userServices = useSelector(state => state.entities.order.listServices)
     const user = useSelector(state => state.auth.user)
     const localDemandeList = userServices.filter(item => item.Contrats.length === 0 && !item.historique)
-
-
-
-    useEffect(() => {
-
-    }, [localDemandeList])
-
 
 
     if(!user) {
@@ -76,7 +69,10 @@ function UserServiceScreen({navigation}) {
                 alignItems: 'center'
             }}>
                 <AppText>Vous n'avez pas demande de service en cours..</AppText>
-                <AppButton title='Demander maintenant' onPress={() => navigation.navigate('E-service')}/>
+                <AppButton textStyle={{fontSize: 16}}
+                    width={'50%'}
+                    title='Demander maintenant'
+                    onPress={() => navigation.navigate('E-service')}/>
                 </View>}
                   </>
     );

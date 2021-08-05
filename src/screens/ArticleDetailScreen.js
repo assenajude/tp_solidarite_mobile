@@ -9,9 +9,11 @@ import {getColorSizes, getSelectOption} from "../store/slices/mainSlice";
 import useAddToCart from "../hooks/useAddToCart";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AddToCartModal from "../components/shoppingCart/AddToCartModal";
-import {getModalDismiss, getProvenanceSet} from "../store/slices/shoppingCartSlice";
 import routes from "../navigation/routes";
 import useAuth from "../hooks/useAuth";
+import AppLabelWithValue from "../components/AppLabelWithValue";
+import AppLabelWithContent from "../components/AppLabelWithContent";
+import AppSmallButton from "../components/AppSmallButton";
 
 function ArticleDetailScreen({route, navigation}) {
     const dispatch = useDispatch()
@@ -28,9 +30,9 @@ function ArticleDetailScreen({route, navigation}) {
     const colorOptions = useSelector(state => state.entities.main.selectedItemOptions)
     const optionSizes = useSelector(state => state.entities.main.selectedColorSizes)
     const selectedOption = useSelector(state => state.entities.main.selectedOption)
-    const showModal = useSelector(state => state.entities.shoppingCart.commerceDetailModal)
+    const [showModal, setShowModal] = useState(false)
     const isLoading = useSelector(state => state.entities.shoppingCart.loading)
-    const addedItem = useSelector(state => state.entities.shoppingCart.newAdded)
+    const [addedItem, setAddedItem] = useState({})
     const [selectedImage, setSelectedImage] = useState(item.imagesArticle[0])
     const [selectedColor, setSelectedColor] = useState('')
     const [selectedSize, setSelectedSize] = useState('')
@@ -40,38 +42,65 @@ function ArticleDetailScreen({route, navigation}) {
         setSelectedImage(image)
     }
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         const isOptionSelected = selectedColor !=='' && selectedSize !==''
         if(item.ProductOptions.length>0 && !isOptionSelected) {
             return alert('Veuillez choisir une option SVP.')
         }
      const itemData = {...item, prix: selectedOption.prix, couleur: selectedColor, taille: selectedSize,quantite: selectedQty}
-        dispatch(getProvenanceSet('commerceDetail'))
-        addItemToCart(itemData)
+        const result = addItemToCart(itemData)
+        if(!result) return;
+        setAddedItem(itemData)
+        setShowModal(true)
     }
 
 
     if(showModal) {
-        return <AddToCartModal itemModalVisible={showModal} source={{uri: addedItem.imagesArticle[0]}} designation={addedItem.designArticle}
-                               goToHomeScreen={() => dispatch(getModalDismiss())}
-                               goToShoppingCart={() => {
-                                   dispatch(getModalDismiss())
-                                   navigation.navigate('AccueilNavigator', {screen: routes.CART})
-                               }}/>
+        return <AddToCartModal
+            itemModalVisible={showModal} source={{uri: addedItem.imagesArticle[0]}} designation={addedItem.designArticle}
+            goToHomeScreen={() => setShowModal(false)}
+            goToShoppingCart={() => {
+                setShowModal(false)
+                navigation.navigate('AccueilNavigator', {screen: routes.CART})
+            }}/>
     }
 
+    if(!item) {
+        return <View style={{
+            flex:  1,
+            alignItems: "center",
+            justifyContent: 'center'
+        }}>
+            <AppText>Cet article n'est plus en stock</AppText>
+        </View>
+    }
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-        <ScrollView style={{marginTop: 20}}>
+        <ScrollView
+            contentContainerStyle={{
+                paddingBottom:50
+            }}>
            {userRoleAdmin() &&  <View style={{
                 alignSelf: 'flex-end',
                 marginBottom: 20
             }}>
                <View>
-                <AppButton title='Edit' iconName='edit' iconSize={15} iconColor={colors.blanc} onPress={() => navigation.navigate('E-commerce', {screen: 'NewArticleScreen', params: item})}/>
-                <AppButton style={{marginTop: 10}}  title='Supprimer' iconName='delete' iconSize={15} iconColor={colors.blanc}/>
-                <AppButton style={{marginTop: 10}} title='Add option' iconName='plus' iconSize={15} iconColor={colors.blanc} onPress={() => navigation.navigate('NewOptionScreen', item)}/>
+                   <AppSmallButton
+                       title='Edit'
+                       iconName='shoppingcart'
+                       onPress={() => navigation.navigate('E-commerce', {screen: 'NewArticleScreen', params: item})}
+                   />
+                <AppSmallButton
+                    iconName='delete'
+                    title='Supprimer'
+                    width={120}/>
+                    <AppSmallButton
+                        title='add option'
+                        iconName='plus'
+                        width={120}
+                        onPress={() => navigation.navigate('NewOptionScreen', item)}
+                    />
                </View>
             </View>}
             <View style={{margin: 5}}>
@@ -101,13 +130,15 @@ function ArticleDetailScreen({route, navigation}) {
                     <View style={{
                         alignSelf: 'flex-end'
                     }}>
-                        <AppButton style={{padding: 5}} title='Acheter' onPress={handleAddToCart}/>
+                            <AppSmallButton
+                                title='Acheter'
+                                iconName='shoppingcart'
+                                onPress={handleAddToCart}
+                            />
                     </View>
                 </View>
-                <View style={{flexDirection: 'row', marginTop: 5}}>
-                    <AppText style={{fontWeight: 'bold'}}>Reste en stock: </AppText>
-                    <AppText style={{fontWeight: 'bold', color: colors.rougeBordeau}}>{item.qteStock}</AppText>
-                </View>
+                <AppLabelWithValue label='Reste en stock:' labelValue={item.qteStock} />
+
                 {colorOptions.length >= 1 && <View style={{flexDirection: 'row', justifyContent: 'space-between', borderWidth: 0.5}}>
                     <View style={{borderWidth: 1}}>
                         <View style={{backgroundColor: colors.rougeBordeau}}>
@@ -186,10 +217,9 @@ function ArticleDetailScreen({route, navigation}) {
                         </View>
                     </View>
                 </View>}
-                <View style={{flexDirection: 'row', marginTop: 5}}>
-                    <AppText style={{fontWeight: 'bold'}}>Description: </AppText>
-                    <AppText>{item.descripArticle}</AppText>
-                </View>
+                <AppLabelWithContent showSeparator={false}
+                    label='Description'
+                    content={item.descripArticle}/>
             </View>
 
         </ScrollView>
@@ -203,9 +233,8 @@ function ArticleDetailScreen({route, navigation}) {
 
 const styles = StyleSheet.create({
     imageStyle: {
-        height: 200,
+        height: 300,
         width: '100%',
-        padding: 10,
         overflow: 'hidden'
     },
     imagesContainer: {

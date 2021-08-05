@@ -8,26 +8,32 @@ import AppText from "../AppText";
 import AppButton from "../AppButton";
 import DelaiPlanShower from "../DelaiPlanShower";
 import colors from "../../utilities/colors";
+import AppIconButton from "../AppIconButton";
 
 function PayementListItem({libelle, description, checked=false, selectItem, buttonStyle,
                               planDelai, showDelai=true, showDetail, getDetails, goToPlanDetail,
                               isAdLivraison=false, children, showDetailButton=true, disablePlan,
-                              goToDisabledPlanDetail}) {
+                              goToDisabledPlanDetail, showMoreButton=true}) {
     return (
         <View>
         <TouchableOpacity onPress={selectItem}>
             <View>
            <View style={styles.listContainer}>
-            <View style={styles.checkStyle}>
-                {checked && <AntDesign name='check' size={24} color='green' />}
-            </View>
             <View style={styles.listContent}>
                 <View style={styles.detailStyle}>
                     <View style={{
                         flexDirection: 'row',
                         alignItems: 'flex-end'
                     }}>
-                    <AppText style={{fontWeight: 'bold', fontSize: 20}}> {libelle}</AppText>
+                        <View style={{
+                            flexDirection: 'row',
+                            alignItems: 'center'
+                        }}>
+                            <View style={styles.checkStyle}>
+                                {checked && <AntDesign name='check' size={24} color='green' />}
+                            </View>
+                            <AppText style={{fontWeight: 'bold', fontSize: 20}}> {libelle}</AppText>
+                        </View>
                         {showDelai && <DelaiPlanShower delai={planDelai}
                                          otherContainerStyle={{marginLeft: -20, marginBottom: 10}}/>}
                     </View>
@@ -40,13 +46,6 @@ function PayementListItem({libelle, description, checked=false, selectItem, butt
                             {children}
                         </View>}
                     </View>}
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
-                        <AppButton iconName={showDetail ?'caretup':'caretdown'} iconColor={colors.blanc} style={{width: 'auto'}} textStyle={{marginLeft: 5}} title={showDetail?'Fermer':'Deplier'} onPress={getDetails}/>
-                        {showDetailButton && <AppButton title='+ details' style={[{width: 'auto',height: 20,marginLeft: 20, alignSelf: 'flex-start'}, buttonStyle]} onPress={goToPlanDetail}/>}
-                    </View>
 
                 </View>
             </View>
@@ -54,8 +53,20 @@ function PayementListItem({libelle, description, checked=false, selectItem, butt
             </View>
             {disablePlan && <View style={styles.disablePlan}>
             </View>}
-
         </TouchableOpacity>
+            <View>
+                {showDetailButton && <AppButton
+                    height={40}
+                    width={80}
+                    color1={colors.leger}
+                    color2={colors.leger}
+                    color3={colors.leger}
+                    title='+ details'
+                    textStyle={{color: colors.dark}}
+                    style={[{marginLeft: 20, alignSelf: 'flex-start'},
+                    buttonStyle]} onPress={goToPlanDetail}/>}
+
+            </View>
             {disablePlan && <View style={{
                 position: 'absolute', zIndex:48,
                 alignSelf: 'center',
@@ -66,6 +77,15 @@ function PayementListItem({libelle, description, checked=false, selectItem, butt
             }}>
 
                 <AppButton onPress={goToDisabledPlanDetail}  title='consulter le plan'/>
+            </View>}
+            {showMoreButton && <View style={{
+                position: 'absolute',
+                right: 20,
+                top: 20,
+                flexDirection: 'row',
+                alignItems: 'center'
+            }}>
+                <AppIconButton iconName={showDetail ?'caretup':'caretdown'} onPress={getDetails} iconColor={colors.dark}/>
             </View>}
         </View>
     );

@@ -24,10 +24,22 @@ const factureSlice = createSlice({
           state.loading = false
           state.error = null
             state.newFactureCompter = 0
-            const receiveds = action.payload
-          state.list = receiveds
-            state.encoursList = receiveds.filter(item => item.montant !== item.solde)
-            state.soldeList = receiveds.filter(item => item.montant === item.solde)
+            const received = action.payload
+          state.list = received
+
+            const encoursTab = []
+            const soldeTab = []
+            received.forEach(facture => {
+                const factureTranches = facture.Tranches
+                const isTranchePaying = factureTranches.some(tranche => tranche.payedState !== 'confirmed')
+                if(isTranchePaying){
+                    encoursTab.push(facture)
+                }else {
+                    soldeTab.push(facture)
+                }
+            })
+            state.encoursList = encoursTab
+            state.soldeList = soldeTab
         },
         factureAdded: (state, action) => {
             state.loading = false
@@ -57,9 +69,13 @@ const factureSlice = createSlice({
             const updatedIndex = state.list.findIndex(item => item.id === action.payload.id)
             state.list[updatedIndex] = action.payload
             if(action.payload.montant === action.payload.solde) {
-                const newEncours = state.encoursList.filter(item => item.id !== action.payload.id)
-                state.encoursList = newEncours
-                state.soldeList.push(action.payload)
+                const factureTranches = action.payload.Tranches
+                const isTranchePaying = factureTranches.some(tranche => tranche.payedState !== 'confirmed')
+                if(isTranchePaying === false) {
+                    const newEncours = state.encoursList.filter(item => item.id !== action.payload.id)
+                    state.encoursList = newEncours
+                    state.soldeList.push(action.payload)
+                }
             } else {
                 let encoursIndex = state.encoursList.findIndex(item => item.id === action.payload.id)
                 state.encoursList[encoursIndex] = action.payload

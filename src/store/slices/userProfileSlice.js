@@ -8,7 +8,7 @@ const profilSlice = createSlice({
         loading: false,
         error: null,
         avatar: null,
-        notifCompter: 0
+        notifCompter: 0,
     },
     reducers: {
         profileRequested: (state, action) => {

@@ -20,7 +20,7 @@ import AppUploadProgress from "../components/AppUploadProgress";
 
 const propositionValidSchema = Yup.object().shape({
     images: Yup.array().min(1, 'Vous devez choisir au moins une image'),
-    desciptionList: Yup.array(),
+    descriptionList: Yup.array(),
     designation:Yup.string()
 })
 
@@ -45,7 +45,7 @@ function NewPropositionScreen({navigation, route}) {
             isOk: proposition.isOk
         }
 
-        const optionsList = proposition.desciptionList
+        const optionsList = proposition.descriptionList
         optionsList.forEach(proposition => {
             formData[proposition.label] = proposition.value
         })
@@ -105,7 +105,7 @@ function NewPropositionScreen({navigation, route}) {
             <View style={{margin: 10}}>
            <AppForm validationSchema={propositionValidSchema} initialValues={{
                designation: selected.designation,
-               desciptionList: selected.description || [],
+               descriptionList: selected.description || [],
                images: selected.images || [],
                type: selected.type || '',
                idReference: String(selected.idReference) || '',
@@ -114,11 +114,11 @@ function NewPropositionScreen({navigation, route}) {
            }} onSubmit={handleSaveProposition}>
                <FormImageListPicker name='images'/>
                <AppFormField name='designation' title='Nom de votre produit'/>
-               <AppFormOption name='desciptionList'/>
+               <AppFormOption name='descriptionList' />
                {userRoleAdmin() && mode==='edit' && <AppFormSwitch name='isOk' title='is Ok?'/>}
                {userRoleAdmin() && mode==='edit' && <AppFormField name='idReference' title='Id de la reference'/>}
                {userRoleAdmin() && mode==='edit' && <AppFormField name='type' title='Type de la proposition'/>}
-               <AppSubmitButton title='Envoyez votre proposition'/>
+               <AppSubmitButton title='Proposer'/>
            </AppForm>
 
             </View>

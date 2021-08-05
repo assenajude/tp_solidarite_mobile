@@ -9,24 +9,14 @@ import AppButton from "../AppButton";
 
 function ListFooter({otherStyle, onPress}) {
     return (
+        <AppButton onPress={onPress} width={60} height={60}  iconColor={color.blanc} iconSize={30} style={[styles.buttonStyle, otherStyle]} iconName='pluscircleo' />
 
-        <TouchableWithoutFeedback onPress={onPress}>
-            <View>
-                <View style={otherStyle}>
-                    <AppButton iconColor={color.blanc} iconSize={30} style={styles.buttonStyle} iconName='pluscircleo' />
-                </View>
-            </View>
-        </TouchableWithoutFeedback>
     );
 }
 
 const styles  = StyleSheet.create({
     buttonStyle: {
-        width: 50,
-        height: 20,
-        borderRadius: 100,
-        padding: 25,
-        backgroundColor: color.rougeBordeau
+        borderRadius:30,
     },
 })
 

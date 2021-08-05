@@ -4,7 +4,6 @@ import AppText from "../AppText";
 import AppButton from "../AppButton";
 import colors from "../../utilities/colors";
 import { MaterialIcons,Entypo} from "@expo/vector-icons";
-import ItemIconButton from "../list/ItemIconButton";
 import ContratWatch from "./ContratWatch";
 import ListItemHeader from "../list/ListItemHeader";
 import FactureItemLabel from "../list/FactureItemLabel";
@@ -12,6 +11,8 @@ import StatusPicker from "./StatusPicker";
 import dayjs from "dayjs";
 import AppLabelWithValue from "../AppLabelWithValue";
 import AppModePayement from "../AppModePayement";
+import AppIconButton from "../AppIconButton";
+import AppSmallButton from "../AppSmallButton";
 
 function UserServiceItem({showDetail, dateFourniture,payement,serviceDescrip,
                             statusContratValue,accordStyle,iconContainerStyle,
@@ -25,12 +26,7 @@ function UserServiceItem({showDetail, dateFourniture,payement,serviceDescrip,
 
 }) {
     return (
-            <View style={{
-                backgroundColor: colors.blanc, marginTop: 20, paddingBottom: 5,
-                borderBottomWidth: 0.2,
-                padding: 10,
-                width: '100%'
-            }}>
+            <View style={styles.serviceContainer}>
                     <AppModePayement modePayement={payement}/>
                 <View style={{
                     flexDirection: 'row',
@@ -79,7 +75,17 @@ function UserServiceItem({showDetail, dateFourniture,payement,serviceDescrip,
 
                         {!isDemande && <FactureItemLabel itemLabel='Contrat:' labelValue={statusContratValue}
                                                          labelStyle={{fontSize: 15, fontWeight: 'bold'}} labelValueStyle={contratValueStyle}/>}
-
+                    <AppIconButton
+                        onPress={getDetails}
+                        buttonContainer={{
+                            backgroundColor: colors.leger,
+                            width: 60,
+                            height: 60,
+                            borderRadius: 30,
+                            marginLeft: 20
+                        }}
+                        iconColor={colors.dark}
+                        iconName={showDetail ?'caretup':'caretdown'}/>
             </View>
               {endFacture &&  <View style={[{
                     position: 'absolute',
@@ -102,7 +108,11 @@ function UserServiceItem({showDetail, dateFourniture,payement,serviceDescrip,
                                 <Entypo name='reply' size={24}/>
                             </View>
                         </TouchableOpacity>}
-                        <ItemIconButton onPress={deleteItem} otherStyle={{marginTop: 10}} iconName='delete' iconSize={24} color='red'/>
+                        <AppIconButton
+                            onPress={deleteItem}
+                            buttonContainer={styles.icon}
+                            iconColor={colors.rougeBordeau}
+                            iconName='delete'/>
                     </View>
 
                 </View>}
@@ -114,19 +124,25 @@ function UserServiceItem({showDetail, dateFourniture,payement,serviceDescrip,
                         <AppLabelWithValue label='Demandé le: ' labelValue={dayjs(dateDemande).format('DD/MM/YYYY HH:mm:ss')}/>
                         <AppLabelWithValue label={dateFournitureFinal?'Fourni le: ':'Sera fourni le: '}
                                            labelValue={dateFournitureFinal?dayjs(dateFournitureFinal).format('DD/MM/YYYY HH:mm:ss'):dayjs(dateFourniture).format('DD/MM/YYYY HH:mm:ss')}/>
-
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-around',
+                                alignItems: 'center'
+                            }}>
+                                <AppSmallButton
+                                    onPress={goToItemDetails}
+                                    title='Details'
+                                    iconName='plus'/>
+                            {!isDemande &&
+                                <AppSmallButton
+                                    iconName='back'
+                                    width={150}
+                                    onPress={getLink}
+                                    title='Voir la facture'/>
+                            }
+                        </View>
                     </View>}
-
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
-                        marginTop: 20,
-                        marginBottom: 15
-                    }}>
-                        <AppButton iconName={showDetail ?'caretup':'caretdown'} iconColor={colors.blanc} style={{width: 'auto'}} textStyle={{marginLeft: 5}} title={showDetail ?'Fermer':'Deplier'} onPress={getDetails}/>
-                        <AppButton iconName='plus' iconColor={colors.blanc} style={{width: 'auto', marginLeft: 20 }} textStyle={{marginLeft: 5}} title='Details' onPress={goToItemDetails}/>
-                        {!isDemande &&  <AppButton style={{marginLeft: 20}} title='Voir la facture' onPress={getLink}/>}
-                    </View>
                 </View>
 
     {!isDemande && <View style={{position: 'absolute', top: -30, right:-30}}>
@@ -137,10 +153,19 @@ function UserServiceItem({showDetail, dateFourniture,payement,serviceDescrip,
                 top: 20,
                 right: 10
             }}>
-                {accordValue && accordValue.toLowerCase() === 'accepté' && <ItemIconButton iconSize={40} iconName='like1'
-                                                                                                       onPress={createOrderContrat} color='green'/>}
-                {accordValue && accordValue.toLowerCase() === 'refusé' && <ItemIconButton iconName='dislike1'
-                                                                                                      iconSize={40} color='red' />}
+                {accordValue && accordValue.toLowerCase() === 'accepté' &&
+                    <AppIconButton
+                        iconName='like1'
+                        iconSize={40}
+                        onPress={createOrderContrat}
+                        iconColor={colors.vert}
+                        buttonContainer={styles.accordIcon}/>
+                }
+                {accordValue && accordValue.toLowerCase() === 'refusé' &&
+                    <AppIconButton
+                        buttonContainer={styles.accordIcon}
+                        iconName='dislike1' iconSize={40} iconColor={colors.rougeBordeau}/>
+                }
             </View>}
             </View>
     );
@@ -157,6 +182,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height:30,
         margin: 10
+    },
+    icon: {
+        backgroundColor: colors.lightGrey,
+        height: 40,
+        width: 40,
+        borderRadius: 20
+    },
+    accordIcon: {
+        backgroundColor: colors.lightGrey,
+        height: 60,
+        width: 60,
+        borderRadius: 30
+    },
+    serviceContainer:{
+        backgroundColor: colors.blanc,
+        marginTop: 20,
+        paddingBottom: 5,
+        borderBottomWidth: 0.2,
+        padding: 10,
+        width: '100%'
     }
 })
 

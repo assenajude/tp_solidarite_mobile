@@ -5,6 +5,7 @@ import AppText from "../AppText";
 import AppButton from "../AppButton";
 import AppLabelWithValue from "../AppLabelWithValue";
 import useAuth from "../../hooks/useAuth";
+import AppSmallButton from "../AppSmallButton";
 
 function PropositionItem({isPropositionImage, propositionImage,label,
                              descriptionOptions, propositionNotReady, editProposition, getPropositionOrder}) {
@@ -28,14 +29,28 @@ function PropositionItem({isPropositionImage, propositionImage,label,
                     <AppText style={{fontWeight: 'bold', alignSelf: 'flex-start'}}>Description</AppText>
                        {descriptionOptions.map((item) => <AppLabelWithValue key={item.label} label={item.label} labelValue={item.value}/>)}
                    </View>
-                {!propositionNotReady && <AppButton style={{alignSelf: 'flex-end', padding: 5}} title='commander' onPress={getPropositionOrder}/>}
+                {!propositionNotReady &&
+                <AppSmallButton
+                    width={120}
+                    title='commander'
+                    onPress={getPropositionOrder}/>}
             </View>
             {propositionNotReady && <View style={styles.notReady}>
             </View>}
 
             {propositionNotReady && <View style={styles.notReadyEdit}>
                 <AppText style={{color: colors.rougeBordeau, fontWeight: "bold"}}>En cours de traitement...</AppText>
-                {userRoleAdmin() && <AppButton title='Editer' onPress={editProposition}/>}
+                {userRoleAdmin() &&
+                    <View style={{
+                        alignSelf: 'flex-end',
+                        marginRight: -70,
+
+                    }}>
+                        <AppSmallButton
+                            iconName='edit' title='Editer'
+                            onPress={editProposition}/>
+                    </View>
+                }
             </View>}
 
         </TouchableOpacity>

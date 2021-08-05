@@ -1,5 +1,5 @@
-import React, { useEffect, useState} from 'react';
-import {View,StyleSheet, ScrollView, TouchableOpacity, Alert, Modal} from "react-native";
+import React, { useState} from 'react';
+import {View,StyleSheet, ScrollView, TouchableOpacity,Modal} from "react-native";
 import {useSelector, useDispatch} from "react-redux";
 
 
@@ -94,7 +94,7 @@ function OrderPayementScreen({navigation}) {
                     <AntDesign name="infocirlceo" size={20} color={colors.bleuFbi} />
                     <AppText>Avant de faire une commande à credit, </AppText>
                 </View>
-                <View style={{flexDirection: 'row'}}>
+                <View style={{flexDirection: 'row', alignItems: 'center',width:'90%', paddingHorizontal: 20}}>
                     <View>
                         <AppText>assurez-vous de respecter les</AppText>
                     </View>
@@ -141,7 +141,7 @@ function OrderPayementScreen({navigation}) {
                                     alert('Désolé, vous ne pouvez pas choisir ce mode de payement pour cette commande.')
                                 } else {
                                     if(item.mode.toLowerCase() === 'credit' && !permitCredit()) {
-                                        alert('Impossible de choisir ce mode, un ou plusieurs articles de votre commande ne peuvent pas être vendus à credit')
+                                        alert('Impossible de choisir ce mode, un ou plusieurs articles de votre commande ne peuvent être vendus à credit')
                                     } else {
                                       dispatch(getPayementActive(item.id))
                                     }
@@ -166,17 +166,18 @@ function OrderPayementScreen({navigation}) {
                     </View>}
                     <View style={{justifyContent: 'flex-start'}}>
                     {payementPlans.map((plan, index) =>
-                        <PayementListItem disablePlan={isPlanDisabled(plan)}
-                                          libelle={plan.libelle} description={plan.descripPlan} key={index}
-                                          checked={plan.checked} selectItem={() => {
-                                              if(isPlanDisabled(plan)) {
-                                                  return alert('Vous ne pouvez pas choisir ce plan pour cette commande, veuillez choisir un autre plan SVP')
-                                              }
-                                            dispatch(getSelectedPlan(plan))
-                                          }} planDelai={plan.nombreMensualite>0?plan.nombreMensualite+' m':'3 j'}
-                                          showDetail={plan.showPlanDetail} getDetails={() => dispatch(getPlanDetail(plan.id))}
-                                          goToPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: plan})}
-                                          goToDisabledPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: plan})}/>)}
+                        <PayementListItem
+                            showMoreButton={false} disablePlan={isPlanDisabled(plan)}
+                            libelle={plan.libelle} description={plan.descripPlan} key={index}
+                            checked={plan.checked} selectItem={() => {
+                                if(isPlanDisabled(plan)) {
+                                    return alert('Vous ne pouvez pas choisir ce plan pour cette commande, veuillez choisir un autre plan SVP')
+                                }
+                                dispatch(getSelectedPlan(plan))
+                            }} planDelai={plan.nombreMensualite>0?plan.nombreMensualite+' m':'3 j'}
+                            showDetail={plan.showPlanDetail} getDetails={() => dispatch(getPlanDetail(plan.id))}
+                            goToPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: plan})}
+                            goToDisabledPlanDetail={() => navigation.navigate('AccueilNavigator', {screen: 'PlanDetailScreen', params: plan})}/>)}
                     </View>
 
                 </View>
@@ -233,7 +234,7 @@ function OrderPayementScreen({navigation}) {
                 </View>
 
                 {selectedOption.length>0 && <View style={{alignItems: 'center', marginTop: 5}}>
-                  <AppButton style={{padding: 5, paddingLeft: 20,paddingRight: 20}} title='continuer' onPress={handleModalOptionNext}/>
+                  <AppButton  width={200} style={{paddingHorizontal: 20}} title='continuer' onPress={handleModalOptionNext}/>
                 </View>}
                 </View>
 
@@ -274,8 +275,8 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     buttonStyle: {
-        width: '50%',
-        height: 40,
+        width: '70%',
+        height: 50,
         alignSelf: 'center',
         marginTop: 40
     },
@@ -284,9 +285,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         zIndex: 10,
         width: '100%',
-        height: '40%',
-        top: '30%',
-        bottom: 50,
+        height: '55%',
+        top: '20%',
     },
     mainContainer: {
         flex: 1,
